@@ -1,0 +1,709 @@
+/* primary color: #26619C, secondary color: #318CE7 */
+
+@font-face {
+    font-family: Isidora-Medium;
+    src: url("./fonts/Isidora-Medium.otf") format("opentype");
+}  
+
+@font-face {
+    font-family: IsidoraSans-Medium;
+    src: url("./fonts/IsidoraSans-Medium.otf") format("opentype");
+}  
+
+@font-face {
+    font-family: Isidora-Bold;
+    src: url("./fonts/Isidora-Bold.otf") format("opentype");
+}  
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+    font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
+}
+
+/* /!\ Problème avec les accents pour Isidora-Bold */
+.bold-font {
+    font-family: Isidora-Bold, Isidora-Medium, IsidoraSans-Medium, sans-serif;
+}
+
+.bg-white {
+    background-color: white;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+a {
+    text-decoration: none;
+    cursor: pointer;
+    color: inherit;
+    outline: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.page-title {
+    color: #26619C;
+    justify-content: center;
+    display: flex;
+    margin-bottom: 20px;
+}
+
+/* AGENDA */
+
+.agenda-wrapper {
+    min-width: 790px;
+    min-height: 990px;
+    color: #26619C;
+    display: flex;
+    flex-direction: column;
+}
+
+.agenda-header {
+    margin-top: 20px;
+    display: flex;
+}
+
+.flash-message {
+    height: 45px;
+    display: flex;
+    color: #26619C;
+    align-items: center;
+    justify-content: center;
+}
+
+.flash-message.success{
+    background-color: lightgreen;
+}
+
+.flash-message.error{
+    background-color: red;
+    color: white;
+}
+
+.flash-message.warning{
+    background-color: orange;
+}
+
+.week-selectors {
+    display: flex;
+    justify-content: space-between;
+    color: #318CE7;
+    margin-bottom: 10px;
+}
+
+.next-week {
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 15px;
+}
+
+.previous-week {
+    cursor: pointer;
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.agenda-name {
+    color: #318CE7;
+}
+
+.agenda-header-section.hour-column {
+    max-width: 70px;
+    padding-right: 0;
+    padding-left: 0;
+    border-left: none;
+}
+
+.agenda-content-column.hour-column {
+    border-left: none;
+    max-width: 70px;
+}
+
+.schedule-cell {
+    border-bottom: 1px solid #26619C;
+    display: flex;
+    flex-grow: 1;
+    height: 75px;
+    justify-content: center;
+    align-items: center;
+}
+
+.schedule-cell-content {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #318CE7;
+}
+
+.schedule-cell-content.empty {
+    color: white;
+}
+
+.schedule-cell .schedule-cell-content.empty:hover {
+    border: 2px solid #318CE7;
+    color: #318CE7;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    margin: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.schedule-cell.unavailable {
+    background-color: lightgrey;
+}
+
+.hour-cell {
+    border-bottom: 1px solid #26619C;
+    justify-content: flex-end;
+    padding: 7px 0;
+    display: flex;
+    flex-grow: 1;
+}
+
+.agenda-header-section {
+    border: 1px solid #26619C;
+    border-top: none;
+    display: flex;
+    flex-grow: 1;
+    height: 35px;
+    padding: 3px 3px 3px 5px;
+    align-items: center;
+    font-weight: bold;
+    width: 100px;
+}
+
+.agenda-content-wrapper {
+    display: flex;
+    flex-grow: 1;
+}
+
+.agenda-content-column {
+    border: 1px solid #26619C;
+    border-top: none;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100px;
+}
+
+/* NAVBAR */
+.user-dropdown {
+    cursor: pointer;
+}
+
+.navbar-wrapper {
+    background: linear-gradient(90deg, #318CE7, #26619C);;
+    position: relative;
+    width: 100%;
+    padding: 15px 0px;
+    display: flex;
+    align-items: center;
+}
+.navbar-wrapper .menu-section {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    margin-top: 6px;
+}
+
+.navbar-wrapper .menu-section.no-login {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.menu-item.signup { 
+    margin-right: 15px;
+    background-color: white;
+    color: black;
+    border-radius: 20px;
+    padding: 12px 24px;
+    font-size: 16px;
+}
+
+/* .menu-section .menu-item:hover {
+    color: white;
+} */
+
+.menu-dropdown-list {
+    position: absolute;
+    margin: 15px;
+    z-index: 3;
+    border: 1px solid black;
+    right: 0;
+    top: 40px;
+    background-color: white;
+}
+
+.menu-dropdown-list.hidden {
+    display: none;
+}
+
+.menu-dropdown-list-item {
+    padding: 13px 15px;
+    cursor: pointer;
+    color: #26619C;
+}
+.menu-dropdown-list-item:hover {
+   background-color: aliceblue;
+}
+
+.sign-up-section {
+    text-align: center;
+    cursor: pointer;
+}
+
+/* LANDING */
+
+.landing-page-title {
+    color: white;
+    font-weight: bolder;
+    justify-content: center;
+    text-align: center;
+    display: flex;
+    width: 70px;
+    margin-top: 15px;
+    font-size: 2.3em;
+    font-family: Isidora-Bold;
+}
+
+.signup-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.landing-signup-button {
+    border-radius: 20px;
+    margin-top: 10px;
+    padding: 16px 30px;
+    color: #318CE7;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    background-color: white;
+}
+
+.landing-inscription-card.bg-white {
+    background: white;
+    color: black;
+}
+
+.landing-inscription-card-button.blue-bg {
+    background: linear-gradient(90deg, #318CE7, #26619C);
+    font-weight: bold;
+    color: white;
+}
+
+.landing-advantages-section {
+    background: linear-gradient(90deg, #318CE7, #26619C);
+    padding-bottom: 40px;
+}
+
+.landing-first-page-wrapper {
+    background: #26619C;
+    background:  linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+    color: white;
+    height: 95vh;
+}
+
+.landing-gradiant-wrapper {
+    height: 80vh;
+    background: #26619C;
+    font-weight: bold;
+    font-size: 3.6em;
+    text-align: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #318CE7 20%, white 100%);
+    display: flex;
+    align-items: center;
+}
+
+.landing-gradiant-wrapper-reversed {
+    height: 60vh;
+    background: #26619C;
+    font-weight: bold;
+    font-size: 3.6em;
+    padding: 0 10%;
+    background: linear-gradient(180deg, white  0%, #318CE7 100%);
+    display: flex;
+    text-align: center;
+    align-items: end;
+}
+
+.landing-intermediary-gradiant-reversed {
+    background: linear-gradient(to bottom right, #318CE7 50%, #26619C 100%);
+    height: 30vh;
+}
+
+.landing-text-section {
+    padding: 2em 10% 2em 10%;
+    font-size: 3.6em;
+    overflow: auto;
+    background: linear-gradient(90deg, #318CE7, #26619C);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+
+.landing-intermediary-connection-button {
+    background-color: white;
+    border: 1px solid lightgrey;
+    padding: 10px 18px;
+    color: black;
+    border-radius: 18px;
+    cursor: pointer;
+
+}
+
+.landing-inscription-card {
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+    width: 45%;
+    height: 30vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 2em 0em 2em;
+    margin: 0 auto 15px auto;
+    border-radius: 12px;
+    color: white;
+}
+
+.landing-inscription-card-button {
+    padding: 12px 32px;
+    color: #26619C;
+    background-color: white;
+    border-radius: 24px;
+    font-weight: bold;
+}
+
+.landing-inscription-card-text {
+    font-size: 1.8em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.landing-gradient-text {
+    font-size: 3.5em;
+}
+
+.landing-info-card-text {
+    font-weight: bold;
+    text-align: center;
+    padding: 15px 0;
+    flex-grow: 1;
+}
+
+.landing-info-card-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 4em;
+}
+
+.landing-info-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin: 20px 20px 20px 20px;
+    min-width: 160px;
+    width: 220px;
+    height: 400px;
+}
+
+.landing-info-card-picto {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.landing-info-card-picto-img {
+    width: 80%;
+}
+
+.landing-intermediary-logo {
+    height: 60px;
+    margin-left: 20px;
+}
+
+.landing-inline-logo {
+    height: 100%;
+}
+
+.landing-intermediary-connection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10vh;
+}
+
+.landing-intermediary-gradiant-wrapper {
+    height: 25vh;
+    background: #26619C;
+    background: linear-gradient(to top right, #318CE7 50%, #26619C 100%);
+}
+
+.landing-wrapper.logo-wrapper {
+    margin-top: 80px;
+}
+
+.landing-logo-section {
+    display: flex;
+    justify-content: center;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.landing-first-page-wrapper .landing-logo-section {
+    padding-top: 28%;
+}
+
+.landing-section {
+    margin-bottom: 20px;
+    display: flex;
+}
+
+
+.landing-section-column {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    flex-direction: column;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.landing-section-column-title {
+    color: black;
+    font-weight: bolder;
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.landing-section-column-desc {
+    color: grey;
+    font-size: 18px;
+}
+
+
+/* INFOS */
+.infos-form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+    margin: 20px 0;
+}
+
+.infos-form .input-group {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;    
+}
+
+.button-group {
+    justify-content: flex-end;
+}
+
+.input-label {
+    width: 150px;   
+}
+
+.centered-text {
+    text-align: center;
+}
+
+
+/* MODAL */
+
+.modal {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    background-color: gray;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.close-btn {
+    cursor: pointer;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    padding: 10px;
+    font-size: 22px;
+    color: red;
+}
+
+.fa {
+    font-family: 'FontAwesome';
+}
+
+.input-group.radio-group {
+    justify-content: space-between ;
+}
+
+.radio-label {
+    text-align: center;
+    flex-grow: 1;
+    cursor: pointer;
+}
+
+.radio-choices {
+    flex-grow: 1;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-around;
+}
+
+/* BUTTONS */
+.cl-radio {
+    cursor: pointer;
+}
+
+.cl-button {
+    margin-top: 10px;
+    color: white;
+    background-color: #26619C;
+    border: none;
+    padding: 10px 15px;
+    font-weight: bold;
+    border-radius: 12px;
+    outline: none;
+    cursor: pointer;
+}
+
+
+/* LOGO */
+.navbar-logo-section {
+    display: flex;
+    width: 40%;
+    margin-left: 20px;
+}
+
+.navbar-logo-section .logo-wrapper {
+    width: 60%;
+}
+
+.first-logo-span {
+    color: #318ce7;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.second-logo-span {
+    color: #26619C;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.white-logo {
+    color:white !important;
+}
+
+/* FOOTER */
+
+.footer {
+    background: #26619C;
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+    display: flex;
+    height: 180px;
+    color: white;
+    padding-left: 2em;
+    padding-bottom: 2em;
+    font-size: 20px;
+}
+
+.contact-mail {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.footer-wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.footer-white-logo {
+    display: flex;
+    align-items: baseline;
+}
+
+.footer-white-logo-image {
+    max-width: 200px;
+    margin-right: 15px;
+}
+
+.welcome-page-title {
+    font-size: 42px;
+}
+
+.welcome-page-content {
+    display: flex;
+    justify-content: center;
+    margin: 200px 0;
+    font-size: 28px;
+    text-align: center;
+}
+
+.landing-page-mobile-signup-button {
+    display: none;
+}
+
+/* RESPONSIVE -- TABLET & SMARTPHONE */
+
+@media only screen and (max-width : 768px){
+    .landing-info-card-section {
+        flex-direction: column;
+    }
+
+    .landing-page-mobile-signup-button {
+        padding: 12px 32px;
+        color: #26619C;
+        background-color: white;
+        border-radius: 24px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+    }
+
+    .landing-inscription-card {
+        padding: 2em;
+    }
+}

@@ -1,0 +1,10 @@
+{application,clab,
+             [{applications,[kernel,stdlib,elixir,logger,crypto,eex,plug,
+                             cowboy,plug_cowboy,poison]},
+              {description,"clab"},
+              {modules,['Elixir.Agenda','Elixir.Clab',
+                        'Elixir.Clab.Application','Elixir.ClabRouter',
+                        'Elixir.DataSaver','Elixir.User','Elixir.Utils']},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.Clab.Application',[]}}]}.

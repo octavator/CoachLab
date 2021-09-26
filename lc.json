@@ -1,0 +1,19 @@
+{
+    "serviceName": "clab-app",
+    "containers": {
+        "clab-app-container": {
+            "image": ":clab-app.latest.5",
+            "ports": {
+                "4001": "HTTP"
+            }
+        }
+    },
+    "publicEndpoint": {
+        "containerName": "clab-app-container",
+        "containerPort": 4001,
+        "healthCheck": {
+            "timeoutSeconds": 60,
+            "intervalSeconds": 300
+        }
+    }
+}
