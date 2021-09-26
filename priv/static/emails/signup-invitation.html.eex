@@ -1,0 +1,15 @@
+<html>
+<body>
+
+    Bonjour, <br/>
+    
+    Votre coach  <%= "#{coach.firstname} #{coach.lastname}" %> est à présent disponible sur CoachLab, le premier 
+    centre de coaching digital, et il souhaite vous y retrouver ! <br/><br/>
+    Pour le rejoindre, c'est très rapide et très simple, cliquez sur le lien suivant et laissez-vous guider : <br/><br/>
+    <%= '<a href="https://www.coachlab.fr/inscription?role=default&coach_id=#{coach.id}">https://www.coachlab.fr/inscription?role=default&coach_id=#{coach.id}</a>' %><br/><br/>
+    Vous aurez accès à la plateforme et à ses avantages : l'agenda interactif de votre coach avec ses disponibilités, et la
+     possibilité d'utiliser un module vidéo simple pour des coachings instantanés depuis chez vous. <br/><br/>
+    Je reste à votre disposition pour toute question ou remarque, n'hésitez pas à me contacter par e-mail ou par téléphone. <br/><br/>
+    A bientôt sur CoachLab,<br/><br/><br/>
+    Théophile Fondacci
+</body>

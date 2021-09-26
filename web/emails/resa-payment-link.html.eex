@@ -1,0 +1,13 @@
+<html>
+<body>
+
+    Bonjour <%= "#{user.firstname}," %><br/><br/>
+
+    Vous avez une séance avec <%= "#{coach.firstname} #{coach.lastname}" %> en attente de paiement ! <br/>
+    Connectez-vous puis suivez ce lien pour régler la séance: <%= payment_link %>
+
+    <br/> <br/>
+
+    Merci pour votre confiance et à bientôt sur CoachLab !
+
+</body>

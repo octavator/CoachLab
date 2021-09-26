@@ -1,0 +1,19 @@
+<html>
+<body>
+
+    Prénom: <%= "#{user.firstname} " %><br/>
+    Nom: <%= "#{user.lastname}" %><br/>
+    Téléphone: <%= "#{user.phone}" %><br/>
+    Email: <%= "#{user.email}" %><br/>
+    <%= if user.role == "coach" do %>
+        Spécialités : <%= Enum.join(user.specialties, " | ") %><br/>
+        Description : <%= user[:desc] %><br/>
+    <% else %>
+        <%= if user[:coach_desc] do %>
+            Critères de recherche Coach : <%= "#{user[:coach_desc]}" %><br/>
+        <% end %>
+        <%= if coach do %>
+            Coach selectionné :  <%= "#{coach[:firstname]} #{coach[:lastname]}" %><br/>
+        <% end %>
+    <% end %>
+</body>
