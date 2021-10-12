@@ -30,7 +30,16 @@ defmodule ClabRouter do
   
   get "/" do
     data = Utils.get_html_template("landing")
-    # data = File.read!("./web/landing.html")
+    send_resp(conn, 200, data)
+  end
+
+  get "/agenda" do
+    data = Utils.get_html_template("agenda")
+    send_resp(conn, 200, data)
+  end
+
+  get "/infos" do
+    data = Utils.get_html_template("infos")
     send_resp(conn, 200, data)
   end
 

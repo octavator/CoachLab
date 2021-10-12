@@ -9,15 +9,16 @@ defmodule Schedule do
         []
     end
 
-    """
-        data = %{
-            price: 100,
-            currency: euro,
-            
-        }
-    """
-    def reserve_new_slot(coach_id, data) do
-        
+    def reserve_new_slot(coach_id, reservation) do
+        true
+    end
+
+    def confirm_slot(coach_id, data) do
+        true
+    end
+
+    def change_availability() do
+        true
     end
 
     def check_availability() do

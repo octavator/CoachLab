@@ -2,7 +2,7 @@
 
 const e = React.createElement;
 
-console.log("static landing js")
+console.log("web landing js")
 
 class LikeButton extends React.Component {
   constructor(props) {

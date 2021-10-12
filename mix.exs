@@ -28,3 +28,14 @@ defmodule Clab.MixProject do
     ]
   end
 end
+
+defmodule Mix.Tasks.Webpack.Compile do
+  use Mix.Task
+  def run(_) do
+    files = IO.inspect File.ls!("web/")
+    Enum.each(files, fn file ->
+      IO.inspect File.copy("web/" <> file, "priv/static/" <> file)
+      IO.puts "Copied #{file} to priv/static"    
+    end) 
+  end
+end

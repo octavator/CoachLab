@@ -1,4 +1,145 @@
+/* primary color: #26619C, secondary color: #318CE7 */
+
+
+html {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+a {
+    text-decoration: none;
+    cursor: pointer;
+    color: inherit;
+}
+
 .landing-title {
-    color: red;
-    text-align: center;
+    color: #26619C;
+    justify-content: center;
+    display: flex;
+}
+
+.footer {
+    color: #26619C;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* AGENDA */
+
+.agenda-wrapper {
+    margin-top: 40px;
+    min-width: 790px;
+    min-height: 990px;
+    color: #26619C;
+    display: flex;
+    flex-direction: column;
+}
+
+.agenda-header {
+    display: flex;
+}
+
+.agenda-header-section.hour-column {
+    max-width: 70px;
+    padding-right: 0;
+    padding-left: 0;
+    border-left: none;
+}
+
+.agenda-content-column.hour-column {
+    border-left: none;
+    max-width: 70px;
+}
+
+.schedule-cell {
+    border-bottom: 1px solid #26619C;
+    padding: 7px 5px 7px 0;
+    display: flex;
+    flex-grow: 1;
+}
+
+.hour-cell {
+    border-bottom: 1px solid #26619C;
+    justify-content: end;
+    padding: 7px 5px 7px 0;
+    display: flex;
+    flex-grow: 1;
+    align-items: flex-start;
+}
+
+.agenda-header-section {
+    border: 1px solid #26619C;
+    border-top: none;
+    display: flex;
+    flex-grow: 1;
+    height: 35px;
+    padding: 3px 3px 3px 5px;
+    align-items: center;
+    font-weight: bold;
+    flex-basis: 50%;
+}
+
+.agenda-content-wrapper {
+    display: flex;
+    flex-grow: 1;
+}
+
+.agenda-content-column {
+    border: 1px solid #26619C;
+    border-top: none;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* NAVBAR */
+
+.navbar-wrapper {
+    padding: 15px 10px;
+    border-bottom: 1px solid;
+    border-color: #318ce7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-wrapper .menu-section {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+    font-size: 18px;
+    font-weight: bold;
+    color: #26619C;
+    margin-top: 6px;
+}
+
+.menu-section .menu-item:hover {
+    color: #318ce7;
+}
+
+
+/* FOOTER */
+
+/* LOGO */
+.logo-wrapper {
+    margin-right: 130px;
+}
+
+.first-logo-span {
+    color: #318ce7;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.second-logo-span {
+    color: #26619C;
+    font-size: 30px;
+    font-weight: bold;
 }
