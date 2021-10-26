@@ -43,6 +43,11 @@ defmodule ClabRouter do
     send_resp(conn, 200, data)
   end
 
+  get "/modal" do
+    data = Utils.get_html_template("modal-appointment")
+    send_resp(conn, 200, data)
+  end
+
   get "/hello" do
     send_resp(conn, 200, "world")
   end

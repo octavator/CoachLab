@@ -15,20 +15,13 @@ a {
     text-decoration: none;
     cursor: pointer;
     color: inherit;
+    outline: none;
 }
 
 .landing-title {
     color: #26619C;
     justify-content: center;
     display: flex;
-}
-
-.footer {
-    color: #26619C;
-    display: flex;
-    height: 40px;
-    justify-content: center;
-    align-items: center;
 }
 
 /* AGENDA */
@@ -60,18 +53,48 @@ a {
 
 .schedule-cell {
     border-bottom: 1px solid #26619C;
-    padding: 7px 5px 7px 0;
     display: flex;
     flex-grow: 1;
+    height: 75px;
+    justify-content: center;
+    align-items: center;
+}
+
+.schedule-cell-content {
+    width: 100%;
+    height: auto;
+    /* margin: 7px 5px 7px 5px;
+    border: 1px solid white; */
+    color: white;
+}
+
+.schedule-cell .schedule-cell-content.empty:hover {
+    border: 2px solid #318CE7;
+    color: #318CE7;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    margin: 10px;
+    font-size: 32px;
+    font-weight: bold;
+    border-radius: 10px;
+}
+
+.schedule-cell.unavailable {
+    background-color: lightgrey;
+}
+
+.infos-form {
+    margin: 20px 0;
 }
 
 .hour-cell {
     border-bottom: 1px solid #26619C;
-    justify-content: end;
-    padding: 7px 5px 7px 0;
+    justify-content: flex-end;
+    padding: 7px 0;
     display: flex;
     flex-grow: 1;
-    align-items: flex-start;
 }
 
 .agenda-header-section {
@@ -83,7 +106,8 @@ a {
     padding: 3px 3px 3px 5px;
     align-items: center;
     font-weight: bold;
-    flex-basis: 50%;
+    width: 100px;
+    /* flex-basis: 50%; */
 }
 
 .agenda-content-wrapper {
@@ -97,9 +121,13 @@ a {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    width: 100px;
 }
 
 /* NAVBAR */
+.user-dropdown {
+    cursor: pointer;
+}
 
 .navbar-wrapper {
     padding: 15px 10px;
@@ -124,8 +152,77 @@ a {
     color: #318ce7;
 }
 
+/* INFOS */
+.infos-form {
+    display: flex;
+    flex-direction: column;
+    margin-top: 40px;
+}
+
+.infos-form .input-group {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;    
+}
+
+.infos-form .button-group {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+    justify-content: flex-end;
+}
+
+.input-label {
+    width: 150px;   
+}
 
 /* FOOTER */
+
+.footer {
+    color: #26619C;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+    border-top: 1px solid #318ce7;
+    margin-top: 20px;
+    padding-top: 15px;
+    font-weight: bold;
+}
+
+/* MODAL */
+
+.modal {
+    width: 100%;
+    position: absolute;
+    height: 100%;
+    top: 0;
+    background-color: gray;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.appointment-modal-content {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+}
+
+/* BUTTONS */
+
+.cl-button {
+    margin-top: 10px;
+    color: white;
+    background-color: #26619C;
+    border: none;
+    padding: 10px 15px;
+    font-weight: bold;
+    border-radius: 12px;
+    outline: none;
+    cursor: pointer;
+}
 
 /* LOGO */
 .logo-wrapper {
