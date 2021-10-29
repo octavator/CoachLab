@@ -1,12 +1,13 @@
 class AgendaModal extends React.Component {
-  // constructor(props) {
-  //   super(props)
-  //   this.state = {
-  //       toggle: false
-  //   }
-  // }
+  constructor(props) {
+    super(props)
+    this.state = {
+        toggle: false
+    }
+  }
 
   render() {
+    console.log("toggle", (this.props.toggle))
     if (this.props.toggle) {
       return (
         <div className="modal" id="appointment-modal">
@@ -26,7 +27,7 @@ class AgendaModal extends React.Component {
                     <input type="text" className="infos-form-input email-input"/>
                 </div>
                 <div className="button-group">
-                    <button className="cl-button primary">Valider</button>
+                    <button onClick={() => { this.props.closeFunc() }} className="cl-button primary">Valider</button>
                 </div>
             </div>
           </div>

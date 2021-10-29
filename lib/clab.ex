@@ -24,7 +24,7 @@ defmodule ClabRouter do
   #@TODO: 2 problems:
   # - js files are accessible through url
   # - must copy our files from web/ to priv/static/ :( => webpack ?
-  plug Plug.Static, from: :clab, at: "/web"
+  plug Plug.Static, from: :clab, at: "/priv/static"
   plug :match
   plug :dispatch
   
