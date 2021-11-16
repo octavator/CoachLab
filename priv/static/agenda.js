@@ -6,8 +6,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-import AgendaModal from './modal-appointment.js';
-//const AgendaModal = require('./modal-appointment.js');
+import Modal from './modal.js';
 
 var Agenda = function (_React$Component) {
   _inherits(Agenda, _React$Component);
@@ -20,24 +19,119 @@ var Agenda = function (_React$Component) {
     _this.state = {
       show_schedule_modal: false,
       schedule: null,
+      form: {
+        duration: "30",
+        isVideo: true
+      },
       weekdays: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
-      hours: ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"]
+      hours: ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"]
     };
     return _this;
   }
 
   _createClass(Agenda, [{
+    key: "toggleModal",
+    value: function toggleModal() {
+      this.setState({ show_schedule_modal: false });
+    }
+  }, {
+    key: "sendForm",
+    value: function sendForm() {
+      console.log(this.state.form);
+      // http.post("/sign-up", this.state).then(res => {
+      // })
+    }
+  }, {
     key: "render",
     value: function render() {
       var _this2 = this;
 
       var cellClass = "schedule-cell-content ";
+      var scheduleForm = [
+      // <div key="firstname" className="input-group"><label className="input-label">Prénom</label> <input type="text" className="infos-form-input firstname-input"/></div>,
+      // <div key="lastname" className="input-group"><label className="input-label">Nom de famille</label> <input type="text" className="infos-form-input lastname-input"/></div>,
+      // <div key="email" className="input-group"><label className="input-label">Adresse email</label> <input type="text" className="infos-form-input email-input"/></div>,
+      React.createElement(
+        "div",
+        { key: "duration", className: "input-group select-input" },
+        React.createElement(
+          "label",
+          { className: "input-label" },
+          "Dur\xE9e"
+        ),
+        React.createElement(
+          "select",
+          { onChange: function onChange(e) {
+              console.log(e) && _this2.setState({ form: Object.assign({}, _this2.state.form, { duration: e.target.value }) });
+            }, name: "duration", className: "infos-form-select duration-select" },
+          React.createElement(
+            "option",
+            { value: "30" },
+            "30min"
+          ),
+          React.createElement(
+            "option",
+            { value: "45" },
+            "45min"
+          ),
+          React.createElement(
+            "option",
+            { value: "60" },
+            "1h"
+          )
+        )
+      ), React.createElement(
+        "div",
+        { key: "isVideo", className: "input-group radio-group" },
+        React.createElement(
+          "label",
+          { className: "input-label" },
+          "Visio-conf\xE9rence"
+        ),
+        React.createElement(
+          "div",
+          { className: "radio-choices" },
+          React.createElement(
+            "label",
+            { className: "radio-label", htmlFor: "isVideo" },
+            "Oui"
+          ),
+          React.createElement("input", { type: "radio", defaultChecked: true, value: "true", id: "isVideo", name: "isVideo", className: "cl-radio" }),
+          React.createElement(
+            "label",
+            { className: "radio-label", htmlFor: "isNotVideo" },
+            "Non"
+          ),
+          React.createElement("input", { id: "isNotVideo", value: "false", name: "isVideo", type: "radio", className: "cl-radio" })
+        )
+      ), React.createElement(
+        "div",
+        { key: "sendbtn", className: "input-group" },
+        React.createElement(
+          "div",
+          { className: "button-group" },
+          " ",
+          React.createElement(
+            "button",
+            { onClick: function onClick() {
+                _this2.sendForm() && _this2.toggleModal();
+              }, className: "cl-button primary" },
+            "Valider"
+          )
+        )
+      )];
       return React.createElement(
         "div",
         { className: "agenda-wrapper" },
-        React.createElement(AgendaModal, { toggle: this.state.show_schedule_modal, closeFunc: function closeFunc() {
-            _this2.setState({ show_schedule_modal: false });
-          } }),
+        React.createElement(
+          "h1",
+          { className: "page-title" },
+          "Agenda du coach John Doe"
+        ),
+        React.createElement(Modal, { toggle: this.state.show_schedule_modal, closeFunc: function closeFunc() {
+            _this2.toggleModal();
+          },
+          fields: scheduleForm, title: "Prendre un RDV", id: "appointment" }),
         React.createElement(
           "div",
           { className: "agenda-header" },
@@ -45,7 +139,7 @@ var Agenda = function (_React$Component) {
           this.state.weekdays.map(function (day) {
             return React.createElement(
               "div",
-              { className: "agenda-header-section" },
+              { key: day, className: "agenda-header-section" },
               day
             );
           })
@@ -59,7 +153,7 @@ var Agenda = function (_React$Component) {
             this.state.hours.map(function (hour) {
               return React.createElement(
                 "div",
-                { className: "hour-cell" },
+                { key: hour, className: "hour-cell" },
                 hour,
                 "h\xA0"
               );
@@ -68,11 +162,11 @@ var Agenda = function (_React$Component) {
           this.state.weekdays.map(function (day) {
             return React.createElement(
               "div",
-              { className: "agenda-content-column" },
+              { key: day, className: "agenda-content-column" },
               _this2.state.hours.map(function (hour) {
                 return React.createElement(
                   "div",
-                  { className: "schedule-cell" },
+                  { key: hour, className: "schedule-cell" },
                   React.createElement(
                     "div",
                     { onClick: function onClick() {

@@ -1,10 +1,9 @@
 {application,clab,
-             [{applications,[kernel,stdlib,elixir,logger,plug_cowboy]},
+             [{applications,[kernel,stdlib,elixir,logger,plug_cowboy,poison]},
               {description,"clab"},
               {modules,['Elixir.Clab','Elixir.Clab.Application',
-                        'Elixir.Clab.User','Elixir.ClabRouter',
-                        'Elixir.Reservation','Elixir.Schedule',
-                        'Elixir.Utils']},
+                        'Elixir.ClabRouter','Elixir.Reservation',
+                        'Elixir.Schedule','Elixir.User','Elixir.Utils']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.Clab.Application',[]}}]}.

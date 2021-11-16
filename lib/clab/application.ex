@@ -8,9 +8,12 @@ defmodule Clab.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
-      {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 4001]}
+      {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 4001]},
+      Schedule,
+      User
     ]
-
+    # Schedule.start_link
+    # User.start_link
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Clab.Supervisor]
