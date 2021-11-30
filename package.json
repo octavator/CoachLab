@@ -10,7 +10,7 @@
   "scripts": {
     "start": "iex.bat -S mix",
     "watch": "npx babel --watch web --presets react-app/prod --out-dir priv/static",
-    "build": " mix webpack.compile && npx babel web --presets react-app/prod --out-dir priv/static && mix compile"
+    "build": " mix webcopy && npx babel web --presets react-app/prod --out-dir priv/static && mix compile"
   },
   "repository": {
     "type": "git",

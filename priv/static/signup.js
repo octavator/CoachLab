@@ -69,7 +69,7 @@ var SignUp = function (_React$Component) {
             ),
             React.createElement("input", { onChange: function onChange(e) {
                 _this2.setState({ password: e.target.value });
-              }, value: this.state.password, type: "text" })
+              }, value: this.state.password, type: "password" })
           ),
           React.createElement(
             "div",

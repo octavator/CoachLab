@@ -9,14 +9,17 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 import Modal from './modal.js';
 import Navbar from './navbar.js';
 
-var Agenda = function (_React$Component) {
-  _inherits(Agenda, _React$Component);
+var CoachAgenda = function (_React$Component) {
+  _inherits(CoachAgenda, _React$Component);
 
-  function Agenda(props) {
-    _classCallCheck(this, Agenda);
+  function CoachAgenda(props) {
+    _classCallCheck(this, CoachAgenda);
 
-    var _this = _possibleConstructorReturn(this, (Agenda.__proto__ || Object.getPrototypeOf(Agenda)).call(this, props));
+    var _this = _possibleConstructorReturn(this, (CoachAgenda.__proto__ || Object.getPrototypeOf(CoachAgenda)).call(this, props));
 
+    var url = window.location.href;
+    var slugs = url.split("=");
+    var coach_id = atob(slugs[slugs.length - 1]);
     _this.state = {
       show_schedule_modal: false,
       schedule: {},
@@ -26,7 +29,8 @@ var Agenda = function (_React$Component) {
       form: {
         duration: "30",
         isVideo: true,
-        id: ""
+        id: "",
+        coach_id: coach_id
       },
       user: {
         firstname: "",
@@ -40,19 +44,17 @@ var Agenda = function (_React$Component) {
     return _this;
   }
 
-  _createClass(Agenda, [{
+  _createClass(CoachAgenda, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
       var _this2 = this;
 
-      http.get("/me").then(function (res) {
+      http.get('/api/coach/agenda?coach_id=' + btoa(this.state.form.coach_id.replace("=", ""))).then(function (res) {
+
         console.log(res.status);
         console.log(res.data);
-        http.get("/me/agenda").then(function (agendaData) {
-          console.log("agenda resp", agendaData.data);
-          var curWeek = _this2.getCurrentWeek(_this2.state.currentDay);
-          _this2.setState({ currentWeek: curWeek, user: res.data, schedule: agendaData.data });
-        });
+        var curWeek = _this2.getCurrentWeek(_this2.state.currentDay);
+        _this2.setState({ currentWeek: curWeek, user: res.data.user, schedule: res.data.agenda });
       });
     }
   }, {
@@ -274,15 +276,11 @@ var Agenda = function (_React$Component) {
                   var slot = _this5.state.schedule[slot_id];
                   return React.createElement(
                     'div',
-                    { key: hour, className: 'schedule-cell' },
-                    React.createElement(
-                      'div',
-                      { onClick: function onClick() {
-                          !slot && _this5.setState({ show_schedule_modal: true, form: Object.assign({}, _this5.state.form, { id: slot_id }) });
-                        },
-                        className: !slot && cellClass + ' empty' || cellClass },
-                      slot ? 'RDV de ' + slot.duration + 'min ' + (["true", true].includes(slot.isVideo) ? "avec" : "sans") + ' visio-conf\xE9rence' : "+"
-                    )
+                    { key: hour, className: "schedule-cell" + (slot && ' unavailable' || '') },
+                    React.createElement('div', { onClick: function onClick() {
+                        !slot && _this5.setState({ show_schedule_modal: true, form: Object.assign({}, _this5.state.form, { id: slot_id }) });
+                      },
+                      className: !slot && cellClass + ' empty' || cellClass + ' unavailable' })
                   );
                 })
               );
@@ -293,8 +291,8 @@ var Agenda = function (_React$Component) {
     }
   }]);
 
-  return Agenda;
+  return CoachAgenda;
 }(React.Component);
 
 var domContainer = document.querySelector('.agenda-wrapper');
-ReactDOM.render(React.createElement(Agenda, null), domContainer);
+ReactDOM.render(React.createElement(CoachAgenda, null), domContainer);

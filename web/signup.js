@@ -26,7 +26,7 @@ class SignUp extends React.Component {
             </div>
             <div className="input-group">
               <label className="input-label">Mot de passe</label>
-              <input onChange={(e) => { this.setState({password: e.target.value}) }} value={this.state.password} type="text"></input>
+              <input onChange={(e) => { this.setState({password: e.target.value}) }} value={this.state.password} type="password"></input>
             </div>
             <div className="input-group">
               <label className="input-label">Prénom</label>

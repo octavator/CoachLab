@@ -3,7 +3,6 @@ defmodule User do
     use GenServer
     @table :users
     @path 'data/users.ets'
-    @secret "Jazektkowxppzeâpzepo%32*$ezwxnza"
 
     def start_link(args \\ []) do
         GenServer.start(__MODULE__, args, name: __MODULE__)
@@ -20,7 +19,7 @@ defmodule User do
         Process.flag(:trap_exit, true)
         Task.start(fn ->
             :timer.sleep(1000)
-            User.create_user(%{email: "theodecagny@hotmail.fr", id: "1", firstname: "Theophile", lastname: "de Cagny", password: "toto", role: "coach"})
+            User.create_user(%{email: "theodecagny@hotmail.fr", firstname: "Theophile", lastname: "de Cagny", password: "toto", role: "coach"})
         end)
         {:ok, %{}}
     end
@@ -37,7 +36,9 @@ defmodule User do
     end
 
     def handle_call({:create_user, data}, _from, state) do
+        data = data |> put_in([:id], :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false))
         res = :ets.insert_new(@table, {data.email, data})
+        Agenda.create_agenda(data.email)
         {:reply, res, state}
     end
 

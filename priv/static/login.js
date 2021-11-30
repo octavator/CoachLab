@@ -27,6 +27,8 @@ var Login = function (_React$Component) {
       http.post("/sign-in", this.state).then(function (res) {
         console.log(res.status);
         console.log(res.data);
+        window.location.href = "/";
+        console.log("Connecté avec succès");
       });
     }
   }, {
@@ -34,76 +36,6 @@ var Login = function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      var scheduleForm = [React.createElement(
-        "div",
-        { key: "firstname", className: "input-group" },
-        React.createElement(
-          "label",
-          { className: "input-label" },
-          "Pr\xE9nom"
-        ),
-        " ",
-        React.createElement("input", { type: "text", className: "infos-form-input firstname-input" })
-      ), React.createElement(
-        "div",
-        { key: "lastname", className: "input-group" },
-        React.createElement(
-          "label",
-          { className: "input-label" },
-          "Nom de famille"
-        ),
-        " ",
-        React.createElement("input", { type: "text", className: "infos-form-input lastname-input" })
-      ), React.createElement(
-        "div",
-        { key: "email", className: "input-group" },
-        React.createElement(
-          "label",
-          { className: "input-label" },
-          "Adresse email"
-        ),
-        " ",
-        React.createElement("input", { type: "text", className: "infos-form-input email-input" })
-      ), React.createElement(
-        "div",
-        { key: "isVideo", className: "input-group radio-group" },
-        React.createElement(
-          "label",
-          { className: "input-label" },
-          "Visio-conf\xE9rence"
-        ),
-        React.createElement(
-          "div",
-          { className: "radio-choices" },
-          React.createElement(
-            "label",
-            { className: "radio-label", "for": "isVideo" },
-            "Oui"
-          ),
-          React.createElement("input", { type: "radio", defaultChecked: true, value: "true", id: "isVideo", name: "isVideo", className: "cl-radio" }),
-          React.createElement(
-            "label",
-            { className: "radio-label", "for": "isNotVideo" },
-            "Non"
-          ),
-          React.createElement("input", { id: "isNotVideo", value: "false", name: "isVideo", type: "radio", className: "cl-radio" })
-        )
-      ), React.createElement(
-        "div",
-        { key: "sendbtn", className: "input-group" },
-        React.createElement(
-          "div",
-          { className: "button-group" },
-          " ",
-          React.createElement(
-            "button",
-            { onClick: function onClick() {
-                _this2.toggleModal();
-              }, className: "cl-button primary" },
-            "Valider"
-          )
-        )
-      )];
       return React.createElement(
         "div",
         { className: "login-wrapper" },
@@ -125,7 +57,7 @@ var Login = function (_React$Component) {
             ),
             React.createElement("input", { onChange: function onChange(e) {
                 _this2.setState({ email: e.target.value });
-              }, value: this.state.email, type: "text" })
+              }, value: this.state.email, name: "email", type: "text" })
           ),
           React.createElement(
             "div",
@@ -137,7 +69,7 @@ var Login = function (_React$Component) {
             ),
             React.createElement("input", { onChange: function onChange(e) {
                 _this2.setState({ password: e.target.value });
-              }, value: this.state.password, type: "text" })
+              }, value: this.state.password, name: "password", type: "password" })
           ),
           React.createElement(
             "div",
@@ -153,6 +85,13 @@ var Login = function (_React$Component) {
                 "Valider"
               )
             )
+          ),
+          React.createElement(
+            "div",
+            { className: "sign-up-section", onClick: function onClick() {
+                window.location.href = "/inscription";
+              } },
+            "Cliquez-ici pour cr\xE9er votre compte"
           )
         )
       );

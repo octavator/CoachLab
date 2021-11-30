@@ -1,9 +1,12 @@
 import Modal from './modal.js'
 import Navbar from './navbar.js'
 
-class Agenda extends React.Component {
+class CoachAgenda extends React.Component {
   constructor(props) {
     super(props)
+    let url = window.location.href
+    let slugs = url.split("=")
+    let coach_id = atob(slugs[slugs.length - 1])
     this.state = {
         show_schedule_modal: false,
         schedule: {},
@@ -13,7 +16,8 @@ class Agenda extends React.Component {
         form: {
           duration: "30",
           isVideo: true,
-          id: ""
+          id: "",
+          coach_id: coach_id
         },
         user: {
           firstname: "",
@@ -26,14 +30,12 @@ class Agenda extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/me").then(res => {
+    http.get(`/api/coach/agenda?coach_id=${btoa(this.state.form.coach_id.replace("=", ""))}`).then(res => {
+
       console.log(res.status)
       console.log(res.data)
-      http.get("/me/agenda").then(agendaData => {
-        console.log("agenda resp", agendaData.data)
-        const curWeek = this.getCurrentWeek(this.state.currentDay)
-        this.setState({currentWeek: curWeek, user: res.data, schedule: agendaData.data})
-      })
+      const curWeek = this.getCurrentWeek(this.state.currentDay)
+      this.setState({currentWeek: curWeek, user: res.data.user, schedule: res.data.agenda})
     })
   }
   addDays(date, days) {
@@ -136,13 +138,10 @@ class Agenda extends React.Component {
                       let slot_id = this.buildResaId(day, hour)
                       let slot = this.state.schedule[slot_id]
                       return (
-                        <div key={hour} className="schedule-cell">
+                        <div key={hour} className={"schedule-cell" + (slot && ' unavailable' || '')} >
                           <div onClick={() => { !slot
                            && this.setState({show_schedule_modal: true, form: {...this.state.form, id: slot_id}}) }} 
-                            className={(!slot) && cellClass + ' empty' || cellClass}>
-                              { slot ? 
-                              `RDV de ${slot.duration}min ${["true", true].includes(slot.isVideo) ? "avec" : "sans"} visio-conférence`
-                              : "+"}
+                            className={(!slot) && cellClass + ' empty' || cellClass + ' unavailable'}>
                           </div>
                         </div>
                       )
@@ -158,4 +157,4 @@ class Agenda extends React.Component {
 }
 
 const domContainer = document.querySelector('.agenda-wrapper');
-ReactDOM.render(<Agenda/>, domContainer);
+ReactDOM.render(<CoachAgenda/>, domContainer);

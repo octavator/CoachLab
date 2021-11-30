@@ -6,6 +6,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+import Navbar from './navbar.js';
+
 var UserProfile = function (_React$Component) {
   _inherits(UserProfile, _React$Component);
 
@@ -15,9 +17,11 @@ var UserProfile = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (UserProfile.__proto__ || Object.getPrototypeOf(UserProfile)).call(this, props));
 
     _this.state = {
-      email: "",
-      firstname: "",
-      lastname: ""
+      user: {
+        email: "",
+        firstname: "",
+        lastname: ""
+      }
     };
     return _this;
   }
@@ -30,13 +34,13 @@ var UserProfile = function (_React$Component) {
       http.get("/me").then(function (res) {
         console.log(res.status);
         console.log(res.data);
-        _this2.setState(Object.assign({}, res.data));
+        _this2.setState({ user: res.data });
       });
     }
   }, {
     key: "sendForm",
     value: function sendForm() {
-      http.post("/edit-infos", this.state).then(function (res) {
+      http.post("/edit-infos", this.state.user).then(function (res) {
         console.log(res.status);
         console.log(res.data);
       });
@@ -48,63 +52,68 @@ var UserProfile = function (_React$Component) {
 
       return React.createElement(
         "div",
-        { className: "infos-wrapper" },
-        React.createElement(
-          "h1",
-          { className: "page-title" },
-          "Mes informations"
-        ),
+        null,
+        React.createElement(Navbar, { user: this.state.user }),
         React.createElement(
           "div",
-          { className: "infos-content-wrapper infos-form" },
+          { className: "infos-wrapper" },
           React.createElement(
-            "div",
-            { className: "input-group" },
-            React.createElement(
-              "label",
-              { className: "input-label" },
-              "Nom"
-            ),
-            React.createElement("input", { onChange: function onChange(e) {
-                _this3.setState({ lastname: e.target.value });
-              }, value: this.state.lastname, type: "text" })
+            "h1",
+            { className: "page-title" },
+            "Mes informations"
           ),
           React.createElement(
             "div",
-            { className: "input-group" },
-            React.createElement(
-              "label",
-              { className: "input-label" },
-              "Pr\xE9nom"
-            ),
-            React.createElement("input", { onChange: function onChange(e) {
-                _this3.setState({ firstname: e.target.value });
-              }, value: this.state.firstname, type: "text" })
-          ),
-          React.createElement(
-            "div",
-            { className: "input-group" },
-            React.createElement(
-              "label",
-              { className: "input-label" },
-              "Adresse mail"
-            ),
-            React.createElement("input", { onChange: function onChange(e) {
-                _this3.setState({ email: e.target.value });
-              }, value: this.state.email, type: "text" })
-          ),
-          React.createElement(
-            "div",
-            { className: "input-group" },
+            { className: "infos-content-wrapper infos-form" },
             React.createElement(
               "div",
-              { className: "button-group" },
+              { className: "input-group" },
               React.createElement(
-                "button",
-                { onClick: function onClick() {
-                    _this3.sendForm();
-                  }, className: "cl-button primary" },
-                "Valider"
+                "label",
+                { className: "input-label" },
+                "Nom"
+              ),
+              React.createElement("input", { onChange: function onChange(e) {
+                  _this3.setState({ lastname: e.target.value });
+                }, value: this.state.user.lastname, type: "text" })
+            ),
+            React.createElement(
+              "div",
+              { className: "input-group" },
+              React.createElement(
+                "label",
+                { className: "input-label" },
+                "Pr\xE9nom"
+              ),
+              React.createElement("input", { onChange: function onChange(e) {
+                  _this3.setState({ firstname: e.target.value });
+                }, value: this.state.user.firstname, type: "text" })
+            ),
+            React.createElement(
+              "div",
+              { className: "input-group" },
+              React.createElement(
+                "label",
+                { className: "input-label" },
+                "Adresse mail"
+              ),
+              React.createElement("input", { onChange: function onChange(e) {
+                  _this3.setState({ email: e.target.value });
+                }, value: this.state.user.email, type: "text" })
+            ),
+            React.createElement(
+              "div",
+              { className: "input-group" },
+              React.createElement(
+                "div",
+                { className: "button-group" },
+                React.createElement(
+                  "button",
+                  { onClick: function onClick() {
+                      _this3.sendForm();
+                    }, className: "cl-button primary" },
+                  "Valider"
+                )
               )
             )
           )
