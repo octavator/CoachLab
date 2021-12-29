@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "start": "iex.bat -S mix",
+    "start": "iex -S mix",
     "watch": "npx babel --watch web --presets react-app/prod --out-dir priv/static",
     "build": " mix webcopy && npx babel web --presets react-app/prod --out-dir priv/static && mix compile"
   },

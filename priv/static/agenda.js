@@ -19,10 +19,15 @@ var Agenda = function (_React$Component) {
 
     _this.state = {
       show_schedule_modal: false,
+      show_details_modal: false,
       schedule: {},
       currentDay: new Date(),
       currentWeek: undefined,
       year: 2021,
+      showFlash: false,
+      flashType: '',
+      flashMessage: '',
+      appointment_detailed: {},
       form: {
         duration: "30",
         isVideo: true,
@@ -88,21 +93,29 @@ var Agenda = function (_React$Component) {
       });
     }
   }, {
-    key: 'toggleModal',
-    value: function toggleModal() {
-      this.setState({ show_schedule_modal: false });
+    key: 'showFlashMessage',
+    value: function showFlashMessage(type, message) {
+      var _this4 = this;
+
+      this.setState({ showFlash: true, flashMessage: message, flashType: type }, function () {
+        setTimeout(function () {
+          _this4.setState({ showFlash: false });
+        }, 5000);
+      });
     }
   }, {
     key: 'sendForm',
     value: function sendForm() {
-      var _this4 = this;
+      var _this5 = this;
 
       console.log(this.state.form);
       http.post("/new-resa", { id: this.state.form.id, resa: this.state.form, email: this.state.user.email }).then(function (res) {
-        console.log(res);
-        var schedule = _this4.state.schedule;
-        schedule[_this4.state.form.id] = _this4.state.form;
-        _this4.setState({ schedule: schedule });
+        var schedule = _this5.state.schedule;
+        schedule[_this5.state.form.id] = _this5.state.form;
+        _this5.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.");
+        _this5.setState({ schedule: schedule });
+      }).catch(function (err) {
+        _this5.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.");
       });
     }
   }, {
@@ -117,8 +130,48 @@ var Agenda = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      var _this5 = this;
+      var _this6 = this;
 
+      var detailsForm = [React.createElement(
+        'div',
+        { key: 'duration', className: 'details-duration-section' },
+        React.createElement(
+          'div',
+          { className: 'details-duration-label' },
+          'Dur\xE9e:'
+        ),
+        React.createElement(
+          'div',
+          { className: 'details-duration-value' },
+          this.state.appointment_detailed.duration
+        )
+      ), React.createElement(
+        'div',
+        { key: 'isVideo', className: 'details-isVideo-section' },
+        React.createElement(
+          'div',
+          { className: 'details-isVideo-label' },
+          'Visio-conf\xE9rence:'
+        ),
+        React.createElement(
+          'div',
+          { className: 'details-isVideo-value' },
+          this.state.appointment_detailed.isVideo ? "Oui" : "Non"
+        )
+      ), React.createElement(
+        'div',
+        { key: 'visioLink', className: "details-visioLink-section" + (this.state.appointment_detailed.isVideo ? "" : " hidden") },
+        React.createElement(
+          'div',
+          { className: 'details-visioLink-label' },
+          'Lien de la visio-conf\xE9rence:'
+        ),
+        React.createElement(
+          'div',
+          { className: 'details-visioLink-value' },
+          this.state.appointment_detailed.isVideo ? "http://superlienvideo.caramel" : ""
+        )
+      )];
       var scheduleForm = [React.createElement(
         'div',
         { key: 'duration', className: 'input-group select-input' },
@@ -130,7 +183,7 @@ var Agenda = function (_React$Component) {
         React.createElement(
           'select',
           { onChange: function onChange(e) {
-              _this5.setState({ form: Object.assign({}, _this5.state.form, { duration: e.target.value }) });
+              _this6.setState({ form: Object.assign({}, _this6.state.form, { duration: e.target.value }) });
             }, name: 'duration', className: 'infos-form-select duration-select' },
           React.createElement(
             'option',
@@ -159,7 +212,7 @@ var Agenda = function (_React$Component) {
         React.createElement(
           'div',
           { className: 'radio-choices', onChange: function onChange(e) {
-              _this5.setState({ form: Object.assign({}, _this5.state.form, { isVideo: e.target.value }) });
+              _this6.setState({ form: Object.assign({}, _this6.state.form, { isVideo: e.target.value }) });
             } },
           React.createElement(
             'label',
@@ -180,11 +233,10 @@ var Agenda = function (_React$Component) {
         React.createElement(
           'div',
           { className: 'button-group' },
-          ' ',
           React.createElement(
             'button',
             { onClick: function onClick() {
-                _this5.sendForm();_this5.toggleModal();
+                _this6.sendForm();_this6.setState({ show_schedule_modal: false });
               }, className: 'cl-button primary' },
             'Valider'
           )
@@ -195,6 +247,8 @@ var Agenda = function (_React$Component) {
       var lastDate = this.state.currentWeek ? this.state.currentWeek[6].getDate() : "";
       var lastDateMonth = this.state.currentWeek ? this.state.currentWeek[6].getMonth() : "";
       var lastDateYear = this.state.currentWeek ? this.state.currentWeek[6].getFullYear() : "";
+      console.log(this.state.appointment_detailed);
+      console.log(this.state.show_details_modal);
       return React.createElement(
         'div',
         null,
@@ -203,21 +257,23 @@ var Agenda = function (_React$Component) {
           'div',
           { className: 'agenda-wrapper' },
           React.createElement(
+            'div',
+            { className: "flash-message" + (this.state.showFlash ? ' ' + this.state.flashType : " hidden") },
+            this.state.flashMessage
+          ),
+          React.createElement(
             'h1',
             { className: 'page-title' },
-            'Agenda de ',
-            this.state.user.firstname + ' ' + this.state.user.lastname
+            'Agenda de\xA0',
+            React.createElement(
+              'span',
+              { className: 'agenda-name' },
+              this.state.user.firstname + ' ' + this.state.user.lastname
+            )
           ),
           React.createElement(
             'h2',
             { className: 'page-title' },
-            React.createElement(
-              'span',
-              { onClick: function onClick() {
-                  _this5.showPrevWeek();
-                } },
-              '<'
-            ),
             'Semaine du ',
             firstDate,
             ' au ',
@@ -225,19 +281,34 @@ var Agenda = function (_React$Component) {
             ' ',
             this.state.months[lastDateMonth],
             ' ',
-            lastDateYear,
+            lastDateYear
+          ),
+          React.createElement(
+            'div',
+            { className: 'week-selectors' },
             React.createElement(
-              'span',
+              'div',
               { onClick: function onClick() {
-                  _this5.showNextWeek();
-                } },
-              '>'
+                  _this6.showPrevWeek();
+                }, className: 'previous-week' },
+              '<\xA0Semaine pr\xE9c\xE9dente'
+            ),
+            React.createElement(
+              'div',
+              { onClick: function onClick() {
+                  _this6.showNextWeek();
+                }, className: 'next-week' },
+              'Semaine suivante\xA0>'
             )
           ),
           React.createElement(Modal, { toggle: this.state.show_schedule_modal, closeFunc: function closeFunc() {
-              _this5.toggleModal();
+              _this6.setState({ show_schedule_modal: false });
             },
             fields: scheduleForm, title: 'Prendre un RDV', id: 'appointment' }),
+          React.createElement(Modal, { toggle: this.state.show_details_modal, closeFunc: function closeFunc() {
+              _this6.setState({ show_details_modal: false });
+            },
+            fields: detailsForm, title: 'Votre RDV', id: 'appointment-details' }),
           React.createElement(
             'div',
             { className: 'agenda-header' },
@@ -269,16 +340,16 @@ var Agenda = function (_React$Component) {
               return React.createElement(
                 'div',
                 { key: day, className: 'agenda-content-column' },
-                _this5.state.hours.map(function (hour) {
-                  var slot_id = _this5.buildResaId(day, hour);
-                  var slot = _this5.state.schedule[slot_id];
+                _this6.state.hours.map(function (hour) {
+                  var slot_id = _this6.buildResaId(day, hour);
+                  var slot = _this6.state.schedule[slot_id];
                   return React.createElement(
                     'div',
                     { key: hour, className: 'schedule-cell' },
                     React.createElement(
                       'div',
                       { onClick: function onClick() {
-                          !slot && _this5.setState({ show_schedule_modal: true, form: Object.assign({}, _this5.state.form, { id: slot_id }) });
+                          !slot ? _this6.setState({ show_schedule_modal: true, form: Object.assign({}, _this6.state.form, { id: slot_id }) }) : _this6.setState({ show_details_modal: true, appointment_detailed: slot });
                         },
                         className: !slot && cellClass + ' empty' || cellClass },
                       slot ? 'RDV de ' + slot.duration + 'min ' + (["true", true].includes(slot.isVideo) ? "avec" : "sans") + ' visio-conf\xE9rence' : "+"

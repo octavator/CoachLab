@@ -6,10 +6,15 @@ class Agenda extends React.Component {
     super(props)
     this.state = {
         show_schedule_modal: false,
+        show_details_modal: false,
         schedule: {},
         currentDay: new Date(),
         currentWeek: undefined,
         year: 2021,
+        showFlash: false,
+        flashType: '',
+        flashMessage: '',
+        appointment_detailed: {},
         form: {
           duration: "30",
           isVideo: true,
@@ -58,16 +63,22 @@ class Agenda extends React.Component {
       return this.addDays(targetDay, i - dayIndex)
     })
   }
-  toggleModal() {
-    this.setState({show_schedule_modal: false})
+  showFlashMessage(type, message) {
+    this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
+      setTimeout(() => { this.setState({showFlash: false})}, 5000)
+    })
   }
   sendForm() {
     console.log(this.state.form)
-    http.post("/new-resa", {id: this.state.form.id, resa:  this.state.form, email: this.state.user.email}).then(res => {
-      console.log(res)
+    http.post("/new-resa", {id: this.state.form.id, resa:  this.state.form, email: this.state.user.email})
+    .then(res => {
       let schedule = this.state.schedule
       schedule[this.state.form.id] = this.state.form
+      this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
       this.setState({schedule: schedule})
+    })
+    .catch(err => {
+      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
     })
   }
   buildResaId(day, hour) {
@@ -78,6 +89,20 @@ class Agenda extends React.Component {
     return(date.toLocaleString())
   }
   render() {
+    let detailsForm = [
+      <div key="duration" className="details-duration-section">
+        <div className="details-duration-label">Durée:</div>
+        <div className="details-duration-value">{this.state.appointment_detailed.duration}</div>
+      </div>,
+        <div key="isVideo" className="details-isVideo-section">
+            <div className="details-isVideo-label">Visio-conférence:</div>
+            <div className="details-isVideo-value">{this.state.appointment_detailed.isVideo ? "Oui": "Non"}</div>
+        </div>,
+        <div key="visioLink" className={"details-visioLink-section" + (this.state.appointment_detailed.isVideo ? "" : " hidden")  }>
+            <div className="details-visioLink-label">Lien de la visio-conférence:</div>
+            <div className="details-visioLink-value">{this.state.appointment_detailed.isVideo ? "http://superlienvideo.caramel": ""}</div>
+        </div>,
+    ]
     let scheduleForm = [
       <div key="duration" className="input-group select-input">
         <label className="input-label">Durée</label>
@@ -96,25 +121,36 @@ class Agenda extends React.Component {
             <input id="isNotVideo" value={false} name="isVideo" type="radio" className="cl-radio"/>
           </div>
         </div>,
-      <div key="sendbtn" className="input-group"><div className="button-group"> <button onClick={() => { this.sendForm() ; this.toggleModal() }} className="cl-button primary">Valider</button></div></div>
+      <div key="sendbtn" className="input-group">
+        <div className="button-group">
+          <button onClick={() => { this.sendForm() ; this.setState({show_schedule_modal: false}) }} className="cl-button primary">Valider</button>
+        </div>
+      </div>
     ]
     let cellClass = "schedule-cell-content "
     let firstDate = this.state.currentWeek ? this.state.currentWeek[0].getDate() : ""
     let lastDate = this.state.currentWeek ? this.state.currentWeek[6].getDate() : ""
     let lastDateMonth = this.state.currentWeek ? this.state.currentWeek[6].getMonth() : ""
     let lastDateYear = this.state.currentWeek ? this.state.currentWeek[6].getFullYear() : ""
+    console.log(this.state.appointment_detailed)
+    console.log(this.state.show_details_modal)
     return (
       <div>
         <Navbar user={this.state.user} />
         <div className="agenda-wrapper">
-          <h1 className="page-title">Agenda de {this.state.user.firstname + ' ' + this.state.user.lastname}</h1>
+          <div className={"flash-message" + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+          <h1 className="page-title">Agenda de&nbsp;<span className="agenda-name">{this.state.user.firstname + ' ' + this.state.user.lastname}</span></h1>
           <h2 className="page-title">
-            <span onClick={() => {this.showPrevWeek()}}>&lt;</span>
-              Semaine du {firstDate} au {lastDate} {this.state.months[lastDateMonth]} {lastDateYear}    
-             <span onClick={() => {this.showNextWeek()}}>&gt;</span>
+            Semaine du {firstDate} au {lastDate} {this.state.months[lastDateMonth]} {lastDateYear}    
           </h2>
-          <Modal toggle={this.state.show_schedule_modal} closeFunc={() => {this.toggleModal()}}
+          <div className="week-selectors">
+            <div onClick={() => {this.showPrevWeek()}} className="previous-week">&lt;&nbsp;Semaine précédente</div>
+            <div onClick={() => {this.showNextWeek()}} className="next-week">Semaine suivante&nbsp;&gt;</div>
+          </div>
+          <Modal toggle={this.state.show_schedule_modal} closeFunc={() => {this.setState({show_schedule_modal: false})}}
             fields={scheduleForm} title="Prendre un RDV" id="appointment"/>
+          <Modal toggle={this.state.show_details_modal} closeFunc={() => {this.setState({show_details_modal: false})}}
+            fields={detailsForm} title="Votre RDV" id="appointment-details"/>
           <div className="agenda-header">
             <div className="agenda-header-section hour-column"></div>
             { this.state.weekdays.map(day => {
@@ -138,7 +174,8 @@ class Agenda extends React.Component {
                       return (
                         <div key={hour} className="schedule-cell">
                           <div onClick={() => { !slot
-                           && this.setState({show_schedule_modal: true, form: {...this.state.form, id: slot_id}}) }} 
+                           ? this.setState({show_schedule_modal: true, form: {...this.state.form, id: slot_id}})
+                          :  this.setState({show_details_modal: true, appointment_detailed: slot}) }}
                             className={(!slot) && cellClass + ' empty' || cellClass}>
                               { slot ? 
                               `RDV de ${slot.duration}min ${["true", true].includes(slot.isVideo) ? "avec" : "sans"} visio-conférence`

@@ -3,8 +3,8 @@
               {description,"clab"},
               {modules,['Elixir.Agenda','Elixir.Clab',
                         'Elixir.Clab.Application','Elixir.ClabRouter',
-                        'Elixir.Reservation','Elixir.Schedule','Elixir.User',
-                        'Elixir.Utils']},
+                        'Elixir.DataSaver','Elixir.Reservation',
+                        'Elixir.Schedule','Elixir.User','Elixir.Utils']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.Clab.Application',[]}}]}.

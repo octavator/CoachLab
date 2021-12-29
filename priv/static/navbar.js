@@ -42,43 +42,13 @@ var Navbar = function (_React$Component) {
           React.createElement(
             "div",
             { className: "logo-wrapper" },
-            React.createElement(
-              "a",
-              { href: "/" },
-              React.createElement(
-                "span",
-                { className: "first-logo-span" },
-                "Coach"
-              ),
-              React.createElement(
-                "span",
-                { className: "second-logo-span" },
-                "Lab"
-              )
-            )
+            React.createElement("i", { src: "./images/logo_blanc.svg" })
           )
         ),
-        this.props.user.email != "" ? React.createElement(
+        Object.keys(this.props.user).includes("email") && this.props.user.email != "" ? React.createElement(
           "div",
           { className: "menu-section" },
-          React.createElement(
-            "div",
-            { className: "menu-item" },
-            React.createElement(
-              "a",
-              { href: "/agenda" },
-              " Mon Agenda"
-            )
-          ),
-          React.createElement(
-            "div",
-            { className: "menu-item" },
-            React.createElement(
-              "a",
-              { href: "/profil" },
-              "Mes infos"
-            )
-          ),
+          React.createElement("div", { className: "menu-item" }),
           React.createElement(
             "div",
             { className: "menu-item user-dropdown", onClick: function onClick() {
@@ -98,6 +68,13 @@ var Navbar = function (_React$Component) {
             React.createElement(
               "div",
               { className: "menu-dropdown-list-item", onClick: function onClick() {
+                  window.location.href = "/profil";
+                } },
+              "Mes informations"
+            ),
+            React.createElement(
+              "div",
+              { className: "menu-dropdown-list-item", onClick: function onClick() {
                   _this2.disconnect();
                 } },
               "Se d\xE9connecter"
@@ -105,7 +82,7 @@ var Navbar = function (_React$Component) {
           )
         ) : React.createElement(
           "div",
-          { className: "menu-section" },
+          { className: "menu-section no-login" },
           React.createElement(
             "div",
             { className: "menu-item login" },
@@ -117,7 +94,7 @@ var Navbar = function (_React$Component) {
           ),
           React.createElement(
             "div",
-            { className: "menu-item login" },
+            { className: "menu-item signup" },
             React.createElement(
               "a",
               { href: "/inscription" },

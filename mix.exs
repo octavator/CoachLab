@@ -30,9 +30,16 @@ end
 defmodule Mix.Tasks.Webcopy do
   use Mix.Task
   def run(_) do
-    files = IO.inspect File.ls!("web/")
+    files = File.ls!("web/")
     Enum.each(files, fn file ->
-      IO.inspect File.copy("web/" <> file, "priv/static/" <> file)
+      res = IO.inspect File.copy("web/" <> file, "priv/static/" <> file)
+      if res == {:error, :eisdir} do
+        dir_files = File.ls!("web/#{file}")
+        Enum.each(dir_files, fn dir_file ->
+          File.copy("web/#{file}/" <> dir_file, "priv/static/#{file}/" <> dir_file)
+          IO.puts "Copied #{dir_file} to priv/static/#{file}"
+        end)
+      end
       IO.puts "Copied #{file} to priv/static"
     end)
   end

@@ -6,6 +6,8 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+import Navbar from './navbar.js';
+
 var Login = function (_React$Component) {
   _inherits(Login, _React$Component);
 
@@ -15,8 +17,13 @@ var Login = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (Login.__proto__ || Object.getPrototypeOf(Login)).call(this, props));
 
     _this.state = {
-      email: "",
-      password: ""
+      form: {
+        email: "",
+        password: ""
+      },
+      flashMessage: "",
+      flashType: "",
+      showFlash: false
     };
     return _this;
   }
@@ -24,21 +31,42 @@ var Login = function (_React$Component) {
   _createClass(Login, [{
     key: "sendForm",
     value: function sendForm() {
-      http.post("/sign-in", this.state).then(function (res) {
+      var _this2 = this;
+
+      http.post("/sign-in", this.state.form).then(function (res) {
         console.log(res.status);
         console.log(res.data);
-        window.location.href = "/";
-        console.log("Connecté avec succès");
+        window.location.href = "/bienvenue";
+      }).catch(function (err) {
+        console.log(err);
+        _this2.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.");
+      });
+    }
+  }, {
+    key: "showFlashMessage",
+    value: function showFlashMessage(type, message) {
+      var _this3 = this;
+
+      this.setState({ showFlash: true, flashMessage: message, flashType: type }, function () {
+        setTimeout(function () {
+          _this3.setState({ showFlash: false });
+        }, 5000);
       });
     }
   }, {
     key: "render",
     value: function render() {
-      var _this2 = this;
+      var _this4 = this;
 
       return React.createElement(
         "div",
-        { className: "login-wrapper" },
+        null,
+        React.createElement(Navbar, { user: {} }),
+        React.createElement(
+          "div",
+          { className: "flash-message" + (this.state.showFlash ? " " + this.state.flashType : " hidden") },
+          this.state.flashMessage
+        ),
         React.createElement(
           "h1",
           { className: "page-title" },
@@ -56,8 +84,8 @@ var Login = function (_React$Component) {
               "Adresse mail"
             ),
             React.createElement("input", { onChange: function onChange(e) {
-                _this2.setState({ email: e.target.value });
-              }, value: this.state.email, name: "email", type: "text" })
+                _this4.setState({ form: Object.assign({}, _this4.state.form, { email: e.target.value }) });
+              }, value: this.state.form.email, name: "email", type: "text" })
           ),
           React.createElement(
             "div",
@@ -68,8 +96,8 @@ var Login = function (_React$Component) {
               "Mot de passe"
             ),
             React.createElement("input", { onChange: function onChange(e) {
-                _this2.setState({ password: e.target.value });
-              }, value: this.state.password, name: "password", type: "password" })
+                _this4.setState({ form: Object.assign({}, _this4.state.form, { password: e.target.value }) });
+              }, value: this.state.form.password, name: "password", type: "password" })
           ),
           React.createElement(
             "div",
@@ -80,7 +108,7 @@ var Login = function (_React$Component) {
               React.createElement(
                 "button",
                 { onClick: function onClick() {
-                    _this2.sendForm();
+                    _this4.sendForm();
                   }, className: "cl-button primary" },
                 "Valider"
               )

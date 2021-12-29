@@ -8,7 +8,8 @@ defmodule Clab.Application do
       {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 4001]},
       Schedule,
       User,
-      Agenda
+      Agenda,
+      DataSaver
     ]
     opts = [strategy: :one_for_one, name: Clab.Supervisor]
     Supervisor.start_link(children, opts)

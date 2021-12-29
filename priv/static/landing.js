@@ -7,6 +7,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 import Navbar from './navbar.js';
+import Logo from './utils.js';
 
 var Landing = function (_React$Component) {
   _inherits(Landing, _React$Component);
@@ -27,7 +28,7 @@ var Landing = function (_React$Component) {
   }
 
   _createClass(Landing, [{
-    key: "componentDidMount",
+    key: 'componentDidMount',
     value: function componentDidMount() {
       var _this2 = this;
 
@@ -38,34 +39,124 @@ var Landing = function (_React$Component) {
       });
     }
   }, {
-    key: "render",
+    key: 'render',
     value: function render() {
       return React.createElement(
-        "div",
+        'div',
         null,
         React.createElement(Navbar, { user: this.state.user }),
         React.createElement(
-          "div",
-          { className: "landing-wrapper" },
+          'div',
+          { className: 'landing-wrapper' },
           React.createElement(
-            "h1",
-            { className: "page-title" },
-            "Bienvenue sur \xA0",
+            'div',
+            { className: 'landing-first-page-wrapper' },
             React.createElement(
-              "div",
-              { className: "logo-section" },
+              'div',
+              { className: 'logo-section' },
+              React.createElement('img', { src: 'priv/static/images/logo_blanc.svg' })
+            ),
+            React.createElement(
+              'div',
+              { className: 'landing-subtitle-small' },
+              'Se trouver ici, maintenant'
+            ),
+            React.createElement(
+              'h2',
+              { className: 'landing-page-title' },
+              'Le centre de coaching digital !'
+            ),
+            React.createElement(
+              'div',
+              { className: 'signup-section landing-primary-signup' },
               React.createElement(
-                "span",
-                { className: "first-logo-span" },
-                "Coach"
+                'button',
+                { onClick: function onClick() {
+                    return window.location.href = "/inscription";
+                  }, className: 'landing-signup-button' },
+                'Je m\'inscris !'
+              )
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'landing-section' },
+            React.createElement(
+              'div',
+              { className: 'landing-section-column' },
+              React.createElement(
+                'div',
+                { className: 'landing-section-column-title' },
+                'Prise de rendez-vous en ligne et automatique'
               ),
               React.createElement(
-                "span",
-                { className: "second-logo-span" },
-                "Lab"
+                'div',
+                { className: 'landing-section-column-desc' },
+                'Vous avez la main sur votre emploi du temps, mais les coach\xE9s peuvent \xE9galement directement prendre RDV sur la plateforme selon vos disponibilit\xE9s.'
               )
             ),
-            "!"
+            React.createElement(
+              'div',
+              { className: 'landing-section-column' },
+              React.createElement(
+                'div',
+                { className: 'landing-section-column-title' },
+                'Vid\xE9o live et tr\xE8s simple d\'utilisation'
+              ),
+              React.createElement(
+                'div',
+                { className: 'landing-section-column-desc' },
+                'Notre plateforme vous propose un service de vid\xE9o int\xE9gr\xE9 facilitant ainsi le suivi de vos coach\xE9s et de vos formations.'
+              )
+            )
+          ),
+          React.createElement(
+            'div',
+            { className: 'landing-section' },
+            React.createElement(
+              'div',
+              { className: 'landing-section-column' },
+              React.createElement(
+                'div',
+                { className: 'landing-section-column-title' },
+                'Paiement instantann\xE9 et s\xE9curis\xE9 en toute simplicit\xE9'
+              ),
+              React.createElement(
+                'div',
+                { className: 'landing-section-column-desc' },
+                'L\'argent est directement vers\xE9 sur votre compte bancaire. Cela vous \xE9vite de donner votre RIB \xE0 tous vos coach\xE9s et de garder ainsi vos informations bancaires secr\xE8tes.'
+              )
+            ),
+            React.createElement('div', { className: 'landing-section-column' })
+          ),
+          React.createElement(
+            'div',
+            { className: 'landing-section' },
+            React.createElement(
+              'div',
+              { className: 'landing-section-column centered-text' },
+              React.createElement(
+                'div',
+                { className: 'landing-section-column-title' },
+                'Bient\xF4t ouvert !'
+              ),
+              React.createElement(
+                'div',
+                { className: 'landing-section-column-desc' },
+                'Soyez parmi les premiers inscrits afin de profiter de nombreux avantages !'
+              ),
+              React.createElement(
+                'div',
+                { className: 'signup-section' },
+                React.createElement(
+                  'button',
+                  { onClick: function onClick() {
+                      return window.location.href = "/inscription";
+                    }, className: 'landing-signup-button' },
+                  'Je m\'inscris !'
+                )
+              )
+            )
           )
         )
       );

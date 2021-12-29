@@ -17,7 +17,15 @@ var UserProfile = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (UserProfile.__proto__ || Object.getPrototypeOf(UserProfile)).call(this, props));
 
     _this.state = {
+      showFlash: false,
+      flashType: '',
+      flashMessage: '',
       user: {
+        email: "",
+        firstname: "",
+        lastname: ""
+      },
+      form: {
         email: "",
         firstname: "",
         lastname: ""
@@ -27,92 +35,113 @@ var UserProfile = function (_React$Component) {
   }
 
   _createClass(UserProfile, [{
-    key: "componentDidMount",
+    key: 'componentDidMount',
     value: function componentDidMount() {
       var _this2 = this;
 
       http.get("/me").then(function (res) {
         console.log(res.status);
         console.log(res.data);
-        _this2.setState({ user: res.data });
+        _this2.setState({ user: res.data, form: res.data });
       });
     }
   }, {
-    key: "sendForm",
+    key: 'sendForm',
     value: function sendForm() {
-      http.post("/edit-infos", this.state.user).then(function (res) {
-        console.log(res.status);
-        console.log(res.data);
-      });
-    }
-  }, {
-    key: "render",
-    value: function render() {
       var _this3 = this;
 
+      http.post("/edit-infos", this.state.form).then(function (res) {
+        console.log(res.status);
+        console.log(res.data);
+        _this3.showFlashMessage("success", "Vos informations ont bien été mises à jour.");
+      }).catch(function (err) {
+        _this3.showFlashMessage("error", "Une erreur inattendue est survenue");
+      });
+    }
+  }, {
+    key: 'showFlashMessage',
+    value: function showFlashMessage(type, message) {
+      var _this4 = this;
+
+      this.setState({ showFlash: true, flashMessage: message, flashType: type }, function () {
+        setTimeout(function () {
+          _this4.setState({ showFlash: false });
+        }, 5000);
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this5 = this;
+
       return React.createElement(
-        "div",
+        'div',
         null,
         React.createElement(Navbar, { user: this.state.user }),
         React.createElement(
-          "div",
-          { className: "infos-wrapper" },
+          'div',
+          { className: 'infos-wrapper' },
           React.createElement(
-            "h1",
-            { className: "page-title" },
-            "Mes informations"
+            'div',
+            { className: "flash-message" + (this.state.showFlash ? ' ' + this.state.flashType : " hidden") },
+            this.state.flashMessage
           ),
           React.createElement(
-            "div",
-            { className: "infos-content-wrapper infos-form" },
+            'h1',
+            { className: 'page-title' },
+            'Mes informations'
+          ),
+          React.createElement(
+            'div',
+            { className: 'infos-content-wrapper infos-form' },
             React.createElement(
-              "div",
-              { className: "input-group" },
+              'div',
+              { className: 'input-group' },
               React.createElement(
-                "label",
-                { className: "input-label" },
-                "Nom"
+                'label',
+                { className: 'input-label' },
+                'Nom'
               ),
-              React.createElement("input", { onChange: function onChange(e) {
-                  _this3.setState({ lastname: e.target.value });
-                }, value: this.state.user.lastname, type: "text" })
+              React.createElement('input', { onChange: function onChange(e) {
+                  _this5.setState({ form: Object.assign({}, _this5.state.form, { lastname: e.target.value }) });
+                }, value: this.state.form.lastname, type: 'text' })
             ),
             React.createElement(
-              "div",
-              { className: "input-group" },
+              'div',
+              { className: 'input-group' },
               React.createElement(
-                "label",
-                { className: "input-label" },
-                "Pr\xE9nom"
+                'label',
+                { className: 'input-label' },
+                'Pr\xE9nom'
               ),
-              React.createElement("input", { onChange: function onChange(e) {
-                  _this3.setState({ firstname: e.target.value });
-                }, value: this.state.user.firstname, type: "text" })
+              React.createElement('input', { onChange: function onChange(e) {
+                  _this5.setState({ form: Object.assign({}, _this5.state.form, { firstname: e.target.value }) });
+                }, value: this.state.form.firstname, type: 'text' })
             ),
             React.createElement(
-              "div",
-              { className: "input-group" },
+              'div',
+              { className: 'input-group' },
               React.createElement(
-                "label",
-                { className: "input-label" },
-                "Adresse mail"
+                'label',
+                { className: 'input-label' },
+                'Adresse mail'
               ),
-              React.createElement("input", { onChange: function onChange(e) {
-                  _this3.setState({ email: e.target.value });
-                }, value: this.state.user.email, type: "text" })
+              React.createElement('input', { onChange: function onChange(e) {
+                  _this5.setState({ form: Object.assign({}, _this5.state.form, { email: e.target.value }) });
+                }, value: this.state.form.email, type: 'text' })
             ),
             React.createElement(
-              "div",
-              { className: "input-group" },
+              'div',
+              { className: 'input-group' },
               React.createElement(
-                "div",
-                { className: "button-group" },
+                'div',
+                { className: 'button-group' },
                 React.createElement(
-                  "button",
+                  'button',
                   { onClick: function onClick() {
-                      _this3.sendForm();
-                    }, className: "cl-button primary" },
-                  "Valider"
+                      _this5.sendForm();
+                    }, className: 'cl-button primary' },
+                  'Valider'
                 )
               )
             )
