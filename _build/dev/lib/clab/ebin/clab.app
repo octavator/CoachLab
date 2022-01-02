@@ -1,5 +1,5 @@
 {application,clab,
-             [{applications,[kernel,stdlib,elixir,logger,plug_cowboy,poison]},
+             [{applications,[kernel,stdlib,elixir,logger,poison,plug_cowboy]},
               {description,"clab"},
               {modules,['Elixir.Agenda','Elixir.Clab',
                         'Elixir.Clab.Application','Elixir.ClabRouter',
