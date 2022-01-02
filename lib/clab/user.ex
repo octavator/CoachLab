@@ -5,7 +5,7 @@ defmodule User do
     @path 'data/users.ets'
 
     def start_link(args \\ []) do
-        GenServer.start(__MODULE__, args, name: __MODULE__)
+        GenServer.start_link(__MODULE__, args, name: __MODULE__)
     end
 
     def init(_args) do
@@ -58,6 +58,11 @@ defmodule User do
     def handle_call({:delete_user, id}, _from, state) do
         res = IO.inspect :ets.delete(@table, id)
         {:reply, res, state}
+    end
+
+    def terminate(_reason, _state) do
+        Logger.info("[ETS] Saving #{@table} table in #{@path}")
+        :ets.tab2file(@table, @path)
     end
 
     def get_user(email) do

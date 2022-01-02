@@ -5,7 +5,7 @@ defmodule DataSaver do
   @backup_interval 4 #hours
 
   def start_link(args \\ []) do
-    GenServer.start(__MODULE__, args, name: __MODULE__)
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   def init(_args) do

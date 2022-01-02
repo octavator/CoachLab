@@ -11,8 +11,6 @@ defmodule ClabRouter do
 
   @secret "73JIOiOJSKLAZHOJfspaioz9902"
 
-  #@TODO: 1 problems:
-  # - js files are not minimized and/or obfuscated
   plug Plug.Static, from: :clab, at: "/priv/static"
   plug :match
   plug Plug.Parsers, parsers: [:json],
@@ -93,7 +91,7 @@ defmodule ClabRouter do
           true ->
             user_data = Map.delete(user, :salt) |> Map.delete(:password)
             token = (user.id <> "|" <> :crypto.hash(:sha256, @secret <> user.id)) |> Base.encode64(padding: false)
-            conn = put_resp_cookie(conn, "cltoken", token)
+            conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
             send_resp(conn, 200, user_data |> Poison.encode!)
           _ ->
             send_resp(conn, 401, "Votre mot de passe est incorrect")
@@ -103,7 +101,7 @@ defmodule ClabRouter do
   end
 
   get "/logout" do
-    conn = put_resp_cookie(conn, "cltoken", "disconnected")
+    conn = put_resp_cookie(conn, "cltoken", "disconnected", same_site: "Strict")
     send_resp(conn, 200, "Vous avez été déconnecté")
   end
 
@@ -170,11 +168,13 @@ defmodule ClabRouter do
     {status_code, ret_text} = cond do
       email == body.email -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
       true ->
-        user = User.get_user(body.email)
-        #@TODO: update coach's agenda too
+        user = User.get_user(email)
+        coach = User.get_user(body.email)
         case Agenda.update_agenda(user.id, %{body.id => body.resa}) do
           :error -> {400, "Une erreur est survenue durant la reservation."}
-          _ ->  {200, "Votre rendez-vous a bien été enregistré."}
+          _ ->
+            Agenda.update_agenda(coach.id, %{body.id => body.resa})
+            {200, "Votre rendez-vous a bien été enregistré."}
         end
     end
     send_resp(conn, status_code, ret_text)

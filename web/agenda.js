@@ -32,10 +32,7 @@ class Agenda extends React.Component {
   }
   componentDidMount() {
     http.get("/me").then(res => {
-      console.log(res.status)
-      console.log(res.data)
       http.get("/me/agenda").then(agendaData => {
-        console.log("agenda resp", agendaData.data)
         const curWeek = this.getCurrentWeek(this.state.currentDay)
         this.setState({currentWeek: curWeek, user: res.data, schedule: agendaData.data})
       })
@@ -69,8 +66,7 @@ class Agenda extends React.Component {
     })
   }
   sendForm() {
-    console.log(this.state.form)
-    http.post("/new-resa", {id: this.state.form.id, resa:  this.state.form, email: this.state.user.email})
+    http.post("/new-resa", {id: this.state.form.id, resa: this.state.form, email: this.state.user.email})
     .then(res => {
       let schedule = this.state.schedule
       schedule[this.state.form.id] = this.state.form
@@ -132,8 +128,6 @@ class Agenda extends React.Component {
     let lastDate = this.state.currentWeek ? this.state.currentWeek[6].getDate() : ""
     let lastDateMonth = this.state.currentWeek ? this.state.currentWeek[6].getMonth() : ""
     let lastDateYear = this.state.currentWeek ? this.state.currentWeek[6].getFullYear() : ""
-    console.log(this.state.appointment_detailed)
-    console.log(this.state.show_details_modal)
     return (
       <div>
         <Navbar user={this.state.user} />

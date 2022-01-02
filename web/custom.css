@@ -23,7 +23,6 @@ body {
     margin: 0;
     height: 100%;
     font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
-    /* font-family: Arial, Helvetica, sans-serif; */
 }
 
 /* /!\ Problème avec les accents pour Isidora-Bold */
@@ -136,8 +135,9 @@ a {
 .schedule-cell-content {
     width: 100%;
     height: auto;
-    /* margin: 7px 5px 7px 5px;
-    border: 1px solid white; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: #318CE7;
 }
 
@@ -180,7 +180,6 @@ a {
     align-items: center;
     font-weight: bold;
     width: 100px;
-    /* flex-basis: 50%; */
 }
 
 .agenda-content-wrapper {
@@ -204,13 +203,10 @@ a {
 
 .navbar-wrapper {
     padding: 15px 10px;
-    /* border-bottom: 1px solid;
-    border-color: #318ce7; */
     display: flex;
     align-items: center;
     justify-content: space-between;
     background: #26619C;
-    /* background: linear-gradient(90deg, #318CE7 0%, #26619C 100%); */
 }
 .navbar-wrapper .menu-section {
     display: flex;
@@ -230,10 +226,6 @@ a {
     font-weight: bold;
     color: white;
     margin-top: 6px;
-}
-
-.menu-section.menu-item {
-
 }
 
 .menu-item.login {
@@ -311,8 +303,6 @@ a {
     border: none;
     cursor: pointer;
     background-color: white;
-    /* background: #26619C;
-    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%); */
 }
 
 .landing-first-page-wrapper {

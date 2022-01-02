@@ -2,7 +2,7 @@
     "serviceName": "clab-app",
     "containers": {
         "clab-app-container": {
-            "image": ":clab-app.latest.4",
+            "image": ":clab-app.latest.5",
             "ports": {
                 "4001": "HTTP"
             }

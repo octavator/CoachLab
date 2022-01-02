@@ -1,7 +1,7 @@
 {
-  "name": "CoachLab",
+  "name": "coachlab",
   "version": "1.0.0",
-  "description": "**TODO: Add description**",
+  "description": "React JS Client for CoachLab, ES6 compiled with babel",
   "main": "index.js",
   "directories": {
     "lib": "lib",
@@ -10,7 +10,7 @@
   "scripts": {
     "start": "iex -S mix",
     "watch": "npx babel --watch web --presets react-app/prod --out-dir priv/static",
-    "build": " mix webcopy && npx babel web --presets react-app/prod --out-dir priv/static && mix compile"
+    "build": " mix webcopy && npx babel web --presets react-app/prod --minified --out-dir priv/static && mix compile"
   },
   "repository": {
     "type": "git",
@@ -24,8 +24,8 @@
   },
   "homepage": "https://github.com/octavator/CoachLab#readme",
   "dependencies": {
-    "babel-cli": "^6.26.0",
     "axios": "^0.24.0",
+    "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2"
   },
   "devDependencies": {
