@@ -13,6 +13,7 @@ defmodule Clab.MixProject do
 
   def application do
     [
+      applications: [:poison],
       extra_applications: [:logger, :poison],
       mod: {Clab.Application, []}
     ]
