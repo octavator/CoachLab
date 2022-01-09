@@ -5,11 +5,12 @@ RUN apk add --update git build-base nodejs npm
 RUN mix do local.hex --force, local.rebar --force
 
 RUN mkdir /app
-RUN echo $(pwd)
+
 ENV MIX_ENV=prod
 
 COPY ./ /app
 WORKDIR /app
+RUN echo $(pwd)
 RUN echo $(ls)
 RUN mix deps.get --only $MIX_ENV
 RUN mix deps.compile
@@ -25,7 +26,7 @@ FROM alpine:3.14.2
 # install runtime dependencies
 RUN apk upgrade --no-cache && apk add --no-cache postgresql-client bash openssl libgcc libstdc++ ncurses-libs
 
-EXPOSE 4001
+EXPOSE 443 80 4001
 ENV MIX_ENV=prod
 
 # prepare app directory
@@ -34,8 +35,9 @@ WORKDIR /app
 
 # copy release to app container
 COPY --from=build /app/_build/prod/rel/clab .
+COPY --from=build /app/*.pem ./lib/clab-0.1.0/
 RUN echo $(pwd)
-RUN echo $(ls)
+RUN echo $(ls -la lib/clab-0.1.0)
 
 # @TODO: More secure ?
 # RUN chown -R nobody: /app
