@@ -202,11 +202,12 @@ a {
 }
 
 .navbar-wrapper {
+    background: #26619C;
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
     padding: 15px 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #26619C;
 }
 .navbar-wrapper .menu-section {
     display: flex;
@@ -220,17 +221,16 @@ a {
 
 .navbar-wrapper .menu-section.no-login {
     display: flex;
-    justify-content: space-between;
-    flex-grow: 1;
-    font-size: 18px;
-    font-weight: bold;
-    color: white;
-    margin-top: 6px;
+    justify-content: flex-end;
 }
 
-.menu-item.login {
+.menu-item.signup { 
     margin-right: 15px;
-
+    background-color: white;
+    color: black;
+    border-radius: 20px;
+    padding: 12px 24px;
+    font-size: 16px;
 }
 
 .menu-section .menu-item:hover {
@@ -272,26 +272,15 @@ a {
     font-weight: bolder;
     justify-content: center;
     display: flex;
-    font-size: 26px;
+    font-size: 32px;
     margin-bottom: 20px;
     font-family: Isidora-Bold;
-}
-
-.landing-subtitle-small {
-    display: flex;
-    justify-content: center;
-    font-size: 24px;
-    margin-top: 40px;
 }
 
 .signup-section {
     display: flex;
     justify-content: center;
     margin-bottom: 40px;
-}
-
-.landing-primary-signup {
-    margin-bottom: 80px;
 }
 
 .landing-signup-button {
@@ -307,11 +296,21 @@ a {
 
 .landing-first-page-wrapper {
     background: #26619C;
-    background: linear-gradient(
-        180deg, #26619C 64%, #318CE7 77%, white 92%);
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%),
+    linear-gradient(180deg, #26619C, #318CE7 90%);
     color: white;
-    padding-bottom: 80px;
-    height: 140vh;
+    height: 95vh;
+}
+
+.landing-gradiant-wrapper {
+    height: 100vh;
+    background: #26619C;
+    font-weight: bold;
+    font-size: 32px;
+    background: linear-gradient(180deg, #318CE7 0%, white 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .landing-wrapper.logo-wrapper {

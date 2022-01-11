@@ -24,20 +24,16 @@ class Landing extends React.Component {
       <div>
         <Navbar user={this.state.user}/>
         <div className="landing-wrapper">
-          <div className="landing-first-page-wrapper">
-          
-            {/* <h1 className="page-title">Bienvenue sur&nbsp;<div className="logo-section">
-            <span className="first-logo-span">Coach</span><span className="second-logo-span">Lab</span>
-            </div>!</h1> */}
+          <div className="landing-first-page-wrapper">          
             <div className="logo-section">
               <img src="priv/static/images/logo_blanc.svg"></img>
             </div>
-            <div className="landing-subtitle-small">Se trouver ici, maintenant</div>
-            <h2 className="landing-page-title">Le centre de coaching digital !</h2>
+            <h2 className="landing-page-title">Le centre de coaching digital</h2>
             <div className="signup-section landing-primary-signup">
               <button onClick={() => window.location.href = "/inscription"} className="landing-signup-button">Je m'inscris !</button>
             </div>
           </div>
+          <div className="landing-gradiant-wrapper"></div>
           <div className="landing-section">
             <div className="landing-section-column">
               <div className="landing-section-column-title">

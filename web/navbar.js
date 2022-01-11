@@ -45,8 +45,12 @@ class Navbar extends React.Component {
               
               : 
               <div className="menu-section no-login">
-                <div className="menu-item login"><a href="/connexion">Se connecter</a></div>
-                <div className="menu-item signup"><a href="/inscription">S'inscrire</a></div>
+                {
+                  this.props.show_login == true ?
+                    <div className="menu-item login"><a href="/connexion">Se connecter</a></div>
+                    :
+                    <div className="menu-item signup"><a href="/inscription">Je m'inscris</a></div>
+                }
               </div>
             }
             </div>
