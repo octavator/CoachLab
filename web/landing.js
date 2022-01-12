@@ -26,64 +26,70 @@ class Landing extends React.Component {
         <div className="landing-wrapper">
           <div className="landing-first-page-wrapper">          
             <div className="logo-section">
-              <img src="priv/static/images/logo_blanc.svg"></img>
+            <img src="priv/static/images/logo_blanc.svg"></img>
             </div>
             <h2 className="landing-page-title">Le centre de coaching digital</h2>
-            <div className="signup-section landing-primary-signup">
-              <button onClick={() => window.location.href = "/inscription"} className="landing-signup-button">Je m'inscris !</button>
+          </div>
+          <div className="landing-intermediary-gradiant-wrapper"></div>
+          <div className="landing-gradiant-wrapper">
+            <div>Se trouver, ici et maintenant.</div>
+          </div>
+          <div className="landing-intermediary-connection-header">
+            <div className="landing-intermediary-logo">
+                <img className="landing-inline-logo" src="priv/static/images/logo_cartouche_blanc.svg"></img>
+              </div>
+            <div className="landing-intermediary-connection-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
+          </div>
+          <div className="landing-text-section">
+            Vous êtes intéressé.e par un coaching, vous souhaitez développer vos capacités dans un domaine particulier...
+            depuis chez vous et en quelques clics ? De nombreux coachs certifiés vous attendent sur CoachLab ! Coachs professionnels, Spécialistes du développement personnel,
+            Coachs sportifs, Life Coachs... Tous, diplômés et expérimentés sont à porté de clic ! 
+          </div>
+          <div className="landing-inscription-card">
+            <div className="landing-inscription-card-text">
+              Rejoignez la plateforme CoachLab,<br/> le premier centre de coaching digital !
+            </div>
+            <div className="landing-inscription-card-button" onClick={() => { window.location.href = "/inscription" }}>
+              Je m'inscris
             </div>
           </div>
-          <div className="landing-gradiant-wrapper"></div>
-          <div className="landing-section">
-            <div className="landing-section-column">
-              <div className="landing-section-column-title">
-                Prise de rendez-vous en ligne et automatique
-              </div>
-              <div className="landing-section-column-desc">
-                Vous avez la main sur votre emploi du temps, mais les coachés peuvent également directement prendre RDV sur la plateforme selon vos disponibilités.
-              </div>
-              {/* <div className="signup-section">
-                <button onClick={() => window.location.href = "/inscription"} className="landing-signup-button">Je m'inscris !</button>
-              </div> */}
-            </div>
-            <div className="landing-section-column">
-              <div className="landing-section-column-title">
-                Vidéo live et très simple d'utilisation
-              </div>
-              <div className="landing-section-column-desc">
-                Notre plateforme vous propose un service de vidéo intégré facilitant ainsi le suivi de vos coachés et de vos formations.
-              </div>
-              {/* <div className="signup-section">
-                <button onClick={() => window.location.href = "/inscription"} className="landing-signup-button">Je m'inscris !</button>
-              </div> */}
-            </div>
+          <div className="landing-gradiant-wrapper-reversed">
+            <div>Vous êtes coach certifié ? <br/>L'outil digital CoachLab est fait pour vous ! </div>
           </div>
-          <div className="landing-section">
-            <div className="landing-section-column">
-              <div className="landing-section-column-title">
-               Paiement instantanné et sécurisé en toute simplicité
+          <div className="landing-intermediary-gradiant-reversed"></div>
+          <div className="landing-advantages-section">
+            <div className="landing-info-card-section">
+              <div className="landing-info-card">
+                <div className="landing-info-card-picto">
+                <img className="landing-info-card-picto-img" src="priv/static/images/calendrier.svg"/>
+                </div>
+                <div className="landing-info-card-text">
+                  Un agenda interactif, qui vous aide à organiser et à planifier vos coachings à votre convenance, avec inscription de vos coachés possible directement sur la plateforme selon vos disponibilités.
+                </div>
               </div>
-              <div className="landing-section-column-desc">
-                L'argent est directement versé sur votre compte bancaire. Cela vous évite de donner votre RIB à tous vos coachés et de garder ainsi vos informations bancaires secrètes.
+              <div className="landing-info-card">
+                <div className="landing-info-card-picto">
+                  <img className="landing-info-card-picto-img" src="priv/static/images/livevideo.svg"/>
+                </div>
+                <div className="landing-info-card-text">
+                  Un outil de live vidéo simple d'utilisation, afin d'exercer votre profession où vous voulez, quand vous voulez.
+                </div>
               </div>
-              {/* <div className="signup-section">
-                <button onClick={() => window.location.href = "/inscription"} className="landing-signup-button">Je m'inscris !</button>
-              </div> */}
+              <div className="landing-info-card">
+                <div className="landing-info-card-picto">
+                  <img className="landing-info-card-picto-img" src="priv/static/images/facturation.svg"/>
+                </div>
+                <div className="landing-info-card-text">
+                  Une facturation automatique et instantanée de vos coachings, vous permettant de gagner du temps et de vous concentrer sur votre activité uniquement. 
+                </div>
+              </div>
             </div>
-            <div className="landing-section-column">
-              
-            </div>
-          </div>
-          <div className="landing-section">
-            <div className="landing-section-column centered-text">
-              <div className="landing-section-column-title">
-                Bientôt ouvert !
+            <div className="landing-inscription-card bg-white">
+              <div className="landing-inscription-card-text">
+                Soyez parmis les premiers coachs inscrits pour profiter de nombreux avantages ! 
               </div>
-              <div className="landing-section-column-desc">
-                Soyez parmi les premiers inscrits afin de profiter de nombreux avantages ! 
-              </div>
-              <div className="signup-section">
-                <button onClick={() => window.location.href = "/inscription"} className="landing-signup-button">Je m'inscris !</button>
+              <div className="landing-inscription-card-button blue-bg" onClick={() => { window.location.href = "/inscription" }}>
+                Je m'inscris
               </div>
             </div>
           </div>
