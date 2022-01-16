@@ -4,26 +4,27 @@ defmodule Clab.Application do
   use Application
 
   def start(_type, _args) do
-    cowboy_child = case Application.fetch_env!(:clab, :env) do
+    cowboy_children = case Application.fetch_env!(:clab, :env) do
       env when env in [:prod, :preprod] ->
-        {
+        [{
           Plug.Cowboy, scheme: :https, plug: ClabRouter, options: [
             port: 443,
             otp_app: :clab,
             keyfile: "./privkey.pem",
             certfile: "./certificate.pem"
           ]
-        }
+        },
+        {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 80]}
+        ]
       _ ->
-        {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 4001]}
+        [{Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 4001]}]
     end
 
-    children = [
-      cowboy_child,
+    children = cowboy_children ++ [
       User,
       Agenda,
       DataSaver
-    ]
+    ] 
     opts = [strategy: :one_for_one]
     Supervisor.start_link(children, opts)
   end

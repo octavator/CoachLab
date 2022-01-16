@@ -3,19 +3,19 @@
 @font-face {
     font-family: Isidora-Medium;
     src: url("./fonts/Isidora-Medium.otf") format("opentype");
-  }  
+}  
 
-  @font-face {
+@font-face {
     font-family: IsidoraSans-Medium;
     src: url("./fonts/IsidoraSans-Medium.otf") format("opentype");
-  }  
+}  
 
-  @font-face {
+@font-face {
     font-family: Isidora-Bold;
     src: url("./fonts/Isidora-Bold.otf") format("opentype");
-  }  
+}  
 
-  html {
+html {
     height: 100%;
 }
 
@@ -206,13 +206,12 @@ a {
 }
 
 .navbar-wrapper {
-    background: transparent;
-    position: absolute;
+    background: linear-gradient(90deg, #318CE7, #26619C);;
+    position: relative;
     width: 100%;
-    padding: 15px 10px;
+    padding: 15px 0px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
 }
 .navbar-wrapper .menu-section {
     display: flex;
@@ -238,9 +237,10 @@ a {
     font-size: 16px;
 }
 
-.menu-section .menu-item:hover {
+/* .menu-section .menu-item:hover {
     color: white;
-}
+} */
+
 .menu-dropdown-list {
     position: absolute;
     margin: 15px;
@@ -275,7 +275,9 @@ a {
     color: white;
     font-weight: bolder;
     justify-content: center;
+    text-align: center;
     display: flex;
+    width: 70px;
     margin-top: 15px;
     font-size: 2.3em;
     font-family: Isidora-Bold;
@@ -326,14 +328,15 @@ a {
     background: #26619C;
     font-weight: bold;
     font-size: 3.6em;
+    text-align: center;
+    justify-content: center;
     background: linear-gradient(180deg, #318CE7 20%, white 100%);
     display: flex;
-    justify-content: center;
     align-items: center;
 }
 
 .landing-gradiant-wrapper-reversed {
-    height: 80vh;
+    height: 60vh;
     background: #26619C;
     font-weight: bold;
     font-size: 3.6em;
@@ -341,8 +344,7 @@ a {
     background: linear-gradient(180deg, white  0%, #318CE7 100%);
     display: flex;
     text-align: center;
-    justify-content: center;
-    align-items: center;
+    align-items: end;
 }
 
 .landing-intermediary-gradiant-reversed {
@@ -351,9 +353,10 @@ a {
 }
 
 .landing-text-section {
-    padding: 4em 2.5em 2em 2.5em;
+    padding: 2em 10% 2em 10%;
     font-size: 3.6em;
-    background: -webkit-linear-gradient(#318CE7, #26619C);
+    overflow: auto;
+    background: linear-gradient(90deg, #318CE7, #26619C);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -373,7 +376,7 @@ a {
 .landing-inscription-card {
     background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
     width: 45%;
-    height: 35vh;
+    height: 30vh;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -466,7 +469,16 @@ a {
     margin-top: 80px;
 }
 
-.landing-first-page-wrapper .logo-section {
+.landing-logo-section {
+    display: flex;
+    justify-content: center;
+    width: 40%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.landing-first-page-wrapper .landing-logo-section {
     padding-top: 28%;
 }
 
@@ -524,24 +536,6 @@ a {
     text-align: center;
 }
 
-/* FOOTER */
-
-.footer {
-    background: #26619C;
-    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
-    display: flex;
-    height: 120px;
-    justify-content: center;
-    align-items: center;
-    color: white;
-x    padding-top: 15px;
-    font-size: 20px;
-}
-
-.contact-mail {
-    font-weight: bold;
-    margin-left: 10px;
-}
 
 /* MODAL */
 
@@ -614,16 +608,14 @@ x    padding-top: 15px;
 
 
 /* LOGO */
-.logo-section {
+.navbar-logo-section {
     display: flex;
-    justify-content: center;
     width: 40%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 20px;
 }
 
-.navbar-wrapper .logo-wrapper {
-    margin-right: 130px;
+.navbar-logo-section .logo-wrapper {
+    width: 60%;
 }
 
 .first-logo-span {
@@ -642,6 +634,42 @@ x    padding-top: 15px;
     color:white !important;
 }
 
+/* FOOTER */
+
+.footer {
+    background: #26619C;
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+    display: flex;
+    height: 180px;
+    color: white;
+    padding-left: 2em;
+    padding-bottom: 2em;
+    font-size: 20px;
+}
+
+.contact-mail {
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.footer-wrapper {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.footer-white-logo {
+    display: flex;
+    align-items: baseline;
+}
+
+.footer-white-logo-image {
+    max-width: 200px;
+    margin-right: 15px;
+}
+
 .welcome-page-title {
     font-size: 42px;
 }
@@ -652,4 +680,30 @@ x    padding-top: 15px;
     margin: 200px 0;
     font-size: 28px;
     text-align: center;
+}
+
+.landing-page-mobile-signup-button {
+    display: none;
+}
+
+/* RESPONSIVE -- TABLET & SMARTPHONE */
+
+@media only screen and (max-width : 768px){
+    .landing-info-card-section {
+        flex-direction: column;
+    }
+
+    .landing-page-mobile-signup-button {
+        padding: 12px 32px;
+        color: #26619C;
+        background-color: white;
+        border-radius: 24px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+    }
+
+    .landing-inscription-card {
+        padding: 2em;
+    }
 }

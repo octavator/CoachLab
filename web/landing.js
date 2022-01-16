@@ -13,6 +13,7 @@ class Landing extends React.Component {
     }
   }
   componentDidMount() {
+    //@todo redirect to connected landing page if user is recognized
     http.get("/me").then(res => {
       console.log(res.status)
       console.log(res.data)
@@ -22,23 +23,27 @@ class Landing extends React.Component {
   render() {
     return (
       <div>
-        <Navbar user={this.state.user}/>
+        {/* <Navbar user={this.state.user}/> */}
         <div className="landing-wrapper">
-          <div className="landing-first-page-wrapper">          
-            <div className="logo-section">
-            <img src="priv/static/images/logo_blanc.svg"></img>
+          <div className="landing-first-page-wrapper">
+            {/* @TODO: connection button top right 
+            <div className="landing-page-desktop-signup-button" onClick={() => { window.location.href = "/connexion" }}>Je m'inscris</div>
+            */}
+            <div className="landing-logo-section">
+              <img src="priv/static/images/logo_blanc.svg"></img>
             </div>
             <h2 className="landing-page-title">Le centre de coaching digital</h2>
+            <div className="landing-page-mobile-signup-button" onClick={() => { window.location.href = "/connexion" }}>Je m'inscris</div>
           </div>
           <div className="landing-intermediary-gradiant-wrapper"></div>
           <div className="landing-gradiant-wrapper">
-            <div>Se trouver, ici et maintenant.</div>
+            Se trouver, ici et maintenant.
           </div>
           <div className="landing-intermediary-connection-header">
             <div className="landing-intermediary-logo">
                 <img className="landing-inline-logo" src="priv/static/images/logo_cartouche_blanc.svg"></img>
               </div>
-            <div className="landing-intermediary-connection-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
+              <div className="landing-intermediary-connection-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
           </div>
           <div className="landing-text-section">
             Vous êtes intéressé.e par un coaching, vous souhaitez développer vos capacités dans un domaine particulier...

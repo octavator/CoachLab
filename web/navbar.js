@@ -14,9 +14,9 @@ class Navbar extends React.Component {
   render() {
     return (
         <div className="navbar-wrapper">
-            <div className="logo-section">
-                <div className="logo-wrapper">
-                  <i src="./images/logo_blanc.svg"></i>
+            <div className="navbar-logo-section">
+                <div onClick={() => {window.location.href = "/"}} className="logo-wrapper">
+                  <img src="priv/static/images/logo_blanc.svg"/>
                 </div>
             </div>
 
@@ -47,9 +47,9 @@ class Navbar extends React.Component {
               <div className="menu-section no-login">
                 {
                   this.props.show_login == true ?
-                    <div className="menu-item login"><a href="/connexion">Se connecter</a></div>
+                  <div className="menu-item login" onClick={() => window.location.href = "/connexion"}>Se connecter</div>
                     :
-                    <div className="menu-item signup"><a href="/inscription">Je m'inscris</a></div>
+                    <div className="menu-item signup" onClick={() => window.location.href = "/inscription"}>Je m'inscris</div>
                 }
               </div>
             }

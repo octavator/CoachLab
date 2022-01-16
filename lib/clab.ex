@@ -11,6 +11,7 @@ defmodule ClabRouter do
 
   @secret "73JIOiOJSKLAZHOJfspaioz9902"
 
+  plug Plug.SSL
   plug Plug.Static, from: :clab, at: "/priv/static"
   plug :match
   plug Plug.Parsers, parsers: [:json],
