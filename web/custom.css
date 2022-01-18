@@ -277,9 +277,8 @@ a {
     justify-content: center;
     text-align: center;
     display: flex;
-    width: 70px;
     margin-top: 15px;
-    font-size: 2.3em;
+    font-size: 1.3rem;
     font-family: Isidora-Bold;
 }
 
@@ -321,6 +320,9 @@ a {
     background:  linear-gradient(90deg, #318CE7 0%, #26619C 100%);
     color: white;
     height: 95vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .landing-gradiant-wrapper {
@@ -336,31 +338,32 @@ a {
 }
 
 .landing-gradiant-wrapper-reversed {
-    height: 60vh;
+    height: 70vh;
     background: #26619C;
     font-weight: bold;
-    font-size: 3.6em;
+    font-size: 2.9rem;
     padding: 0 10%;
     background: linear-gradient(180deg, white  0%, #318CE7 100%);
     display: flex;
     text-align: center;
-    align-items: end;
+    align-items: center;
 }
 
 .landing-intermediary-gradiant-reversed {
     background: linear-gradient(to bottom right, #318CE7 50%, #26619C 100%);
-    height: 30vh;
+    height: 20vh;
 }
 
 .landing-text-section {
     padding: 2em 10% 2em 10%;
-    font-size: 3.6em;
+    font-size: 3.6rem;
     overflow: auto;
     background: linear-gradient(90deg, #318CE7, #26619C);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: bold;
+    word-break: break-word;
 }
 
 .landing-intermediary-connection-button {
@@ -376,12 +379,12 @@ a {
 .landing-inscription-card {
     background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
     width: 45%;
-    height: 30vh;
+    min-height: 40vh;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    padding: 0 2em 0em 2em;
+    padding: 1rem 2rem 1rem 2rem;
     margin: 0 auto 15px auto;
     border-radius: 12px;
     color: white;
@@ -399,6 +402,7 @@ a {
     font-size: 1.8em;
     font-weight: bold;
     text-align: center;
+    margin-bottom: 20px;
 }
 
 .landing-gradient-text {
@@ -472,7 +476,7 @@ a {
 .landing-logo-section {
     display: flex;
     justify-content: center;
-    width: 40%;
+    width: 55%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -616,6 +620,8 @@ a {
 
 .navbar-logo-section .logo-wrapper {
     width: 60%;
+    cursor: pointer;
+    max-width: 280px;
 }
 
 .first-logo-span {
@@ -686,21 +692,42 @@ a {
     display: none;
 }
 
+
+.landing-page-desktop-signup-button {
+    padding: 10px 36px;
+    background: white;
+    border-radius: 24px;
+    color: black;
+    margin-top: 20px;
+    margin-right: 20px;
+    align-self: end;
+}
+
 /* RESPONSIVE -- TABLET & SMARTPHONE */
 
 @media only screen and (max-width : 768px){
+
+    .landing-first-page-wrapper {
+        justify-content: center;
+    }
+
+    .landing-page-desktop-signup-button {
+        display: none;
+    }
+    
     .landing-info-card-section {
         flex-direction: column;
     }
 
     .landing-page-mobile-signup-button {
         padding: 12px 32px;
-        color: #26619C;
+        color: black;
         background-color: white;
         border-radius: 24px;
         font-weight: bold;
         display: flex;
         justify-content: center;
+        width: 90px;
     }
 
     .landing-inscription-card {

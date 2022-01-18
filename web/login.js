@@ -1,4 +1,6 @@
 import Navbar from './navbar.js'
+import TextInput from './components/forms/inputs.js'
+
 
 class Login extends React.Component {
   constructor(props) {
@@ -39,7 +41,7 @@ class Login extends React.Component {
         <div className="login-content-wrapper infos-form">
           <div className="input-group">
             <label className="input-label">Adresse mail</label>
-            <input onChange={(e) => { this.setState({form: {...this.state.form, email: e.target.value}}) }} value={this.state.form.email} name="email" type="text"></input>
+            <input onChange={(e) => { this.setState({form: {...this.state.form, email: e.target.value}}) }} value={this.state.form.email} name="email" type="email"></input>
           </div>
           <div className="input-group">
             <label className="input-label">Mot de passe</label>
