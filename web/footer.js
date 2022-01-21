@@ -7,7 +7,7 @@ class Footer extends React.Component {
     return (
       <div className="footer-wrapper">
         <div className="footer-white-logo"><img className="footer-white-logo-image" src="priv/static/images/logo_blanc.svg"></img><div>Copyright © 2022 CoachLab, tous droits réservés.</div></div>
-        <div><a class="contact-mail" href="mailto:contact@coachlab.fr">Nous contacter</a></div>
+        <div className=""><a className="footer-link contact-mail" href="mailto:contact@coachlab.fr">Nous contacter</a></div>
       </div>
     )
   }

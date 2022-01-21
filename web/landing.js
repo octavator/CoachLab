@@ -26,33 +26,33 @@ class Landing extends React.Component {
         {/* <Navbar user={this.state.user}/> */}
         <div className="landing-wrapper">
           <div className="landing-first-page-wrapper">
-            <div className="landing-page-desktop-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+            <div className="cl-button landing-page-desktop-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
             <div className="landing-logo-section">
               <img src="priv/static/images/logo_blanc.svg"></img>
             </div>
             <h2 className="landing-page-title">Le centre de coaching digital</h2>
-            <div className="landing-page-mobile-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
-          </div>
+            <div className="cl-button landing-page-mobile-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+          </div> 
           <div className="landing-intermediary-gradiant-wrapper"></div>
           <div className="landing-gradiant-wrapper">
-            Se trouver, ici et maintenant.
+            Se trouver.<br/>Ici et maintenant
           </div>
           <div className="landing-intermediary-connection-header">
             <div className="landing-intermediary-logo">
                 <img className="landing-inline-logo" src="priv/static/images/logo_cartouche_blanc.svg"></img>
               </div>
-              <div className="landing-intermediary-connection-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
+              <div className="cl-button landing-intermediary-connection-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
           </div>
           <div className="landing-text-section">
             Vous êtes intéressé.e par un coaching, vous souhaitez développer vos capacités dans un domaine particulier...
             depuis chez vous et en quelques clics ? De nombreux coachs certifiés vous attendent sur CoachLab ! Coachs professionnels, Spécialistes du développement personnel,
-            Coachs sportifs, Life Coachs... Tous, diplômés et expérimentés sont à porté de clic ! 
+            Coachs sportifs, Life Coachs... Tous, diplômés et expérimentés, sont à portée de clic ! 
           </div>
           <div className="landing-inscription-card">
             <div className="landing-inscription-card-text">
               Rejoignez la plateforme CoachLab,<br/> le premier centre de coaching digital !
             </div>
-            <div className="landing-inscription-card-button" onClick={() => { window.location.href = "/inscription" }}>
+            <div className="cl-button landing-inscription-card-button" onClick={() => { window.location.href = "/inscription" }}>
               Je m'inscris
             </div>
           </div>
@@ -67,7 +67,7 @@ class Landing extends React.Component {
                 <img className="landing-info-card-picto-img" src="priv/static/images/calendrier.svg"/>
                 </div>
                 <div className="landing-info-card-text">
-                  Un agenda interactif, qui vous aide à organiser et à planifier vos coachings à votre convenance, avec inscription de vos coachés possible directement sur la plateforme selon vos disponibilités.
+                  Un agenda interactif, qui vous aide à organiser et à planifier vos coachings à votre convenance, avec inscription de vos coachés directement sur la plateforme, selon vos disponibilités.
                 </div>
               </div>
               <div className="landing-info-card">
@@ -89,9 +89,9 @@ class Landing extends React.Component {
             </div>
             <div className="landing-inscription-card bg-white">
               <div className="landing-inscription-card-text">
-                Soyez parmis les premiers coachs inscrits pour profiter de nombreux avantages ! 
+                Soyez parmi les premiers coachs inscrits pour profiter de nombreux avantages ! 
               </div>
-              <div className="landing-inscription-card-button blue-bg" onClick={() => { window.location.href = "/inscription" }}>
+              <div className="cl-button landing-inscription-card-button blue-bg" onClick={() => { window.location.href = "/inscription" }}>
                 Je m'inscris
               </div>
             </div>
