@@ -14,8 +14,8 @@ defmodule ClabRouter do
   plug Plug.SSL
   plug Plug.Static, from: :clab, at: "/priv/static"
   plug :match
-  plug Plug.Parsers, parsers: [:json],
-                     pass:  ["text/*"],
+  plug Plug.Parsers, parsers: [:json, :multipart],
+                     pass: ["*/*"],
                      json_decoder: Poison
   plug :dispatch
 
@@ -134,8 +134,27 @@ defmodule ClabRouter do
   end
 
   get "/inscription" do
-    data = Utils.get_html_template("signup")
+    data = Utils.get_html_template("new-signup")
     send_resp(conn, 200, data)
+  end
+
+  post "/inscription/file" do
+    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    IO.inspect(File.read!(body.myFile.path), label: "body")
+    File.write("#{:code.priv_dir(:clab)}/images/#{body.myFile.filename}", File.read!(body.myFile.path))
+    send_resp(conn, 200, "ok")
+  end
+
+  get "/coach/search" do
+    {conn, id} = get_token_user(conn)
+    if conn.cookies["cltoken"] == build_token(id) do
+      coach_id = conn.query_params["coach_name"] |> Base.decode64!(padding: false)
+      Logger.debug("coach search: #{coach_name}")
+      users = User.search_users_by_name(coach_name)  |> Poison.encode!
+      send_resp(conn, 200, users)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
   end
 
   post "/sign-up" do

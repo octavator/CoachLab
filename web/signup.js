@@ -1,4 +1,4 @@
-import TextInput from "./components/forms/inputs.js"
+import {TextInput} from "./components/forms/inputs.js"
 import Navbar from "./navbar.js"
 
 class SignUp extends React.Component {
@@ -47,8 +47,8 @@ class SignUp extends React.Component {
               <label className="input-label">Mot de passe</label>
               <input onChange={(e) => { this.setState({form: {...this.state.form, password: e.target.value}}) }} value={this.state.form.password} type="password"></input>
             </div>
-            <TextInput value={this.state.form.firstname} on_change={(e) => { this.setState({form: {...this.state.form, firstname: e.target.value}}) }} label="Prénom" />
-            <TextInput value={this.state.form.lastname} on_change={(e) => { this.setState({form: {...this.state.form, lastname: e.target.value}}) }} label="Nom" />
+            <TextInput value={this.state.form.firstname} onChange={(e) => { this.setState({form: {...this.state.form, firstname: e.target.value}}) }} label="Prénom" />
+            <TextInput value={this.state.form.lastname} onChange={(e) => { this.setState({form: {...this.state.form, lastname: e.target.value}}) }} label="Nom" />
             <div className="input-group">
               <div className="button-group">
                 <button onClick={() => { this.sendForm() }} className="cl-button primary">

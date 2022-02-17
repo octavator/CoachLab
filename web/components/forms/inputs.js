@@ -1,22 +1,131 @@
+/*
+  TextInput component
+
+  props: {
+    label: "Firstname" - field's label // optionnal (hidden)
+    onChange: (e) => {...}  - field's related onChange function // required
+    value: "Firstname" - field's value to bind // required
+    type: "password" - field's type // optionnal (text)
+    extraClass: "myClass" - field's extraClass to add // optionnal ("")
+    required: "Firstname" - is field required // optionnal (false)
+    name: "firstname" - field's HTTP name // optionnal ("")
+    placeholder: "type here" - field's HTTP placeholder // optionnal ("")
+  }
+*/
+
 class TextInput extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      show_dropdown: false
     }
   }
   render() {
     return (
       <div className="text-input-wrapper">
         <div className="input-group">
-          <label className="input-label">{this.props.label}</label>
-          <input onChange={(e) => { this.props.on_change(e)}} placeholder={this.props.placeholder} value={this.props.value} type="text"></input>
+          <label className={"input-label" + (this.props.label ? "" : " hidden")}>{this.props.label}</label>
+          <input className={"cl-input " + (this.props.extraClass ? this.props.extraClass : "")} required={this.props.required} name={this.props.name || ""}
+           onChange={(e) => { this.props.onChange(e.target.value)}} placeholder={this.props.placeholder} value={this.props.value} type={this.props.type || "text"}></input>
         </div>
       </div>              
     )
   }
 }
 
-export default TextInput
-// const domContainer = document.querySelector('.TextInput-wrapper');
-// ReactDOM.render(<TextInput/>, domContainer);
+/*
+  FileInput component
+
+  props: {
+    label: "Firstname" - field's label // optionnal (hidden)
+    onChange: (e) => {...}  - field's related onChange function // required
+    value: "Firstname" - field's value to bind // required
+    extraClass: "myClass" - field's extraClass to add // optionnal ("")
+    required: "Firstname" - is field required // optionnal (false)
+    name: "firstname" - field's HTTP name // optionnal ("")
+  }
+*/
+
+class FileInput extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+  render() {
+    return (
+      <div className={"file-input-wrapper "  + (this.props.extraClass.includes("bg-white") ? "white-text" : "")}>
+        <label className={"file-input-label " + (this.props.extraClass ? this.props.extraClass : "")}>
+          <input className={"cl-file-input "} required={this.props.required} onChange={(e) => { this.props.onChange(e.target.files[0])}}
+            type="file" name={this.props.name || ""} accept={this.props.accept} ></input>
+          <span>{this.props.label}</span>
+        </label>
+        <div className="file-input-filename">{this.props.filename}</div>
+      </div>
+    )
+  }
+}
+
+/*
+  TextArea component
+
+  props: {
+    label: "Firstname" - field's label // optionnal (hidden)
+    onChange: (e) => {...}  - field's related onChange function // required
+    value: "Firstname" - field's value to bind // required
+    extraClass: "myClass" - field's extraClass to add // optionnal ("")
+    required: "Firstname" - is field required // optionnal (false)
+    name: "firstname" - field's HTTP name // optionnal ("")
+    placeholder: "type here" - field's HTTP placeholder // optionnal (""),
+    rows: "10" - default number of rows that can be seen at once in the text area // optionnal (""),
+  }
+*/
+
+class TextArea extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+  render() {
+    return (
+      <div className="text-area-wrapper">
+        <div className="input-group">
+          <label className={"input-label" + (this.props.label ? "" : " hidden")}>{this.props.label}</label>
+          <textarea className={"cl-textarea " + (this.props.extraClass ? this.props.extraClass : "")} required={this.props.required} name={this.props.name || ""}
+           onChange={(e) => { this.props.onChange(e.target.value)}} placeholder={this.props.placeholder} value={this.props.value} rows={this.props.rows || "10"}></textarea>
+        </div>
+      </div>              
+    )
+  }
+}
+
+/*
+  Button component
+
+  props: {
+    onClick: () => {...}  - field's related onClick function // required
+    extraClass: "myClass" - field's extraClass to add // optionnal ("")
+    disabled: "Firstname" - is field disabled // optionnal (false)
+    text: "Suivant" - button content // optionnal ("")
+  }
+*/
+
+class Button extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+  render() {
+    return (
+      <div className="button-wrapper">
+        <button className={"cl-button " + (this.props.extraClass ? this.props.extraClass : "")} disabled={this.props.disabled || false}
+          onClick={() => { this.props.onClick()}} >
+          {this.props.text}
+        </button>
+      </div>              
+    )
+  }
+}
+
+export {TextInput, FileInput, TextArea, Button}

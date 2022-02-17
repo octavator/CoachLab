@@ -1,5 +1,4 @@
 import Navbar from './navbar.js'
-import TextInput from './components/forms/inputs.js'
 
 
 class Login extends React.Component {

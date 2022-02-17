@@ -9,7 +9,8 @@ class Landing extends React.Component {
         firstname: "",
         lastname: "",
         email: ""
-      }
+      },
+      show_navbar: false
     }
   }
   componentDidMount() {
@@ -19,8 +20,32 @@ class Landing extends React.Component {
       console.log(res.data)
       this.setState({user: res.data})
     })
+
+    const options = {
+      root: null,
+      threshold: 0.20, // 0 - 1 this work as a trigger. 
+    };
+
+    const targetOn = document.querySelector('.landing-text-section');
+    const targetOff = document.querySelector('.landing-first-page-wrapper');
+    const observerOn = new IntersectionObserver(
+     entries => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) this.setState({show_navbar: true})
+      });
+  }, options);
+    const observerOff = new IntersectionObserver(
+      entries => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) this.setState({show_navbar: false})
+      });
+  }, options);
+
+  observerOn.observe(targetOn);
+  observerOff.observe(targetOff);
   }
   render() {
+    console.log(this.state.show_navbar)
     return (
       <div>
         {/* <Navbar user={this.state.user}/> */}
@@ -34,18 +59,19 @@ class Landing extends React.Component {
             <div className="cl-button landing-page-mobile-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
           </div> 
           <div className="landing-intermediary-gradiant-wrapper"></div>
-          <div className="landing-gradiant-wrapper">
+          <div className="landing-gradient-wrapper">
             Se trouver.<br/>Ici et maintenant
           </div>
-          <div className="landing-intermediary-connection-header">
+          {/* FAKE NAVBAR */}
+          <div className={"landing-intermediary-connection-header" + (this.state.show_navbar ? "" : " hidden")} >
             <div className="landing-intermediary-logo">
-                <img className="landing-inline-logo" src="priv/static/images/logo_cartouche_blanc.svg"></img>
+                <img className="landing-inline-logo" src="priv/static/images/logo.svg"></img>
               </div>
-              <div className="cl-button landing-intermediary-connection-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
+              <div className="cl-button landing-intermediary-connection-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
           </div>
           <div className="landing-text-section">
-            Vous êtes intéressé.e par un coaching, vous souhaitez développer vos capacités dans un domaine particulier...
-            depuis chez vous et en quelques clics ? De nombreux coachs certifiés vous attendent sur CoachLab ! Coachs professionnels, Spécialistes du développement personnel,
+            Vous êtes intéressé.e par un coaching, vous souhaitez développer vos capacités dans un domaine particulier... depuis chez vous et en quelques clics ? <br/>
+            De nombreux coachs certifiés vous attendent sur CoachLab !<br/> Coachs professionnels, Spécialistes du développement personnel,
             Coachs sportifs, Life Coachs... Tous, diplômés et expérimentés, sont à portée de clic ! 
           </div>
           <div className="landing-inscription-card">
@@ -56,7 +82,7 @@ class Landing extends React.Component {
               Je m'inscris
             </div>
           </div>
-          <div className="landing-gradiant-wrapper-reversed">
+          <div className="landing-gradient-wrapper-reversed">
             <div>Vous êtes coach certifié ? <br/>L'outil digital CoachLab est fait pour vous ! </div>
           </div>
           <div className="landing-intermediary-gradiant-reversed"></div>

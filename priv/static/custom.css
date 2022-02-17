@@ -23,6 +23,7 @@ body {
     margin: 0;
     height: 100%;
     font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
+    font-size: 1.0vw;
 }
 
 /* /!\ Problème avec les accents pour Isidora-Bold */
@@ -32,6 +33,10 @@ body {
 
 .bg-white {
     background-color: white;
+}
+
+.white-text {
+    color: white;
 }
 
 .bold {
@@ -49,12 +54,137 @@ a {
     display: none !important;
 }
 
+.clab-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
 .page-title {
     color: #26619C;
     justify-content: center;
     display: flex;
     margin-bottom: 20px;
 }
+
+/* BUTTONS */
+.cl-radio {
+    cursor: pointer;
+}
+
+.cl-button {
+    display: flex;
+    justify-content: center;
+    border-radius: 50px;
+    outline: none;
+    border: none;
+    text-align: center;
+    font-size: 1.0vw;
+    /* font-size: 1.4vw; */
+    padding: 12px 24px;
+    cursor: pointer;
+    box-shadow: 0px 0px 1px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 1px 1px darkslategrey;
+    background-color: #26619C;
+    color: white;
+    font-family: Isidora-Bold, Isidora-Medium, IsidoraSans-Medium, sans-serif;
+    font-weight: bold;
+}
+
+.cl-button.bg-white {
+    background-color: white;
+    color: black;
+}
+
+.cl-button:hover {
+    box-shadow: 0px 0px 4px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 4px 1px darkslategrey;
+}
+
+.cl-form-button {
+    margin-top: 30px;
+}
+
+/* INPUTS */
+
+.cl-input {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0 10px 0;
+    padding: 12px 24px;  
+    border-radius: 50px;
+    box-shadow: 0px 0px 1px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 1px 1px darkslategrey;
+    background-color: white;
+    border: none;
+    min-width: 80px;
+    font-size: 1.0vw;
+}
+
+.cl-input:hover {
+    box-shadow: 0px 0px 4px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 4px 1px darkslategrey;
+    border: none;
+}
+
+.cl-form-input {
+    width: 30vh;
+}
+
+.text-area-wrapper {
+    width: 100%;
+}
+
+.cl-textarea {
+    border-radius: 24px;
+    width: 90%;
+    padding: 15px;
+    font-size: 1.0vw;
+}
+
+.cl-file-input {
+    position:absolute;
+    top: -1000px;
+}
+
+.file-input-label {
+    display: flex;
+    justify-content: center;
+    border-radius: 50px;
+    outline: none;
+    border: none;
+    text-align: center;
+    font-size: 1.0vw;
+    padding: 6px 42px;
+    cursor: pointer;
+    box-shadow: 0px 0px 1px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 1px 1px darkslategrey;
+    background-color: #26619C;
+    color: white;
+    font-family: Isidora-Bold, Isidora-Medium, IsidoraSans-Medium, sans-serif;
+    margin-right: 15px;
+}
+
+.file-input-label.bg-white {
+    background-color: white;
+    color: black;
+}
+
+.file-input-label:hover {
+    box-shadow: 0px 0px 4px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 4px 1px darkslategrey;
+}
+
+.file-input-wrapper {
+    display: flex;
+    align-items: center;
+    color: black;
+    
+}
+.file-input-wrapper.white-text {
+    color: white;
+}
+
 
 /* AGENDA */
 
@@ -206,20 +336,27 @@ a {
 }
 
 .navbar-wrapper {
-    background: linear-gradient(90deg, #318CE7, #26619C);;
+    /* background: linear-gradient(90deg, #318CE7, #26619C); */
+    background: white;
     position: relative;
     width: 100%;
     padding: 15px 0px;
+    min-height: 6vh;
     display: flex;
     align-items: center;
 }
+
+.navbar-wrapper.blue-bg {
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+}
+
 .navbar-wrapper .menu-section {
     display: flex;
     justify-content: space-between;
     flex-grow: 1;
     font-size: 18px;
     font-weight: bold;
-    color: white;
+    color: #318CE7;
     margin-top: 6px;
 }
 
@@ -277,7 +414,7 @@ a {
     justify-content: center;
     text-align: center;
     display: flex;
-    margin-top: 30px;
+    margin-top: 4vh;
     font-size: 3.5vw;
     font-family: Isidora-Bold;
 }
@@ -319,18 +456,18 @@ a {
     background: #26619C;
     background:  linear-gradient(90deg, #318CE7 0%, #26619C 100%);
     color: white;
-    height: 100vh;
+    height: 97vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
 }
 
-.landing-gradiant-wrapper {
-    height: 80vh;
+.landing-gradient-wrapper {
+    height: 45vh;
     background: #26619C;
     font-weight: bold;
-    font-size: 10.6vw;
+    font-size: 2.8vw;
     text-align: center;
     justify-content: center;
     background: linear-gradient(180deg, #318CE7 20%, white 100%);
@@ -338,16 +475,17 @@ a {
     align-items: center;
 }
 
-.landing-gradiant-wrapper-reversed {
-    height: 70vh;
+.landing-gradient-wrapper-reversed {
+    height: 45vh;
     background: #26619C;
     font-weight: bold;
-    font-size: 2.9rem;
-    padding: 0 10%;
+    font-size: 2.8vw;
+    padding: 0 10% 5% 10%;
     background: linear-gradient(180deg, white  0%, #318CE7 100%);
     display: flex;
     text-align: center;
-    align-items: center;
+    align-items: flex-end;
+    justify-content: center;
 }
 
 .landing-intermediary-gradiant-reversed {
@@ -356,8 +494,9 @@ a {
 }
 
 .landing-text-section {
+    margin: 4vh auto;
     padding: 2em 10% 2em 10%;
-    font-size: 3.6rem;
+    font-size: 2.8vw;
     overflow: auto;
     background: linear-gradient(90deg, #318CE7, #26619C);
     -webkit-background-clip: text;
@@ -368,13 +507,10 @@ a {
 }
 
 .landing-intermediary-connection-button {
-    background-color: white;
-    padding: 10px 18px;
-    color: black;
-    border-radius: 18px;
-    cursor: pointer;
-    margin-right: 20px;
-    box-shadow: 0px 0px 1px 1px grey;
+    background-color: linear-gradient(90deg, #318CE7, #26619C);
+    padding: 10px 36px;
+    color: white;
+    margin-right: 40px;
 }
 
 .landing-inscription-card {
@@ -385,9 +521,9 @@ a {
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    padding: 1rem 2rem 1rem 2rem;
+    padding: 4vh 5vw 4vh 5vw;
     margin: 0 auto 15px auto;
-    border-radius: 12px;
+    border-radius: 16px;
     color: white;
 }
 
@@ -395,12 +531,12 @@ a {
     padding: 12px 32px;
     color: #26619C;
     background-color: white;
-    border-radius: 24px;
+    border-radius: 50px;
     font-weight: bold;
 }
 
 .landing-inscription-card-text {
-    font-size: 1.8em;
+    font-size: 2.8vw;
     font-weight: bold;
     text-align: center;
     margin-bottom: 20px;
@@ -415,13 +551,15 @@ a {
     text-align: center;
     padding: 15px 0;
     flex-grow: 1;
+    font-size: 18px;
 }
 
 .landing-info-card-section {
     display: flex;
     justify-content: center;
+    width: 60%;
     align-items: center;
-    margin-bottom: 4em;
+    margin: auto auto 4em auto;
 }
 
 .landing-info-card {
@@ -431,17 +569,18 @@ a {
     flex-direction: column;
     background-color: white;
     border-radius: 15px;
-    padding: 15px;
+    padding: 35px 20px;
     margin: 20px 20px 20px 20px;
     min-width: 160px;
-    width: 220px;
-    height: 400px;
+    width: 260px;
+    height: 420px;
 }
 
 .landing-info-card-picto {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 100%;
 }
 
 .landing-info-card-picto-img {
@@ -458,15 +597,20 @@ a {
 }
 
 .landing-intermediary-connection-header {
+
+    width: 100%;
     display: flex;
+    background: white;
+    top: 0;
+    position: fixed;
     justify-content: space-between;
     align-items: center;
-    margin-top: 10vh;
+    padding: 15px;
     flex-wrap: wrap;
 }
 
 .landing-intermediary-gradiant-wrapper {
-    height: 25vh;
+    height: 15vh;
     background: #26619C;
     background: linear-gradient(to top right, #318CE7 50%, #26619C 100%);
 }
@@ -478,13 +622,9 @@ a {
 .landing-logo-section {
     display: flex;
     justify-content: center;
-    width: 50%;
+    width: 55%;
     margin-left: auto;
     margin-right: auto;
-}
-
-
-.landing-first-page-wrapper .landing-logo-section {
 }
 
 .landing-section {
@@ -514,6 +654,145 @@ a {
     font-size: 18px;
 }
 
+/* OTHER STEPS */
+
+.step-wrapper {
+    padding-top: 12vh;
+    padding-bottom: 5vh;
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+    color: white;
+}
+
+.step-form {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* FIRST STEP */
+
+.first-step-wrapper {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 5vh;
+    flex-direction: column;
+}
+
+.role-step-btn {
+    height: 35vh;
+    font-size: 3.4vw;
+    flex-grow: 1;
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+    margin: 0 4vw;
+    width: 50vw;
+    color: white;
+    text-align: center;
+    justify-content: center;
+    border-radius: 1.2vw;
+    padding: 2vw;
+    cursor: pointer;
+    box-shadow: 0px 0px 1px 1px grey;
+    -webkit-box-shadow: 0px 0px 1px 1px grey;
+}
+
+.role-step-btn:hover {
+    box-shadow: 0px 0px 4px 1px grey;
+    -webkit-box-shadow: 0px 0px 4px 1px grey;
+}
+
+.role-step-btn-text {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.first-step-btns-wrapper {
+    display: flex;
+    margin: 40px 20px;
+}
+
+/* DEFAULT THIRD STEP */
+
+.default-choices-container {
+    display: flex;
+    padding: 3vh 3vw 3vh 3vw;
+}
+
+.default-choice-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 50%;
+}
+
+.default-choice-label {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 2vh;
+}
+
+.picture-upload-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 3vh 3vw;
+}
+
+.file-upload-container {
+    display: flex;
+    justify-content: center;
+}
+
+.default-choice-no-description {
+    width: 90%;
+}
+
+.step-title {
+    font-size: 2.8vw;
+    text-align: center;
+}
+
+.page-button-container {
+    justify-content: center;
+    display: flex;
+}
+
+
+/* STEPPER */
+
+.stepper-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 4vh 20px;
+    margin-top: 4vh;
+}
+
+.stepper-step {
+    width: 3vw;
+    height: 3vw;
+    border-radius: 80px;
+    cursor: pointer;
+    margin: 0 15px;
+}
+
+.stepper-step.second-step {
+    background: #318CE7;
+}
+
+.stepper-step.third-step {
+    background: #26619C;
+}
+
+.stepper-step.active {
+    background: white;
+    -webkit-box-shadow: 0px 0px 4px 1px darkslategrey;
+}
+
 
 /* INFOS */
 .infos-form {
@@ -523,7 +802,7 @@ a {
     margin: 20px 0;
 }
 
-.infos-form .input-group {
+.input-group {
     display: flex;
     justify-content: center;
     margin: 10px 0;    
@@ -594,23 +873,6 @@ a {
     justify-content: space-around;
 }
 
-/* BUTTONS */
-.cl-radio {
-    cursor: pointer;
-}
-
-.cl-button {
-    border-radius: 50px;
-    outline: none;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: 0px 0px 1px 1px grey;
-}
-
-.cl-button:hover {
-    -webkit-box-shadow: 0px 0px 4px 1px grey;
-}
-
 /* LOGO */
 .navbar-logo-section {
     display: flex;
@@ -646,7 +908,8 @@ a {
     background: #26619C;
     background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
     display: flex;
-    height: 180px;
+    height: 15vh;
+    min-height: 200px;
     color: white;
     padding-left: 2em;
     padding-bottom: 2em;
@@ -684,6 +947,7 @@ a {
 .footer-white-logo-image {
     max-width: 200px;
     margin-right: 15px;
+    margin-bottom: 15px;
 }
 
 .welcome-page-title {
@@ -706,7 +970,6 @@ a {
 .landing-page-desktop-signup-button {
     padding: 10px 36px;
     background: white;
-    border-radius: 24px;
     color: black;
     margin-top: 20px;
     margin-right: 20px;
@@ -722,36 +985,104 @@ a {
     .landing-first-page-wrapper {
         justify-content: center;
     }
-
-    .landing-page-desktop-signup-button {
-        display: none;
-    }
-    
     .landing-info-card-section {
         flex-direction: column;
     }
-
     .landing-page-mobile-signup-button {
-        padding: 12px 32px;
+        padding: 10px 15px;
         color: black;
         background-color: white;
         border-radius: 24px;
         font-weight: bold;
         display: flex;
         justify-content: center;
-        width: 90px;
     }
-
-    .landing-inscription-card {
-        padding: 2em;
+    .cl-button {
+        padding: 10px 15px; 
+        font-size: 2.2vw;
+    }
+    .file-input-label {
+        padding: 10px 24px; 
+        font-size: 2.2vw;
+    }
+    .cl-text {
+        font-size: 2.2vw;
+    }
+    body {
+        font-size: 2.2vw;
+    }
+    .cl-input {
+        font-size: 2.2vw;
+    }
+    .cl-textarea {
+        font-size: 2.2vw;
+    }
+    .landing-page-desktop-signup-button {
+        display: none;
+    }
+    .landing-text-section {
+        font-size: 5.4vw;
+    }
+    .landing-page-title {
+        padding-bottom: 20px;
+    }
+    .landing-inscription-card-button {
+        /* margin: 25px 0; */
     }
 }
 
 /* CUSTOM BREAK POINTS */
 
-@media only screen and (max-width : 410px){
-
-    .landing-intermediary-connection-header {
-        justify-content: center;
-    }   
+@media only screen and (max-width : 480px){
+    body {
+        font-size: 11px;
+    }
+    .landing-inscription-card-text {
+        font-size: 13px;
+        margin-bottom: 0;
+    }
+    .landing-text-section {
+        font-size: 13px;
+    }
+    .landing-gradient-wrapper {
+        font-size: 13px;
+    }
+    .landing-gradient-wrapper-reversed {
+        font-size: 13px;
+    }
+    .stepper-step {
+        width: 30px;
+        height: 30px;
+    }
+    .landing-inscription-card {
+        min-height: 25vh;
+    }
+    .landing-info-card {
+        width: 200px;
+        height: 390px;
+    }
+    .landing-intermediary-logo {
+        height: 40px;
+    }
+    .cl-button {
+        font-size: 11px;
+    }
+    .cl-textarea {
+        font-size: 11px;
+    }
+    .cl-text {
+        font-size: 11px;
+    }
+    .cl-input {
+        font-size: 11px;
+    }
+    .landing-page-title {
+        padding-bottom: 20px;
+        font-size: 4.0vw;
+    }
+    .landing-logo-section {
+        width: 60%;
+        margin-top: 2vh;
+        font-size: 4.2vw;
+    }
 }
