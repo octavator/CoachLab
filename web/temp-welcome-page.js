@@ -26,10 +26,10 @@ class TempWelcomePage extends React.Component {
     return (
       <div className="login-wrapper">
         <Navbar user={this.state.user}/>
-        <h1 className="page-title welcome-page-title">Vous êtes bien inscrits sur CoachLab !</h1>
+        <h1 className="page-title welcome-page-title">Vous êtes bien inscrit sur CoachLab !</h1>
         <div className="welcome-page-content">
           Votre inscription a bien été prise en compte. <br/><br/>
-          Vous serez prévenus par mail dès que la plateforme ouvrira officiellement ses portes.<br/><br/>
+          Vous serez prévenu par mail dès que la plateforme ouvrira officiellement ses portes.<br/><br/>
           Merci pour votre intérêt et à très bientôt sur CoachLab !
         </div>
       </div>

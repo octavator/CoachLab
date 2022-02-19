@@ -6,7 +6,9 @@ class Footer extends React.Component {
   render() {
     return (
       <div className="footer-wrapper">
-        <div className="footer-white-logo"><img className="footer-white-logo-image" src="priv/static/images/logo_blanc.svg"></img><div>Copyright © 2022 CoachLab, tous droits réservés.</div></div>
+        <div className="footer-white-logo" onClick={(e) => {window.scroll({top: 0, left: 0, behavior: 'smooth'})}}>
+          <img className="footer-white-logo-image" src="priv/static/images/logo_blanc.svg"/>
+          <div>Copyright © 2022 CoachLab, tous droits réservés.</div></div>
         <div className=""><a className="footer-link contact-mail" href="mailto:contact@coachlab.fr">Nous contacter</a></div>
       </div>
     )

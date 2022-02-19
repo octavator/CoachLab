@@ -53,18 +53,18 @@ class Landing extends React.Component {
           <div className="landing-first-page-wrapper">
             <div className="cl-button landing-page-desktop-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
             <div className="landing-logo-section">
-              <img src="priv/static/images/logo_blanc.svg"></img>
+              <img style={{"width": "100%"}} src="priv/static/images/logo_blanc.svg"></img>
             </div>
             <h2 className="landing-page-title">Le centre de coaching digital</h2>
             <div className="cl-button landing-page-mobile-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
           </div> 
           <div className="landing-intermediary-gradiant-wrapper"></div>
           <div className="landing-gradient-wrapper">
-            Se trouver.<br/>Ici et maintenant
+            Se trouver.<br/>Ici et maintenant.
           </div>
           {/* FAKE NAVBAR */}
           <div className={"landing-intermediary-connection-header" + (this.state.show_navbar ? "" : " hidden")} >
-            <div className="landing-intermediary-logo">
+            <div className="landing-intermediary-logo" onClick={(e) => {window.scroll({top: 0, left: 0, behavior: 'smooth'})}}>
                 <img className="landing-inline-logo" src="priv/static/images/logo.svg"></img>
               </div>
               <div className="cl-button landing-intermediary-connection-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
@@ -76,7 +76,7 @@ class Landing extends React.Component {
           </div>
           <div className="landing-inscription-card">
             <div className="landing-inscription-card-text">
-              Rejoignez la plateforme CoachLab,<br/> le premier centre de coaching digital !
+              Rejoignez la plateforme CoachLab,<br/> le premier centre de coaching digital
             </div>
             <div className="cl-button landing-inscription-card-button" onClick={() => { window.location.href = "/inscription" }}>
               Je m'inscris

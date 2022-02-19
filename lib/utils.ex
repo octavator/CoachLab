@@ -5,4 +5,8 @@ defmodule Utils do
         footer = EEx.eval_file("#{:code.priv_dir(:clab)}/static/footer.html")
         header <> data <> footer
     end
+
+    def contains_string(s1, s2) do
+        String.contains?(String.trim(String.downcase(s1)), String.trim(String.downcase(s2)))
+    end
 end

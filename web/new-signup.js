@@ -19,6 +19,7 @@ class SignUp extends React.Component {
       }
     }
     sendForm() {
+      console.log(this.state.form)
       http.post("/sign-up", this.state.form).then(res => {
         console.log(res.status)
         console.log(res.data)
@@ -50,10 +51,10 @@ class SignUp extends React.Component {
               this.state.form.user_role == "coach" ?
                 (this.state.step == 2 ? 
                   <CoachSecondStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
-                : <CoachThirdStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={this.sendForm} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)
+                : <CoachThirdStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={() => this.sendForm()} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)
               : (this.state.step == 2 ? 
                   <DefaultSecondStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
-                : <DefaultThirdStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={this.sendForm} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)                
+                : <DefaultThirdStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={() => this.sendForm()} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)                
             )
           }
             {/* <TextInput value={this.state.form.firstname} onChange={(e) => { this.setState({form: {...this.state.form, firstname: e.target.value}}) }} label="Prénom" />

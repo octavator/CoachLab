@@ -24,18 +24,24 @@ defmodule ClabRouter do
      |> Base.encode64(padding: false)
   end
 
-  def get_token_user(conn) do
+  #@TODO: add expiration to token (1 month ?)
+  def check_token_user(conn) do
     conn = fetch_cookies(conn)
     cookie = conn.cookies["cltoken"]
-    if cookie == nil do
-      {conn, nil}
-    else
-      token = cookie |> Base.decode64!(padding: false)
-      tokens = String.split(token, "|")
-      id = tokens |> hd
-      {conn, id}
+    case get_user_from_token(cookie) do
+      nil -> nil
+      id ->
+       cookie == build_token(id) && id || nil
     end
+  end
 
+  def get_user_from_token(cookie) do
+    case cookie do
+      nil -> nil
+      cookie ->
+        token = cookie |> Base.decode64!(padding: false)
+        String.split(token, "|") |> hd
+    end
   end
 
   get "/" do
@@ -44,8 +50,8 @@ defmodule ClabRouter do
   end
 
   get "/me" do
-    {conn, id} = get_token_user(conn)
-    if !is_nil(id) && conn.cookies["cltoken"] == build_token(id) do
+    id = check_token_user(conn)
+    if !is_nil(id) do
       user = User.get_user_by_id(id)
       data = Map.delete(user, :salt) |> Map.delete(:password)
       {:ok, user_data} = data |> Poison.encode
@@ -56,8 +62,8 @@ defmodule ClabRouter do
   end
 
   get "/me/agenda" do
-    {conn, id} = get_token_user(conn)
-    if conn.cookies["cltoken"] == build_token(id) do
+    id = check_token_user(conn)
+    if !is_nil(id) do
       user = User.get_user_by_id(id)
       agenda = Agenda.get_agenda(user.id)
       {:ok, agenda_data} = agenda |> Poison.encode
@@ -68,8 +74,8 @@ defmodule ClabRouter do
   end
 
   get "/api/coach/agenda" do
-    {conn, id} = get_token_user(conn)
-    if conn.cookies["cltoken"] == build_token(id) do
+    id = check_token_user(conn)
+    if !is_nil(id) do
       coach_id = conn.query_params["coach_id"] |> Base.decode64!(padding: false)
       Logger.debug("coach id = #{coach_id}")
       agenda = Agenda.get_agenda(coach_id)
@@ -138,19 +144,38 @@ defmodule ClabRouter do
     send_resp(conn, 200, data)
   end
 
+  #@TODO: rajouter une sécurité pour s'assurer qeu ca vient de notre front
+  post "/file/upload" do
+    user_id = check_token_user(conn)
+    if !is_nil(user_id) do
+      body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+      #@TODO :  à harmoniser
+      [dir_name | filename] = body.myFile.filename |> String.split("_") |> hd
+      File.mkdir_p("data/#{dir_name}/#{user_id}")
+      IO.inspect(File.read!(body.myFile.path), label: "writing file to data/#{dir_name}/#{user_id}/#{filename}")
+      File.write("data/#{dir_name}/#{user_id}/#{filename}", File.read!(body.myFile.path))
+      send_resp(conn, 200, "ok")
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  #@TODO: rajouter une sécurité pour s'assurer qeu ca vient de notre front
   post "/inscription/file" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-    IO.inspect(File.read!(body.myFile.path), label: "body")
-    File.write("#{:code.priv_dir(:clab)}/images/#{body.myFile.filename}", File.read!(body.myFile.path))
+    filename = body.myFile.filename
+    File.mkdir_p("data/tmp_files/#{body.myFile.filename}")
+    IO.inspect(File.read!(body.myFile.path), label: "writing file to data/tmp_files/#{filename}")
+    File.write("data/tmp_files/#{filename}", File.read!(body.myFile.path))
     send_resp(conn, 200, "ok")
   end
 
   get "/coach/search" do
-    {conn, id} = get_token_user(conn)
-    if conn.cookies["cltoken"] == build_token(id) do
-      coach_id = conn.query_params["coach_name"] |> Base.decode64!(padding: false)
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      coach_name = conn.query_params["coach_name"]
       Logger.debug("coach search: #{coach_name}")
-      users = User.search_users_by_name(coach_name)  |> Poison.encode!
+      users = User.search_coach_by_name(coach_name)  |> Poison.encode!
       send_resp(conn, 200, users)
     else
       send_resp(conn, 401, "Token invalide")
@@ -170,34 +195,42 @@ defmodule ClabRouter do
 
   post "/edit-infos" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-    {conn, id} = get_token_user(conn)
-    user = User.get_user_by_id(id)
-    existing_user = body.email != user.email && !is_nil(User.get_user(body.email))
-    edit_ret = User.edit_user(user.id, body)
-    {status_code, ret_text} = cond do
-      edit_ret == :error -> {400, "Erreur durant le changement de vos informations."}
-      existing_user  -> {400, "Cette adresse mail est déjà utilisée."}
-      true ->  {200, "Vos informations ont été mis à jour."}
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      user = User.get_user_by_id(id)
+      existing_user = body.email != user.email && !is_nil(User.get_user(body.email))
+      edit_ret = User.edit_user(user.id, body)
+      {status_code, ret_text} = cond do
+        edit_ret == :error -> {400, "Erreur durant le changement de vos informations."}
+        existing_user  -> {400, "Cette adresse mail est déjà utilisée."}
+        true ->  {200, "Vos informations ont été mis à jour."}
+      end
+      send_resp(conn, status_code, ret_text)
+    else
+      send_resp(conn, 401, "Token invalide")
     end
-    send_resp(conn, status_code, ret_text)
   end
 
   post "/new-resa" do
-    {conn, email} = get_token_user(conn)
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-    {status_code, ret_text} = cond do
-      email == body.email -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
-      true ->
-        user = User.get_user(email)
-        coach = User.get_user(body.email)
-        case Agenda.update_agenda(user.id, %{body.id => body.resa}) do
-          :error -> {400, "Une erreur est survenue durant la reservation."}
-          _ ->
-            Agenda.update_agenda(coach.id, %{body.id => body.resa})
-            {200, "Votre rendez-vous a bien été enregistré."}
-        end
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      user = User.get_user_by_id(id)
+      body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+      {status_code, ret_text} = cond do
+        user.email == body.email -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
+        true ->
+          coach = User.get_user(body.email)
+          case Agenda.update_agenda(user.id, %{body.id => body.resa}) do
+            :error -> {400, "Une erreur est survenue durant la reservation."}
+            _ ->
+              Agenda.update_agenda(coach.id, %{body.id => body.resa})
+              {200, "Votre rendez-vous a bien été enregistré."}
+          end
+      end
+      send_resp(conn, status_code, ret_text)
+    else
+      send_resp(conn, 401, "Token invalide")
     end
-    send_resp(conn, status_code, ret_text)
   end
 
  #forward "/users", to: UsersRouter

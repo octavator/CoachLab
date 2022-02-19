@@ -54,12 +54,16 @@ class FileInput extends React.Component {
   render() {
     return (
       <div className={"file-input-wrapper "  + (this.props.extraClass.includes("bg-white") ? "white-text" : "")}>
-        <label className={"file-input-label " + (this.props.extraClass ? this.props.extraClass : "")}>
-          <input className={"cl-file-input "} required={this.props.required} onChange={(e) => { this.props.onChange(e.target.files[0])}}
-            type="file" name={this.props.name || ""} accept={this.props.accept} ></input>
-          <span>{this.props.label}</span>
-        </label>
-        <div className="file-input-filename">{this.props.filename}</div>
+        <div className="file-label">{this.props.label}</div>
+        <div className="file-upload-section">
+          <label className={"file-input-label " + (this.props.extraClass ? this.props.extraClass : "")}>
+            <input className={"cl-file-input "} required={this.props.required} onChange={(e) => { this.props.onChange(e.target.files[0])}}
+              type="file" name={this.props.name || ""} accept={this.props.accept} ></input>
+            <span>{this.props.text}</span>
+          </label>
+          <div className="file-input-filename">{this.props.filename}</div>
+        </div>
+        
       </div>
     )
   }

@@ -16,7 +16,7 @@ class FirstStep extends React.Component {
             <div className="role-step-btn-text">Vous souhaitez vous faire coacher ?</div>
           </div>
         </div>
-        <Stepper change_step={this.props.change_step} step="1" />
+        <Stepper step="1" />
       </div>
     )
   }

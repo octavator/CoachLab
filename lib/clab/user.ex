@@ -41,10 +41,12 @@ defmodule User do
         {:reply, value, state}
     end
 
-     def handle_call({:search_users_by_name, name}, _from, state) do
-       all_users = :ets.tab2list(@table)
-       matching_users = all_users |> Enum.filter(fn user -> String.contains?(user.lastname, name)
-        {:reply, value, state}
+     def handle_call({:search_coach_by_name, name}, _from, state) do
+        all_users = :ets.tab2list(@table)
+        matching_users = all_users
+         |> Enum.filter(fn {_key, user} -> user.role == "coach" && Utils.contains_string(user.lastname, name) end)
+         |> Enum.map(fn {_key, user} -> user |> Map.take([:firstname, :lastname, :email, :id, :role, :avatar]) end)
+        {:reply, matching_users, state}
     end
 
     def handle_call({:create_user, data}, _from, state) do
@@ -98,8 +100,8 @@ defmodule User do
         GenServer.call(__MODULE__, {:delete_user, email})
     end
 
-     def search_users_by_name(name) do
-        GenServer.call(__MODULE__, {:search_users_by_name, name})
+     def search_coach_by_name(name) do
+        GenServer.call(__MODULE__, {:search_coach_by_name, name})
     end
 
     def edit_user(email, data) do
