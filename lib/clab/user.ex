@@ -44,16 +44,16 @@ defmodule User do
      def handle_call({:search_coach_by_name, name}, _from, state) do
         all_users = :ets.tab2list(@table)
         matching_users = all_users
-         |> Enum.filter(fn {_key, user} -> user.role == "coach" && Utils.contains_string(user.lastname, name) end)
+         |> Enum.filter(fn {_key, user} -> user.role == "coach" && Utils.equals_string(user.lastname, name) end)
          |> Enum.map(fn {_key, user} -> user |> Map.take([:firstname, :lastname, :email, :id, :role, :avatar]) end)
         {:reply, matching_users, state}
     end
 
     def handle_call({:create_user, data}, _from, state) do
-        data = data |> put_in([:id], :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false))
-        res = :ets.insert_new(@table, {data.id, data})
+        data = data |> put_in([:id], :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false) |> String.replace("/", "-"))
+        true = :ets.insert_new(@table, {data.id, data})
         Agenda.create_agenda(data.id)
-        {:reply, res, state}
+        {:reply, data, state}
     end
 
     def handle_call({:edit_user, {id, data}}, _from, state) do
@@ -91,21 +91,22 @@ defmodule User do
                 salt = :rand.uniform() |> to_string |> Base.encode16
                 hashed_pwd = hash_password(data[:password], salt)
                 updated_data = put_in(data, [:password], hashed_pwd)
-                updated_data = put_in(updated_data, [:salt], salt)
+                 |> put_in([:salt], salt)
+                 |> Map.delete(:password_check)
                 GenServer.call(__MODULE__, {:create_user, updated_data})
         end
     end
 
-    def delete_user(email) do
-        GenServer.call(__MODULE__, {:delete_user, email})
+    def delete_user(id) do
+        GenServer.call(__MODULE__, {:delete_user, id})
     end
 
      def search_coach_by_name(name) do
         GenServer.call(__MODULE__, {:search_coach_by_name, name})
     end
 
-    def edit_user(email, data) do
-        GenServer.call(__MODULE__, {:edit_user, {email, data}})
+    def edit_user(id, data) do
+        GenServer.call(__MODULE__, {:edit_user, {id, data}})
     end
 
     def hash_password(password, salt) do

@@ -132,7 +132,7 @@ class Agenda extends React.Component {
       <div>
         <Navbar user={this.state.user} />
         <div className="agenda-wrapper">
-          <div className={"flash-message" + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+          <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
           <h1 className="page-title">Agenda de&nbsp;<span className="agenda-name">{this.state.user.firstname + ' ' + this.state.user.lastname}</span></h1>
           <h2 className="page-title">
             Semaine du {firstDate} au {lastDate} {this.state.months[lastDateMonth]} {lastDateYear}    

@@ -47,7 +47,7 @@ class UserProfile extends React.Component {
         <div>
           <Navbar user={this.state.user} />
           <div className="infos-wrapper">
-            <div className={"flash-message" + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+            <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
             <h1 className="page-title">Mes informations</h1>
             <div className="infos-content-wrapper infos-form">
               <div className="input-group">

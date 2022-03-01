@@ -29,14 +29,14 @@ class Navbar extends React.Component {
                 {/* HACK FOR TEMP WELCOME PAGE */}
                 <div className="menu-item"></div>
 
-                <div className="menu-item user-dropdown" onClick={() => {this.setState({show_dropdown: !this.state.show_dropdown})}}>
+                <div className="menu-item user-dropdown text-3" onClick={() => {this.setState({show_dropdown: !this.state.show_dropdown})}}>
                   {this.props.user.firstname + ' ' + this.props.user.lastname}&nbsp;<span className="downward-arrow">&#9660;</span>
                 </div>
                 <div className={"menu-dropdown-list" + (this.state.show_dropdown ? "" : " hidden")}>
-                    <div className="menu-dropdown-list-item" onClick={() => { window.location.href = "/profil" }}>
+                    <div className="menu-dropdown-list-item text-3" onClick={() => { window.location.href = "/profil" }}>
                       Mes informations
                     </div>
-                    <div className="menu-dropdown-list-item" onClick={() => {this.disconnect()}}>
+                    <div className="menu-dropdown-list-item text-3" onClick={() => {this.disconnect()}}>
                       Se déconnecter
                     </div>
 

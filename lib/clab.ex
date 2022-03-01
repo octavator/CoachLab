@@ -53,7 +53,7 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       user = User.get_user_by_id(id)
-      data = Map.delete(user, :salt) |> Map.delete(:password)
+      data = Map.take(user, [:role, :phone, :lastname, :firstname, :id, :email])
       {:ok, user_data} = data |> Poison.encode
       send_resp(conn, 200, user_data)
     else
@@ -144,13 +144,14 @@ defmodule ClabRouter do
     send_resp(conn, 200, data)
   end
 
-  #@TODO: rajouter une sécurité pour s'assurer qeu ca vient de notre front
+  #@TODO: rajouter de la sécurité
   post "/file/upload" do
     user_id = check_token_user(conn)
     if !is_nil(user_id) do
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+      true = Utils.test_file_type(body.myFile.path, body.myFile.filename)
       #@TODO :  à harmoniser
-      [dir_name | filename] = body.myFile.filename |> String.split("_") |> hd
+      [dir_name | filename] = body.myFile.filename |> String.split("_")
       File.mkdir_p("data/#{dir_name}/#{user_id}")
       IO.inspect(File.read!(body.myFile.path), label: "writing file to data/#{dir_name}/#{user_id}/#{filename}")
       File.write("data/#{dir_name}/#{user_id}/#{filename}", File.read!(body.myFile.path))
@@ -160,35 +161,52 @@ defmodule ClabRouter do
     end
   end
 
-  #@TODO: rajouter une sécurité pour s'assurer qeu ca vient de notre front
+  #@TODO: rajouter de la sécurité
   post "/inscription/file" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
     filename = body.myFile.filename
-    File.mkdir_p("data/tmp_files/#{body.myFile.filename}")
+    true = Utils.test_file_type(body.myFile.path, body.myFile.filename)
     IO.inspect(File.read!(body.myFile.path), label: "writing file to data/tmp_files/#{filename}")
     File.write("data/tmp_files/#{filename}", File.read!(body.myFile.path))
     send_resp(conn, 200, "ok")
   end
 
   get "/coach/search" do
-    id = check_token_user(conn)
-    if !is_nil(id) do
-      coach_name = conn.query_params["coach_name"]
-      Logger.debug("coach search: #{coach_name}")
-      users = User.search_coach_by_name(coach_name)  |> Poison.encode!
-      send_resp(conn, 200, users)
-    else
-      send_resp(conn, 401, "Token invalide")
-    end
+    coach_name = conn.query_params["coach_name"] |> URI.decode()
+    Logger.debug("coach search: #{coach_name}")
+    users = User.search_coach_by_name(coach_name)  |> Poison.encode!
+    send_resp(conn, 200, users)
   end
 
   post "/sign-up" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-    {status_code, ret_text} = case User.create_user(body) do
-      :email_already_used -> {400, "Cet email est déjà associé à un autre utilisateur"}
-      :error -> {400, "Erreur durant la création de votre utilisateur."}
-      false -> {400, "Erreur durant la création de votre utilisateur."}
-      _ ->  {200, "Votre compte a été bien été créé."}
+    # body = %{body | email: body.email <> "#{:crypto.strong_rand_bytes(20)}"}
+    {conn, status_code, ret_text} = case User.create_user(body) do
+      :email_already_used -> {conn, 400, "Cet email est déjà associé à un autre utilisateur"}
+      :error -> {conn, 400, "Erreur durant la création de votre utilisateur."}
+      false -> {conn, 400, "Erreur durant la création de votre utilisateur."}
+      user ->
+        files = case user.role do
+          "coach" -> ["avatar", "certification", "idcard", "rib"]
+          "default" -> ["avatar"]
+        end
+        IO.inspect(user)
+        all_files_without_error = files |> Enum.all?(fn file ->
+          ext = user[String.to_atom(file)] |> String.split(".") |> List.last()
+          old_filepath = "data/tmp_files/#{user[String.to_atom(file)]}"
+          new_filepath = "data/images/#{user.id}/#{file}.#{ext}"
+          Utils.move_user_files(old_filepath, new_filepath, user)
+        end)
+        case all_files_without_error do
+          false ->
+            User.delete_user(user.id)
+            files |> Enum.each(& File.rm("data/images/#{user.id}/#{&1}_#{user[&1]}"))
+            {conn, 400, "Une erreur est survenue lors de la sauvegarde d'un de vos fichiers."}
+          _ ->
+            token = (user.id <> "|" <> :crypto.hash(:sha256, @secret <> user.id)) |> Base.encode64(padding: false)
+            conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
+            {conn, 200, "Votre compte a été bien été créé."}
+        end
     end
     send_resp(conn, status_code, ret_text)
   end

@@ -24,8 +24,13 @@ defmodule Clab.Application do
       User,
       Agenda,
       DataSaver
-    ] 
-    opts = [strategy: :one_for_one]
+    ]
+
+    opts = [
+      max_restarts: 30,
+      max_seconds: 5,
+      strategy: :one_for_one
+    ]
     Supervisor.start_link(children, opts)
   end
 end

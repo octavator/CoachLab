@@ -24,7 +24,7 @@ class TextInput extends React.Component {
       <div className="text-input-wrapper">
         <div className="input-group">
           <label className={"input-label" + (this.props.label ? "" : " hidden")}>{this.props.label}</label>
-          <input className={"cl-input " + (this.props.extraClass ? this.props.extraClass : "")} required={this.props.required} name={this.props.name || ""}
+          <input className={"cl-input " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
            onChange={(e) => { this.props.onChange(e.target.value)}} placeholder={this.props.placeholder} value={this.props.value} type={this.props.type || "text"}></input>
         </div>
       </div>              
@@ -54,15 +54,16 @@ class FileInput extends React.Component {
   render() {
     return (
       <div className={"file-input-wrapper "  + (this.props.extraClass.includes("bg-white") ? "white-text" : "")}>
-        <div className="file-label">{this.props.label}</div>
+        <div className={"file-label text-2 " + (this.props.label ? "" : "hidden")} >{this.props.label}</div>
         <div className="file-upload-section">
-          <label className={"file-input-label " + (this.props.extraClass ? this.props.extraClass : "")}>
+          <label className={"file-input-label " + (this.props.extraClass ? this.props.extraClass : "text-3")}>
             <input className={"cl-file-input "} required={this.props.required} onChange={(e) => { this.props.onChange(e.target.files[0])}}
               type="file" name={this.props.name || ""} accept={this.props.accept} ></input>
-            <span>{this.props.text}</span>
+            <span className="text-3">{this.props.text}</span>
           </label>
-          <div className="file-input-filename">{this.props.filename}</div>
-        </div>
+          {/* <div className="file-input-filename">{this.props.filename}</div> */}
+          <div className="file-input-filename text-3">{this.props.filename ? "Le fichier a bien été enregistré" : ""}</div>
+          </div>
         
       </div>
     )
@@ -94,8 +95,8 @@ class TextArea extends React.Component {
     return (
       <div className="text-area-wrapper">
         <div className="input-group">
-          <label className={"input-label" + (this.props.label ? "" : " hidden")}>{this.props.label}</label>
-          <textarea className={"cl-textarea " + (this.props.extraClass ? this.props.extraClass : "")} required={this.props.required} name={this.props.name || ""}
+          <label className={"input-label " + (this.props.label ? "text-3" : " hidden")}>{this.props.label}</label>
+          <textarea className={"cl-textarea " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
            onChange={(e) => { this.props.onChange(e.target.value)}} placeholder={this.props.placeholder} value={this.props.value} rows={this.props.rows || "10"}></textarea>
         </div>
       </div>              
@@ -123,7 +124,7 @@ class Button extends React.Component {
   render() {
     return (
       <div className="button-wrapper">
-        <button className={"cl-button " + (this.props.extraClass ? this.props.extraClass : "")} disabled={this.props.disabled || false}
+        <button className={"cl-button " + (this.props.extraClass ? this.props.extraClass : "text-3")} disabled={this.props.disabled || false}
           onClick={() => { this.props.onClick()}} >
           {this.props.text}
         </button>

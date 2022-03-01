@@ -23,15 +23,18 @@ class SignUp extends React.Component {
       http.post("/sign-up", this.state.form).then(res => {
         console.log(res.status)
         console.log(res.data)
-        window.location.href = "/connexion";
+        window.location.href = "/bienvenue";
       })
       .catch(err => {
         console.log(err.response)
         this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
       })
     }
-    setStateForm(new_form) {
-      this.setState({form: {...this.state.form, ...new_form}})
+    setStateForm(new_form, is_complete = false) {
+      if (!is_complete) this.setState({form: {...this.state.form, ...new_form}})
+      else {
+        this.setState({form: {...this.state.form, ...new_form}}, () => {this.sendForm()})
+      }
     }
     showFlashMessage(type, message) {
       this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
@@ -43,22 +46,20 @@ class SignUp extends React.Component {
       return (
         <div className="clab-container">
           <Navbar blue_bg={this.state.step == 1 ? false : true} user={{}}/>
-          <div className={"flash-message" + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+          <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
           {
             this.state.step == 1 ? 
               <FirstStep showFlashMessage={this.showFlashMessage} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
             :(
-              this.state.form.user_role == "coach" ?
+              this.state.form.role == "coach" ?
                 (this.state.step == 2 ? 
-                  <CoachSecondStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
-                : <CoachThirdStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={() => this.sendForm()} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)
+                  <CoachSecondStep user_form={this.state.form} showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} update_form={(data, is_complete) => { this.setStateForm(data, is_complete) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
+                : <CoachThirdStep user_form={this.state.form} showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={() => this.sendForm()} update_form={(data, is_complete) => { this.setStateForm(data, is_complete) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)
               : (this.state.step == 2 ? 
-                  <DefaultSecondStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
-                : <DefaultThirdStep showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={() => this.sendForm()} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)                
+                  <DefaultSecondStep user_form={this.state.form} showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} update_form={(data, is_complete = false) => { this.setStateForm(data, is_complete) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
+                : <DefaultThirdStep user_form={this.state.form} showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={() => this.sendForm()} update_form={(data, is_complete) => { this.setStateForm(data, is_complete) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)                
             )
           }
-            {/* <TextInput value={this.state.form.firstname} onChange={(e) => { this.setState({form: {...this.state.form, firstname: e.target.value}}) }} label="Prénom" />
-            <TextInput value={this.state.form.lastname} onChange={(e) => { this.setState({form: {...this.state.form, lastname: e.target.value}}) }} label="Nom" /> */}
         </div>
       )
     }

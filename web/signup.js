@@ -36,7 +36,7 @@ class SignUp extends React.Component {
       return (
         <div>
           <Navbar user={{}}/>
-          <div className={"flash-message" + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+          <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
           <h1 className="page-title">Inscrivez-vous</h1>
           <div className="login-content-wrapper infos-form">
             <div className="input-group">

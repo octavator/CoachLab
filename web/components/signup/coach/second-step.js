@@ -1,5 +1,5 @@
 import Stepper from "../stepper.js"
-import {TextInput, FileInput} from "../../forms/inputs.js"
+import {TextInput, FileInput, Button} from "../../forms/inputs.js"
 
 class CoachSecondStep extends React.Component {
   constructor(props) {
@@ -10,9 +10,9 @@ class CoachSecondStep extends React.Component {
     }
   }
   validate() {
-    let required_keys = ["id_card"]
+    let required_keys = ["idcard"]
     let isValid = required_keys.every(key => {return this.state.form[key] != undefined})
-    if (!isValid) this.props.showFlashMessage("error", "Veuillez renseigner tous les champs")
+    if (!isValid) this.props.showFlashMessage("error", "Veuillez télécharger votre carté d'identité")
     return isValid
   }
   sendForm() {
@@ -25,14 +25,14 @@ class CoachSecondStep extends React.Component {
     console.log(e)
     console.log(e.name)
     const formData = new FormData()
+    const filename = `idcard_${this.state.form.lastname}_${e.name}`.replace(" ", "-")
     formData.append( 
       "myFile", 
       e,
-      e.name
+      filename
     )
-    this.setState({filename: e.name, form: {...this.state.form, id_card: "idcard_" + e.name}})
     http.post("/inscription/file", formData).then(res => {
-      console.log(res)
+      this.setState({filename: filename, form: {...this.state.form, idcard: filename}})
     })
   }
   render() {
@@ -40,17 +40,24 @@ class CoachSecondStep extends React.Component {
       <div className="step-wrapper">
         <div className="first-step-wrapper">
         <form className="step-form" onSubmit={(e) => { e.preventDefault() }}>
-            <TextInput type="email" extraClass="cl-form-input" required={true} value={this.state.form.email} onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }} name="email" placeholder="Email" />
-            <TextInput extraClass="cl-form-input" required={true} value={this.state.form.firstname} onChange={(e) => { this.setState({form: {...this.state.form, firstname: e}}) }} name="firstname" placeholder="Prénom" />
-            <TextInput extraClass="cl-form-input" required={true} value={this.state.form.lastname} onChange={(e) => { this.setState({form: {...this.state.form, lastname: e}}) }} name="lastname" placeholder="Nom" />
-            <TextInput type="password" extraClass="cl-form-input" required={true} value={this.state.form.password} onChange={(e) => { this.setState({form: {...this.state.form, password: e}}) }} name="password" placeholder="Mot de passe" />
-            <TextInput type="password" extraClass="cl-form-input" required={true} value={this.state.form.password_check} onChange={(e) => { this.setState({form: {...this.state.form, password_check: e}}) }}  name="password_check" placeholder="Confirmez le mot de passe" />       
-            <TextInput extraClass="cl-form-input" required={true} value={this.state.form.phone} onChange={(e) => { this.setState({form: {...this.state.form, phone: e}}) }} placeholder="Téléphone" name="phone" />
-            <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filename} onChange={(e) => this.uploadFile(e)} extraClass="bg-white"
+          <div className="step-sections-wrapper">
+            <TextInput type="email" extraClass="cl-form-input text-3" required={true} value={this.state.form.email} 
+             onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }} name="email" placeholder="Email" />
+            <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.firstname} 
+             onChange={(e) => { this.setState({form: {...this.state.form, firstname: e}}) }} name="firstname" placeholder="Prénom" />
+            <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.lastname} 
+             onChange={(e) => { this.setState({form: {...this.state.form, lastname: e}}) }} name="lastname" placeholder="Nom" />
+            <TextInput type="password" extraClass="cl-form-input  text-3" required={true} value={this.state.form.password} 
+             onChange={(e) => { this.setState({form: {...this.state.form, password: e}}) }} name="password" placeholder="Mot de passe" />
+            <TextInput type="password" extraClass="cl-form-input  text-3" required={true} value={this.state.form.password_check} 
+             onChange={(e) => { this.setState({form: {...this.state.form, password_check: e}}) }}  name="password_check" placeholder="Confirmez le mot de passe" />       
+            <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.phone} 
+             onChange={(e) => { this.setState({form: {...this.state.form, phone: e}}) }} placeholder="Téléphone" name="phone" />
+            <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filename && this.state.filename.split("_").pop()} onChange={(e) => this.uploadFile(e)} extraClass="bg-white  text-2"
              label="Merci de télécharger une copie de votre pièce d'identité" />
-            <button onClick={() => { this.sendForm() }} className="cl-button cl-form-button bg-white">
-              Suivant
-            </button>
+            <Button onClick={() => { this.sendForm() }} extraClass="cl-button cl-form-button text-3 bg-white"
+              text="Suivant"/>
+          </div>
           </form>
         </div>
         <Stepper step="2" />
