@@ -1,5 +1,50 @@
 # Changelog
 
+## v1.13.4 (2022-03-10)
+
+### Bug fixes
+
+  * Improve deprecation warnings
+
+## v1.13.3 (2022-02-12)
+
+### Enhancements
+
+  * [Plug.Builder] Introduce `:copy_opts_to_assign` instead of `builder_opts/0`
+  * [Plug.Router] Do not introduce compile-time dependencies in `Plug.Router`
+
+## v1.13.2 (2022-02-04)
+
+### Bug fixes
+
+  * [Plug.Router] Properly fix regression on Plug.Router helper function accidentally renamed
+
+## v1.13.1 (2022-02-03)
+
+### Bug fixes
+
+  * [Plug.Router] Fix regression on Plug.Router helper function accidentally renamed
+
+## v1.13.0 (2022-02-02)
+
+### Enhancements
+
+  * [Plug.Builder] Do not add compile-time deps to literal options in function plugs
+  * [Plug.Parsers.MULTIPART] Allow custom conversion of multipart to parameters
+  * [Plug.Router] Allow suffix matches in the router (such as `/feeds/:name.atom`)
+  * [Plug.Session] Allow a list of `:rotating_options` for rotating session cookies
+  * [Plug.Static] Allow a list of `:encodings` to be given for handling static assets
+  * [Plug.Test] Raise an error when providing path not starting with "/"
+
+### Bug fixes
+
+  * [Plug.Upload] Normalize paths coming from environment variables
+
+### Deprecations
+
+  * [Plug.Router] Mixing prefix matches with globs is deprecated
+  * [Plug.Parsers.MULTIPART] Deprecate `:include_unnamed_parts_at`
+
 ## v1.12.1 (2021-08-01)
 
 ### Bug fixes

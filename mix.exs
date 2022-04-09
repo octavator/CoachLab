@@ -21,8 +21,9 @@ defmodule Clab.MixProject do
   defp deps do
     [
       {:plug_cowboy, "~> 2.0"},
-      {:poison, "~> 5.0"}
-      # {:dep_from_hexpm, "~> 0.3.0"},
+      {:poison, "~> 5.0"},
+      {:mailibex, "~> 0.1.6"},
+      {:gen_smtp, "~> 1.1.1"}
     ]
   end
 end

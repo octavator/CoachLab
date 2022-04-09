@@ -24,7 +24,7 @@ RUN mix release
 FROM alpine:3.14.2
 
 # install runtime dependencies
-RUN apk upgrade --no-cache && apk add --no-cache postgresql-client bash openssl libgcc libstdc++ ncurses-libs
+RUN apk upgrade --no-cache && apk add --no-cache postgresql-client bash openssl libgcc libstdc++ ncurses-libs file
 
 EXPOSE 443 80 4001
 ENV MIX_ENV=prod

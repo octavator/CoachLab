@@ -86,10 +86,12 @@ class DefaultThirdStep extends React.Component {
               <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filenames["rib"] && this.state.filenames.rib.split("_").pop()}
               onChange={(e) => this.uploadFile("rib", e)} extraClass="bg-white  text-3"/>
             </div>
-            <Button extraClass="cl-button cl-form-button bg-white  text-3"
-              onClick={() => { this.sendForm() }} text="Suivant" />
           </div>
+          <Button extraClass="cl-button cl-form-button bg-white  text-3 hidden"
+              onClick={() => { this.sendForm() }} text="Suivant" />
         </form>
+        <Button extraClass="cl-button cl-form-button bg-white  text-3"
+              onClick={() => { this.sendForm() }} text="Suivant" />
       </div>
       <Stepper step="3" />
     </div>

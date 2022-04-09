@@ -6,8 +6,13 @@ defmodule Plug.Adapters.Test.Conn do
 
   def conn(conn, method, uri, body_or_params) do
     maybe_flush()
-
     uri = URI.parse(uri)
+
+    if is_binary(uri.path) and not String.starts_with?(uri.path, "/") do
+      # TODO: Convert to an error
+      IO.warn("the URI path used in plug tests must start with \"/\", got: #{inspect(uri.path)}")
+    end
+
     method = method |> to_string |> String.upcase()
     query = uri.query || ""
     owner = self()

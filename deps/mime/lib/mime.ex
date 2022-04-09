@@ -17,6 +17,7 @@ defmodule MIME do
   """
 
   types = %{
+    "application/atom+xml" => ["atom"],
     "application/epub+zip" => ["epub"],
     "application/gzip" => ["gz"],
     "application/java-archive" => ["jar"],
@@ -30,10 +31,13 @@ defmodule MIME do
     "application/ogg" => ["ogx"],
     "application/pdf" => ["pdf"],
     "application/postscript" => ["ps", "eps", "ai"],
+    "application/rss+xml" => ["rss"],
     "application/rtf" => ["rtf"],
     "application/vnd.amazon.ebook" => ["azw"],
     "application/vnd.api+json" => ["json-api"],
     "application/vnd.apple.installer+xml" => ["mpkg"],
+    "application/vnd.etsi.asic-e+zip" => ["asice", "sce"],
+    "application/vnd.etsi.asic-s+zip" => ["asics", "scs"],
     "application/vnd.mozilla.xul+xml" => ["xul"],
     "application/vnd.ms-excel" => ["xls"],
     "application/vnd.ms-fontobject" => ["eot"],
@@ -46,6 +50,7 @@ defmodule MIME do
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => ["docx"],
     "application/vnd.rar" => ["rar"],
     "application/vnd.visio" => ["vsd"],
+    "application/wasm" => ["wasm"],
     "application/x-7z-compressed" => ["7z"],
     "application/x-abiword" => ["abw"],
     "application/x-bzip" => ["bz"],
@@ -60,7 +65,6 @@ defmodule MIME do
     "application/x-tar" => ["tar"],
     "application/xhtml+xml" => ["xhtml"],
     "application/xml" => ["xml"],
-    "application/wasm" => ["wasm"],
     "application/zip" => ["zip"],
     "audio/3gpp" => ["3gp"],
     "audio/3gpp2" => ["3g2"],
@@ -93,16 +97,17 @@ defmodule MIME do
     "text/xml" => ["xml"],
     "video/3gpp" => ["3gp"],
     "video/3gpp2" => ["3g2"],
-    "video/quicktime" => ["mov"],
     "video/mp2t" => ["ts"],
     "video/mp4" => ["mp4"],
     "video/mpeg" => ["mpeg", "mpg"],
     "video/ogg" => ["ogv"],
+    "video/quicktime" => ["mov"],
     "video/webm" => ["webm"],
-    "video/x-msvideo" => ["avi"],
-    "video/x-ms-wmv" => ["wmv"]
+    "video/x-ms-wmv" => ["wmv"],
+    "video/x-msvideo" => ["avi"]
   }
 
+  require Application
   custom_types = Application.compile_env(:mime, :types, %{})
 
   to_exts = fn map ->

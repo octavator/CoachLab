@@ -60,7 +60,7 @@ body {
 }
 
 .text-2 {
-    font-size: 1.8vw;
+    font-size: 1.7vw;
 }
 
 .text-3 {
@@ -68,7 +68,23 @@ body {
 }
 
 .text-4 {
-    font-size: 0.7vw;
+    font-size: 0.8vw;
+}
+
+.mt-1 {
+    margin-top: 10px;
+}
+
+.mt-2 {
+    margin-top: 20px;
+}
+
+.pt-1 {
+    padding-top: 10px;
+}
+
+.pt-2 {
+    padding-top: 20px;
 }
 
 a {
@@ -205,7 +221,6 @@ a {
     color: white;
     font-weight: bold;
     font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
-    margin-right: 15px;
 }
 
 .file-input-label.bg-white {
@@ -221,6 +236,10 @@ a {
 .file-input-label:hover {
     box-shadow: 0px 0px 5px 2px darkslategrey;
     -webkit-box-shadow: 0px 0px 5px 2px darkslategrey;
+}
+
+.file-input-filename {
+    margin-left: 15px;
 }
 
 .file-input-wrapper {
@@ -536,16 +555,17 @@ a {
     font-weight: bold;
     text-align: center;
     justify-content: center;
-    background: linear-gradient(180deg, #318CE7 20%, white 100%);
+    background: linear-gradient(180deg, #318CE7 13%, white 95%);
     display: flex;
     align-items: center;
+    padding-top: 10vh;
 }
 
 .landing-gradient-wrapper-reversed {
     height: 45vh;
     background: #26619C;
     font-weight: bold;
-    padding: 0 10% 5% 10%;
+    padding: 0 10%;
     background: linear-gradient(180deg, white  0%, #318CE7 100%);
     display: flex;
     text-align: center;
@@ -580,7 +600,7 @@ a {
 .landing-inscription-card {
     background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
     width: 50%;
-    min-height: 30vh;
+    min-height: 25vh;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
@@ -651,7 +671,6 @@ a {
 
 .landing-intermediary-logo {
     height: 60px;
-    margin-left: 20px;
     cursor: pointer;
 }
 
@@ -660,7 +679,6 @@ a {
 }
 
 .landing-intermediary-connection-header {
-
     width: 100%;
     display: flex;
     background: white;
@@ -668,7 +686,7 @@ a {
     position: fixed;
     justify-content: space-between;
     align-items: center;
-    padding: 15px;
+    padding: 5px 0;
     flex-wrap: wrap;
 }
 
@@ -738,8 +756,8 @@ a {
 }
 
 .role-step-btn:hover {
-    box-shadow: 0px 0px 5px 2px grey;
-    -webkit-box-shadow: 0px 0px 5px 2px grey;
+    box-shadow: 0px 0px 36px 4px #26619C;
+    -webkit-box-shadow: 0px 0px 36px 4px #26619C;
 }
 
 .role-step-btn-text {
@@ -773,7 +791,8 @@ a {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 50%;
+    width: 100%;
+    margin-bottom: 30px;
 }
 
 .default-choice-label {
@@ -796,7 +815,7 @@ a {
 }
 
 .default-choice-no-description {
-    width: 90%;
+    width: 80%;
 }
 
 .step-title {
@@ -860,8 +879,9 @@ a {
 
 .stepper-step.active {
     background: white;
+    box-shadow: 0px 0px 8px 3px grey;
+    -webkit-box-shadow: 0px 0px 8px 3px grey;
 }
-
 
 /* INFOS */
 .infos-form {
@@ -874,6 +894,7 @@ a {
 .input-group {
     display: flex;
     justify-content: center;
+    align-items: center;
     flex-direction: column;
     margin: 1vh auto;
 }
@@ -971,8 +992,7 @@ a {
     height: 15vh;
     min-height: 200px;
     color: white;
-    padding-left: 2em;
-    padding-bottom: 2em;
+    padding-bottom: 2vh;
 }
 
 .footer-link:hover {
@@ -981,12 +1001,11 @@ a {
     cursor: pointer;
     border-radius: 30px;
     color: #318ce7;
-
 }
 
 .contact-mail {
     font-weight: bold;
-    margin-left: 25px;
+    margin-left: 20px;
 }
 
 .footer-wrapper {
@@ -998,8 +1017,7 @@ a {
 }
 
 .footer-copyright {
-    margin-top: 20px;
-    margin-left: 25px;
+    margin-left: 20px;
 }
 
 .footer-white-logo {
@@ -1010,8 +1028,8 @@ a {
 
 .footer-white-logo-image {
     max-width: 280px;
+    height: 60px;
     cursor: pointer;
-    margin-bottom: 15px;
 }
 
 .welcome-page-content {
@@ -1036,29 +1054,30 @@ a {
     top: 0;
 }
 
-/* RESPONSIVE -- TABLET & SMARTPHONE */
+
+/* RESPONSIVE -- TABLET */
 
 @media only screen and (max-width : 768px){
     .text-1 {
         font-size: 5.4vw;
     }
-    
     .text-2 {
         font-size: 3.6vw;
     }
-    
     .text-3 {
-        font-size: 16px;
+        font-size: 18px;
     }
-    
     .text-4 {
-        font-size: 13px;
+        font-size: 14px;
     }
     .landing-first-page-wrapper {
         justify-content: center;
     }
     .landing-info-card {margin-left: 0!important; margin-right: 0!important;}
     .landing-info-card-section {
+        flex-direction: column;
+    }
+    .default-choices-container {
         flex-direction: column;
     }
     .landing-page-mobile-signup-button {
@@ -1086,7 +1105,8 @@ a {
         display: none;
     }
     .landing-page-title {
-        padding-bottom: 20px;
+        padding-bottom: 25px;
+        margin-top: -18px;
     }
     .step-form {
         flex-direction: column;
@@ -1096,7 +1116,7 @@ a {
     }
 }
 
-/* CUSTOM BREAK POINTS */
+/* RESPONSIVE -- SMARTPHONES */
 
 @media only screen and (max-width : 480px){
     body {
@@ -1105,27 +1125,31 @@ a {
     .text-1 {
         font-size: 18px;
     }
-    
     .text-2 {
         font-size: 15px;
     }
-    
     .text-3 {
         font-size: 11px;
     }
-    
     .text-4 {
         font-size: 9px;
+    }
+    .landing-gradient-wrapper {
+        padding-top: 0;
+    }
+    .landing-inscription-card {
+        margin-bottom: 0;
+        width: 65%;
     }
     .landing-inscription-card-text {
         margin-bottom: 0;
     }
+    .landing-gradient-wrapper-reversed {
+        height: 35vh;
+    }
     .stepper-step {
         width: 30px;
         height: 30px;
-    }
-    .landing-inscription-card {
-        min-height: 25vh;
     }
     .landing-intermediary-logo {
         height: 40px;
@@ -1134,11 +1158,22 @@ a {
         max-width: 70vw;
     }
     .landing-page-title {
+        margin-top: -8px;
         padding-bottom: 20px;
         font-size: 4.0vw;
     }
     .landing-logo-section {
-        width: 60%;
+        width: 70%;
         margin-top: 2vh;
+    }
+    .contact-mail {
+        font-weight: bold;
+        margin-left: 10px;
+    }    
+    .footer-copyright {
+        margin-left: 10px;
+    }
+    .footer-white-logo-image {
+        height: 40px;
     }
 }

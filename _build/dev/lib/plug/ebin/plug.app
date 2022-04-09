@@ -1,7 +1,7 @@
 {application,plug,
              [{applications,[kernel,stdlib,elixir,logger,eex,mime,plug_crypto,
                              telemetry]},
-              {description,"A specification and conveniences for composable modules between web applications"},
+              {description,"Compose web applications with functions"},
               {modules,['Elixir.Collectable.Plug.Conn',
                         'Elixir.Inspect.Plug.Conn','Elixir.Plug',
                         'Elixir.Plug.Adapters.Cowboy',
@@ -47,6 +47,6 @@
                         'Elixir.Plug.TimeoutError','Elixir.Plug.Upload',
                         'Elixir.Plug.UploadError',plug_multipart]},
               {registered,[]},
-              {vsn,"1.12.1"},
+              {vsn,"1.13.4"},
               {mod,{'Elixir.Plug.Application',[]}},
               {env,[{validate_header_keys_during_test,true}]}]}.

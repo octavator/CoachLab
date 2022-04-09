@@ -165,9 +165,13 @@ defmodule ClabRouter do
   post "/inscription/file" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
     filename = body.myFile.filename
-    true = Utils.test_file_type(body.myFile.path, body.myFile.filename)
-    IO.inspect(File.read!(body.myFile.path), label: "writing file to data/tmp_files/#{filename}")
-    File.write("data/tmp_files/#{filename}", File.read!(body.myFile.path))
+    path = Path.expand(body.myFile.path, __DIR__)
+
+    #@TODO: check its extension isnt a potentially dangerous one
+    true = Utils.test_file_type(path, filename)
+    File.read!(path)
+    IO.inspect("writing file to data/tmp_files/#{filename}")
+    File.write("data/tmp_files/#{filename}", File.read!(path))
     send_resp(conn, 200, "ok")
   end
 
@@ -203,6 +207,8 @@ defmodule ClabRouter do
             files |> Enum.each(& File.rm("data/images/#{user.id}/#{&1}_#{user[&1]}"))
             {conn, 400, "Une erreur est survenue lors de la sauvegarde d'un de vos fichiers."}
           _ ->
+            content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-confirmation.html.eex", user: user)
+            Clab.Mailer.send_mail([user.email], "Confirmation de votre inscription sur CoachLab", content)
             token = (user.id <> "|" <> :crypto.hash(:sha256, @secret <> user.id)) |> Base.encode64(padding: false)
             conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
             {conn, 200, "Votre compte a été bien été créé."}

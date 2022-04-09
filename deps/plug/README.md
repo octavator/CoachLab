@@ -5,7 +5,7 @@
 
 Plug is:
 
-  1. A specification for composable modules between web applications
+  1. A specification for composing web applications with functions
   2. Connection adapters for different web servers in the Erlang VM
 
 [Documentation for Plug is available online](http://hexdocs.pm/plug/).
@@ -60,7 +60,7 @@ On a production system, you likely want to start your Plug pipeline under your a
 and then update `lib/my_app/application.ex` as follows:
 
 ```elixir
-defmodule MyApp do
+defmodule MyApp.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -87,12 +87,14 @@ Now run `mix run --no-halt` and it will start your application with a web server
 
 | Branch | Support                  |
 | ------ | ------------------------ |
-| v1.11  | Bug fixes                |
+| v1.13  | Bug fixes                |
+| v1.12  | Security patches only    |
+| v1.11  | Security patches only    |
 | v1.10  | Security patches only    |
 | v1.9   | Security patches only    |
 | v1.8   | Security patches only    |
-| v1.7   | Security patches only    |
-| v1.6   | Security patches only    |
+| v1.7   | Unsupported from 01/2022 |
+| v1.6   | Unsupported from 01/2022 |
 | v1.5   | Unsupported from 03/2021 |
 | v1.4   | Unsupported from 12/2018 |
 | v1.3   | Unsupported from 12/2018 |
@@ -126,9 +128,11 @@ end
 As per the specification above, a connection is represented by the `Plug.Conn` struct:
 
 ```elixir
-%Plug.Conn{host: "www.example.com",
-           path_info: ["bar", "baz"],
-           ...}
+%Plug.Conn{
+  host: "www.example.com",
+  path_info: ["bar", "baz"],
+  ...
+}
 ```
 
 Data can be read directly from the connection and also pattern matched on. Manipulating the connection often happens with the use of the functions defined in the `Plug.Conn` module. In our example, both `put_resp_content_type/2` and `send_resp/3` are defined in `Plug.Conn`.

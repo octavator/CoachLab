@@ -61,8 +61,7 @@ class FileInput extends React.Component {
               type="file" name={this.props.name || ""} accept={this.props.accept} ></input>
             <span className="text-3">{this.props.text}</span>
           </label>
-          {/* <div className="file-input-filename">{this.props.filename}</div> */}
-          <div className="file-input-filename text-3">{this.props.filename ? "Le fichier a bien été enregistré" : ""}</div>
+          <div className={"file-input-filename text-3 " + (this.props.filename ? "" : "hidden")}>{"Le fichier a bien été enregistré"}</div>
           </div>
         
       </div>

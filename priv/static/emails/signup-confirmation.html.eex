@@ -1,0 +1,15 @@
+<html>
+<body>
+
+    Bonjour <%= "#{user.firstname} #{user.lastname}" %><br/><br/>
+
+    Votre inscription sur <a href="https://www.coachlab.fr">Coachlab</a> a bien été prise en compte.<br/>
+    Vous pouvez dès à présent vous connecter grâce aux identifiants fournis lors de votre inscription.<br/><br/>
+
+    Les informations que vous avez saisies, ainsi que vos fichiers téléchargés durant l'inscription seront à l'étude durant les prochaines heures afin de vérifier la 
+    bienséance, la pertinence et l'authorité que vous avez sur ces documents.<br/><br/>
+
+    En cas de besoin, n'hésitez pas à nous contacter via l'adresse email dédiée <a href="mailto:contact@coachlab.fr">contact@coachlab.fr</a><br/>
+    Merci pour votre confiance et à bientôt sur CoachLab !
+
+</body>

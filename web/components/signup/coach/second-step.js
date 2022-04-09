@@ -41,19 +41,20 @@ class CoachSecondStep extends React.Component {
         <div className="first-step-wrapper">
         <form className="step-form" onSubmit={(e) => { e.preventDefault() }}>
           <div className="step-sections-wrapper">
-            <TextInput type="email" extraClass="cl-form-input text-3" required={true} value={this.state.form.email} 
-             onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }} name="email" placeholder="Email" />
-            <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.firstname} 
-             onChange={(e) => { this.setState({form: {...this.state.form, firstname: e}}) }} name="firstname" placeholder="Prénom" />
             <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.lastname} 
              onChange={(e) => { this.setState({form: {...this.state.form, lastname: e}}) }} name="lastname" placeholder="Nom" />
+            <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.firstname}
+             onChange={(e) => { this.setState({form: {...this.state.form, firstname: e}}) }} name="firstname" placeholder="Prénom" />
+            <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.phone} 
+             onChange={(e) => { this.setState({form: {...this.state.form, phone: e}}) }} placeholder="Téléphone" name="phone" />
+            <TextInput type="email" extraClass="cl-form-input text-3" required={true} value={this.state.form.email} 
+             onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }} name="email" placeholder="Email" />
             <TextInput type="password" extraClass="cl-form-input  text-3" required={true} value={this.state.form.password} 
              onChange={(e) => { this.setState({form: {...this.state.form, password: e}}) }} name="password" placeholder="Mot de passe" />
             <TextInput type="password" extraClass="cl-form-input  text-3" required={true} value={this.state.form.password_check} 
              onChange={(e) => { this.setState({form: {...this.state.form, password_check: e}}) }}  name="password_check" placeholder="Confirmez le mot de passe" />       
-            <TextInput extraClass="cl-form-input  text-3" required={true} value={this.state.form.phone} 
-             onChange={(e) => { this.setState({form: {...this.state.form, phone: e}}) }} placeholder="Téléphone" name="phone" />
-            <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filename && this.state.filename.split("_").pop()} onChange={(e) => this.uploadFile(e)} extraClass="bg-white  text-2"
+            <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filename && this.state.filename.split("_").pop()}
+             onChange={(e) => this.uploadFile(e)} extraClass="bg-white text-2 pt-2"
              label="Merci de télécharger une copie de votre pièce d'identité" />
             <Button onClick={() => { this.sendForm() }} extraClass="cl-button cl-form-button text-3 bg-white"
               text="Suivant"/>

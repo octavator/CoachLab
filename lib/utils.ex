@@ -1,4 +1,5 @@
 defmodule Utils do
+    @allowed_exts ["jpg", "jpeg", "png", "svg", "gif", "pdf"]
     require Logger
 
     def get_html_template(tpl) do
@@ -14,9 +15,9 @@ defmodule Utils do
         mimetype = res |> String.split(" ") |> Enum.at(1) |> String.trim(";")
         case mimetype do
             "image/" <> mime_type_ext ->
-                res = mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg")
-                if !res, do:  Logger.error("[SECURITY ERROR]: extension #{ext} doesn't match with real mime_type_ext #{mimetype} (#{mime_type_ext}")
-                res
+                isvalid = Enum.member?(@allowed_exts, ext) && (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
+                if !isvalid, do:  Logger.error("[SECURITY ERROR]: extension #{ext} is invalid or doesn't match with real mime_type_ext #{mimetype} (#{mime_type_ext}")
+                isvalid
             _ ->
                 Logger.error("[SECURITY ERROR]: extension #{ext} doesn't match with real mime_type_ext #{mimetype}")
                 false
