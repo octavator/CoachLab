@@ -1,0 +1,9 @@
+<html>
+<body>
+
+    Prénom: <%= "#{user.firstname} " %><br/>
+    Nom: <%= "#{user.lastname}" %><br/>
+    Téléphone: <%= "#{user.phone}" %><br/>
+    Email: <%= "#{user.email}" %><br/>
+
+</body>

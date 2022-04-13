@@ -209,6 +209,14 @@ defmodule ClabRouter do
           _ ->
             content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-confirmation.html.eex", user: user)
             Clab.Mailer.send_mail([user.email], "Confirmation de votre inscription sur CoachLab", content)
+
+            content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-alert.html.eex", user: user)
+            attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
+            Clab.Mailer.send_mail_with_attachments(
+              Application.get_env(:clab, :mailer)[:signup_emails],
+              "[#{Utils.get_role_label(user.role)}] Nouvelle inscription sur CoachLab !",
+               content, attachments)
+
             token = (user.id <> "|" <> :crypto.hash(:sha256, @secret <> user.id)) |> Base.encode64(padding: false)
             conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
             {conn, 200, "Votre compte a été bien été créé."}

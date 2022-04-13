@@ -9,6 +9,13 @@ defmodule Utils do
         header <> data <> footer
     end
 
+    def get_role_label(role) do
+      case role do
+        :coach -> "Coach"
+        _ -> "Coaché"
+      end
+    end
+
     def test_file_type(filepath, filename) do
         ext = String.split(filename, ".") |> List.last()
         {res , 0} = System.cmd("file", [filepath, "--mime-type", "-i"])

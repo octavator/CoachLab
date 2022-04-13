@@ -22,8 +22,8 @@ defmodule Clab.MixProject do
     [
       {:plug_cowboy, "~> 2.0"},
       {:poison, "~> 5.0"},
-      {:mailibex, "~> 0.1.6"},
-      {:gen_smtp, "~> 1.1.1"}
+      {:mailibex, github: "kbrw/mailibex", branch: "master"},
+      {:gen_smtp, "~> 1.1.1"},
     ]
   end
 end

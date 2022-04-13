@@ -12,7 +12,7 @@ COPY ./ /app
 WORKDIR /app
 RUN echo $(pwd)
 RUN echo $(ls)
-RUN mix deps.get --only $MIX_ENV
+RUN mix deps.get
 RUN mix deps.compile
 # RUN npm install
 # RUN npm run build
