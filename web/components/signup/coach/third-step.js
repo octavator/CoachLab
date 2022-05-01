@@ -23,9 +23,14 @@ class DefaultThirdStep extends React.Component {
       filename
     )
     new_form[key] = filename
-    http.post("/inscription/file", formData).then(res => {
+    fetch("/inscription/file", {
+      body: formData,
+      method: "POST"
+    }).then(res => {
       if (res.status == 200) this.setState({filenames: new_filenames, form: new_form})
-      else  this.props.showFlashMessage("error", "Une erreur est survenue avec l'envoi de votre fichier.")
+      else  this.props.showFlashMessage("error", "Une erreur est survenue lors de l'envoi de votre fichier.")
+    }).catch((e) => {
+      this.props.showFlashMessage("error", "Une erreur est survenue lors du téléchargement")
     })
   }
   updateSpecialty(value, index) {
@@ -63,12 +68,12 @@ class DefaultThirdStep extends React.Component {
             </div>
             <div className="step-section-wrapper">
               <div className="step-section-label text-2">Merci de télécharger votre diplôme,<br/> certification et/ou tout document<br/> attestant de votre autorisation<br/> à pratiquer</div>
-              <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filenames["certification"] && this.state.filenames.certification.split("_").pop()}
+              <FileInput accept=".png,.jpeg,.jpg,.pdf" text="Parcourir..." filename={this.state.filenames["certification"] && this.state.filenames.certification.split("_").pop()}
               onChange={(e) => this.uploadFile("certification", e)} extraClass="bg-white  text-3"/>
             </div>
             <div className="step-section-wrapper">
               <div className="step-section-label  text-2">Merci de télécharger une photo professionnelle</div>
-              <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filenames["avatar"] && this.state.filenames.avatar.split("_").pop()}
+              <FileInput accept=".png,.jpeg,.jpg,.pdf" text="Parcourir..." filename={this.state.filenames["avatar"] && this.state.filenames.avatar.split("_").pop()}
               onChange={(e) => this.uploadFile("avatar", e)} extraClass="bg-white  text-3"/>
             </div>
           </div>
@@ -83,7 +88,7 @@ class DefaultThirdStep extends React.Component {
               <div className="step-section-label  text-2">
                 Merci de télécharger une copie de votre RIB
               </div>
-              <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filenames["rib"] && this.state.filenames.rib.split("_").pop()}
+              <FileInput accept=".png,.jpeg,.jpg,.pdf" text="Parcourir..." filename={this.state.filenames["rib"] && this.state.filenames.rib.split("_").pop()}
               onChange={(e) => this.uploadFile("rib", e)} extraClass="bg-white  text-3"/>
             </div>
           </div>

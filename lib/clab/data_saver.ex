@@ -2,7 +2,7 @@ defmodule DataSaver do
   require Logger
   use GenServer
   @backup_path 'data/backup/'
-  @backup_interval 4 #hours
+  @backup_interval 1 #hours
 
   def start_link(args \\ []) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)

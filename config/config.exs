@@ -8,7 +8,7 @@ config :clab,
   secret: "BEoi3c6LxpW4kDno2BqTfakmQqHe7Un8ntT1hduQPJ5i",
   mailer: %{
     maintainer_emails: ["theophile.decagny@gmail.com"],
-    signup_emails: ["theophile.decagny@gmail.com"]
+    signup_emails: ["theophile.decagny@gmail.com", "theophile.fondacci@coachlab.fr"]
   }
 
 import_config "#{config_env()}.exs"

@@ -58,7 +58,7 @@ class FileInput extends React.Component {
         <div className="file-upload-section">
           <label className={"file-input-label " + (this.props.extraClass ? this.props.extraClass : "text-3")}>
             <input className={"cl-file-input "} required={this.props.required} onChange={(e) => { this.props.onChange(e.target.files[0])}}
-              type="file" name={this.props.name || ""} accept={this.props.accept} ></input>
+              type="file" name={this.props.name || "file"} accept={this.props.accept} ></input>
             <span className="text-3">{this.props.text}</span>
           </label>
           <div className={"file-input-filename text-3 " + (this.props.filename ? "" : "hidden")}>{"Le fichier a bien été enregistré"}</div>

@@ -18,8 +18,9 @@ class Landing extends React.Component {
     http.get("/me").then(res => {
       console.log(res.status)
       console.log(res.data)
-      this.setState({user: res.data})
+      window.location.href = "/bienvenue"
     })
+    .catch((e) => {console.log("")})
 
     const options = {
       root: null,
@@ -45,10 +46,8 @@ class Landing extends React.Component {
   observerOff.observe(targetOff);
   }
   render() {
-    console.log(this.state.show_navbar)
     return (
       <div>
-        {/* <Navbar user={this.state.user}/> */}
         <div className="landing-wrapper">
           <div className="landing-first-page-wrapper">
             <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>

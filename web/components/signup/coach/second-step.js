@@ -22,17 +22,18 @@ class CoachSecondStep extends React.Component {
     }
   }
   uploadFile(e) {
-    console.log(e)
-    console.log(e.name)
     const formData = new FormData()
     const filename = `idcard_${this.state.form.lastname}_${e.name}`.replace(" ", "-")
-    formData.append( 
-      "myFile", 
-      e,
-      filename
-    )
-    http.post("/inscription/file", formData).then(res => {
-      this.setState({filename: filename, form: {...this.state.form, idcard: filename}})
+    formData.append("myFile", e, filename)
+
+    fetch("/inscription/file", {
+      body: formData,
+      method: "POST"
+    }).then(res => {
+      if (res.status == 200) this.setState({filename: filename, form: {...this.state.form, idcard: filename}})
+      else  this.props.showFlashMessage("error", "Une erreur est survenue lors de l'envoi de votre fichier.")
+    }).catch((e) => {
+      this.props.showFlashMessage("error", "Une erreur est survenue lors du téléchargement")
     })
   }
   render() {
@@ -53,9 +54,9 @@ class CoachSecondStep extends React.Component {
              onChange={(e) => { this.setState({form: {...this.state.form, password: e}}) }} name="password" placeholder="Mot de passe" />
             <TextInput type="password" extraClass="cl-form-input  text-3" required={true} value={this.state.form.password_check} 
              onChange={(e) => { this.setState({form: {...this.state.form, password_check: e}}) }}  name="password_check" placeholder="Confirmez le mot de passe" />       
-            <FileInput accept=".png,.jpeg,.jpg" text="Parcourir..." filename={this.state.filename && this.state.filename.split("_").pop()}
+            <FileInput accept=".png,.jpeg,.jpg,.pdf" text="Parcourir..." filename={this.state.filename && this.state.filename.split("_").pop()}
              onChange={(e) => this.uploadFile(e)} extraClass="bg-white text-2 pt-2"
-             label="Merci de télécharger une copie de votre pièce d'identité" />
+             label="Merci de télécharger une copie de votre pièce d'identité (recto)" name="file" />
             <Button onClick={() => { this.sendForm() }} extraClass="cl-button cl-form-button text-3 bg-white"
               text="Suivant"/>
           </div>

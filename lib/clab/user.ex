@@ -17,10 +17,6 @@ defmodule User do
             :ets.new(@table, [:named_table, :public])
         end
         Process.flag(:trap_exit, true)
-        Task.start(fn ->
-            :timer.sleep(1000)
-            User.create_user(%{email: "theodecagny@hotmail.fr", firstname: "Theophile", lastname: "de Cagny", password: "toto", role: "coach"})
-        end)
         {:ok, %{}}
     end
 
@@ -37,8 +33,12 @@ defmodule User do
     end
 
     def handle_call({:get_user_by_id, id}, _from, state) do
-        [{_key, value}] = :ets.lookup(@table, id)
-        {:reply, value, state}
+        try do
+            [{_key, value}] = :ets.lookup(@table, id)
+            {:reply, value, state}
+        rescue
+            _ -> {:reply, nil, state}
+        end
     end
 
      def handle_call({:search_coach_by_name, name}, _from, state) do
@@ -111,5 +111,9 @@ defmodule User do
 
     def hash_password(password, salt) do
         :crypto.hash(:sha256, salt <> password) |> Base.encode16
+    end
+
+    def create_coach_user() do
+        User.create_user(%{email: "theodecagny@hotmail.fr", firstname: "Theophile", lastname: "de Cagny", password: "azeUIRE$6823z9EZZ", role: "coach"})
     end
 end

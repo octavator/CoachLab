@@ -41,11 +41,11 @@ class Login extends React.Component {
         <div className="login-content-wrapper infos-form">
           <div className="input-group">
             <label className="input-label text-3">Adresse mail</label>
-            <input className="cl-input text-3" onChange={(e) => { this.setState({form: {...this.state.form, email: e.target.value}}) }} value={this.state.form.email} name="email" type="email"></input>
+            <input className="cl-input bg-white text-3" onChange={(e) => { this.setState({form: {...this.state.form, email: e.target.value}}) }} value={this.state.form.email} name="email" type="email"></input>
           </div>
           <div className="input-group">
             <label className="input-label text-3">Mot de passe</label>
-            <input className="cl-input text-3" onChange={(e) => { this.setState({form: {...this.state.form, password: e.target.value}}) }} value={this.state.form.password} name="password" type="password"></input>
+            <input className="cl-input bg-white text-3" onChange={(e) => { this.setState({form: {...this.state.form, password: e.target.value}}) }} value={this.state.form.password} name="password" type="password"></input>
           </div>
           <div className="input-group">
             <div className="button-group">

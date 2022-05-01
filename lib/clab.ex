@@ -8,23 +8,33 @@ defmodule ClabRouter do
   use Plug.Router
   plug Plug.Logger
   require Logger
+  
+  use Plug.Debugger
 
   @secret "73JIOiOJSKLAZHOJfspaioz9902"
 
   plug Plug.SSL
   plug Plug.Static, from: :clab, at: "/priv/static"
   plug :match
-  plug Plug.Parsers, parsers: [:json, :multipart],
-                     pass: ["*/*"],
-                     json_decoder: Poison
+  plug Plug.Parsers,
+     parsers: [
+       :json,
+       :urlencoded,
+       {:multipart, length: 6_000_000} #6MB max upload
+     ],
+     json_decoder: Poison
+
   plug :dispatch
+
+  #@TODO: replace auth checks with a custom plug
+  #@TODO: add expiration to token (1 month ?)
+  #@TODO: auto delete of very old backups and tmp_files
 
   def build_token(id) do
     (id <> "|" <> :crypto.hash(:sha256, @secret <> id))
      |> Base.encode64(padding: false)
   end
 
-  #@TODO: add expiration to token (1 month ?)
   def check_token_user(conn) do
     conn = fetch_cookies(conn)
     cookie = conn.cookies["cltoken"]
@@ -53,9 +63,13 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       user = User.get_user_by_id(id)
-      data = Map.take(user, [:role, :phone, :lastname, :firstname, :id, :email])
-      {:ok, user_data} = data |> Poison.encode
-      send_resp(conn, 200, user_data)
+      if !is_nil(user) do
+        data = Map.take(user, [:role, :phone, :lastname, :firstname, :id, :email])
+        {:ok, user_data} = data |> Poison.encode
+        send_resp(conn, 200, user_data)
+      else
+        send_resp(conn, 401, "Utilisateur inconnu")
+      end
     else
       send_resp(conn, 401, "Token invalide")
     end
@@ -144,32 +158,26 @@ defmodule ClabRouter do
     send_resp(conn, 200, data)
   end
 
-  #@TODO: rajouter de la sécurité
   post "/file/upload" do
     user_id = check_token_user(conn)
     if !is_nil(user_id) do
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      true = Utils.test_file_type(body.myFile.path, body.myFile.filename)
-      #@TODO :  à harmoniser
-      [dir_name | filename] = body.myFile.filename |> String.split("_")
-      File.mkdir_p("data/#{dir_name}/#{user_id}")
-      IO.inspect(File.read!(body.myFile.path), label: "writing file to data/#{dir_name}/#{user_id}/#{filename}")
-      File.write("data/#{dir_name}/#{user_id}/#{filename}", File.read!(body.myFile.path))
+      filename = body.myFile.filename
+      path = Path.expand(body.myFile.path, __DIR__)
+      true = Utils.test_file_type(path, filename)
+      IO.inspect("writing file to data/tmp_files/#{filename}")
+      File.write("data/tmp_files/#{filename}", File.read!(path))
       send_resp(conn, 200, "ok")
     else
       send_resp(conn, 401, "Token invalide")
     end
   end
 
-  #@TODO: rajouter de la sécurité
   post "/inscription/file" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
     filename = body.myFile.filename
     path = Path.expand(body.myFile.path, __DIR__)
-
-    #@TODO: check its extension isnt a potentially dangerous one
     true = Utils.test_file_type(path, filename)
-    File.read!(path)
     IO.inspect("writing file to data/tmp_files/#{filename}")
     File.write("data/tmp_files/#{filename}", File.read!(path))
     send_resp(conn, 200, "ok")
@@ -184,42 +192,48 @@ defmodule ClabRouter do
 
   post "/sign-up" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-    # body = %{body | email: body.email <> "#{:crypto.strong_rand_bytes(20)}"}
     {conn, status_code, ret_text} = case User.create_user(body) do
       :email_already_used -> {conn, 400, "Cet email est déjà associé à un autre utilisateur"}
       :error -> {conn, 400, "Erreur durant la création de votre utilisateur."}
       false -> {conn, 400, "Erreur durant la création de votre utilisateur."}
       user ->
-        files = case user.role do
-          "coach" -> ["avatar", "certification", "idcard", "rib"]
-          "default" -> ["avatar"]
-        end
-        IO.inspect(user)
-        all_files_without_error = files |> Enum.all?(fn file ->
-          ext = user[String.to_atom(file)] |> String.split(".") |> List.last()
-          old_filepath = "data/tmp_files/#{user[String.to_atom(file)]}"
-          new_filepath = "data/images/#{user.id}/#{file}.#{ext}"
-          Utils.move_user_files(old_filepath, new_filepath, user)
-        end)
-        case all_files_without_error do
-          false ->
+        try do
+          files = case user.role do
+            "coach" -> ["avatar", "certification", "idcard", "rib"]
+            "default" -> ["avatar"]
+          end
+          IO.inspect(user, label: "new user")
+          all_files_without_error = files |> Enum.all?(fn file ->
+            ext = user[String.to_atom(file)] |> String.split(".") |> List.last()
+            old_filepath = "data/tmp_files/#{user[String.to_atom(file)]}"
+            new_filepath = "data/images/#{user.id}/#{file}.#{ext}"
+            Utils.move_user_files(old_filepath, new_filepath, user)
+          end)
+          case all_files_without_error do
+            false ->
+              User.delete_user(user.id)
+              files |> Enum.each(& File.rm("data/images/#{user.id}/#{&1}_#{user[&1]}"))
+              {conn, 400, "Une erreur est survenue lors de la sauvegarde d'un de vos fichiers."}
+            _ ->
+              content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-confirmation.html.eex", user: user)
+              Clab.Mailer.send_mail([user.email], "Confirmation de votre inscription sur CoachLab", content)
+
+              content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-alert.html.eex", user: user)
+              attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
+              Clab.Mailer.send_mail_with_attachments(
+                Application.get_env(:clab, :mailer)[:signup_emails],
+                "[#{Utils.get_role_label(user.role)}] Nouvelle inscription sur CoachLab !",
+                content, attachments)
+
+              token = (user.id <> "|" <> :crypto.hash(:sha256, @secret <> user.id)) |> Base.encode64(padding: false)
+              conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
+              {conn, 200, "Votre compte a été bien été créé."}
+          end
+        rescue
+          e -> 
+            Logger.error("[ERROR] Bad signup for user: #{user.email}, #{inspect(e)}")
             User.delete_user(user.id)
-            files |> Enum.each(& File.rm("data/images/#{user.id}/#{&1}_#{user[&1]}"))
-            {conn, 400, "Une erreur est survenue lors de la sauvegarde d'un de vos fichiers."}
-          _ ->
-            content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-confirmation.html.eex", user: user)
-            Clab.Mailer.send_mail([user.email], "Confirmation de votre inscription sur CoachLab", content)
-
-            content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-alert.html.eex", user: user)
-            attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
-            Clab.Mailer.send_mail_with_attachments(
-              Application.get_env(:clab, :mailer)[:signup_emails],
-              "[#{Utils.get_role_label(user.role)}] Nouvelle inscription sur CoachLab !",
-               content, attachments)
-
-            token = (user.id <> "|" <> :crypto.hash(:sha256, @secret <> user.id)) |> Base.encode64(padding: false)
-            conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
-            {conn, 200, "Votre compte a été bien été créé."}
+            {conn, 400, "Une erreur est survenue lors de la création de votre compte."}
         end
     end
     send_resp(conn, status_code, ret_text)
@@ -263,6 +277,25 @@ defmodule ClabRouter do
     else
       send_resp(conn, 401, "Token invalide")
     end
+  end
+
+  post "/signup-invite" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      coach = User.get_user_by_id(id)
+      body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+      content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-invitation.html.eex", coach: coach)
+      Clab.Mailer.send_mail([body.email], "Votre coach vous a invité à le rejoindre sur CoachLab", content)
+      send_resp(conn, 200, "Ok")
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  get "/user/:id" do
+    Logger.debug("get user id: #{id}")
+    user = User.get_user_by_id(id)  |> Poison.encode!
+    send_resp(conn, 200, user)
   end
 
  #forward "/users", to: UsersRouter

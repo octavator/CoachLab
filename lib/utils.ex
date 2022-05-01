@@ -3,27 +3,31 @@ defmodule Utils do
     require Logger
 
     def get_html_template(tpl) do
-        header = EEx.eval_file("#{:code.priv_dir(:clab)}/static/header.html")
-        data = EEx.eval_file("#{:code.priv_dir(:clab)}/static/#{tpl}.html")
-        footer = EEx.eval_file("#{:code.priv_dir(:clab)}/static/footer.html")
+        header = EEx.eval_file("#{:code.priv_dir(:clab)}/static/templates/header.html")
+        data = EEx.eval_file("#{:code.priv_dir(:clab)}/static/templates/#{tpl}.html")
+        footer = EEx.eval_file("#{:code.priv_dir(:clab)}/static/templates/footer.html")
         header <> data <> footer
     end
 
     def get_role_label(role) do
       case role do
-        :coach -> "Coach"
+        "coach" -> "Coach"
         _ -> "Coaché"
       end
     end
 
     def test_file_type(filepath, filename) do
-        ext = String.split(filename, ".") |> List.last()
+        ext = String.split(filename, ".") |> List.last() |> String.downcase
         {res , 0} = System.cmd("file", [filepath, "--mime-type", "-i"])
         mimetype = res |> String.split(" ") |> Enum.at(1) |> String.trim(";")
         case mimetype do
             "image/" <> mime_type_ext ->
                 isvalid = Enum.member?(@allowed_exts, ext) && (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
-                if !isvalid, do:  Logger.error("[SECURITY ERROR]: extension #{ext} is invalid or doesn't match with real mime_type_ext #{mimetype} (#{mime_type_ext}")
+                if !isvalid, do:  Logger.error("[SECURITY ERROR]: extension #{ext} is invalid or doesn't match with real mime_type_ext #{mimetype} (#{mime_type_ext})")
+                isvalid
+            "application/" <> mime_type_ext ->
+                isvalid = Enum.member?(@allowed_exts, ext) && (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
+                if !isvalid, do:  Logger.error("[SECURITY ERROR]: extension #{ext} is invalid or doesn't match with real mime_type_ext #{mimetype} (#{mime_type_ext})")
                 isvalid
             _ ->
                 Logger.error("[SECURITY ERROR]: extension #{ext} doesn't match with real mime_type_ext #{mimetype}")

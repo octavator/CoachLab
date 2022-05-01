@@ -15,10 +15,23 @@ class DefaultThirdStep extends React.Component {
       showFlash: false
     }
   }
-  showFlashMessage(type, message) {
-    this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
-      setTimeout(() => { this.setState({showFlash: false})}, 5000)
-    })
+  componentDidMount() {
+    const urlParams = new URLSearchParams(document.location.search)
+    const coach_id = urlParams.get("coach")
+    if (coach_id) {
+      http.get(`/user/${coach_id}`).then(res => {
+        console.log(res.status)
+        console.log(res.data)
+        if (res.status == 200) this.setState({
+          form: {...this.state.form, coaches: [res.data.id]},
+          search_coach_name: `${res.data.firstname} ${res.data.lastname} `
+        })
+        else this.setState({form: {...this.state.form, coaches: []}})
+      })
+      .catch(err => {
+        console.log(err.response)
+      })        
+    }
   }
   getMatchingCoaches(input) {
     if (input.length >= 3) {
@@ -29,8 +42,8 @@ class DefaultThirdStep extends React.Component {
       })
       .catch(err => {
         console.log(err.response)
-        this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
-      })  
+        this.props.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      })
     }
     this.setState({search_coach_name: input})
   }
@@ -38,13 +51,15 @@ class DefaultThirdStep extends React.Component {
     console.log(e)
     const formData = new FormData()
     const filename = `avatar_${this.props.user_form.lastname}_${e.name}`.replace(" ", "-")
-    formData.append( 
-      "myFile", 
-      e,
-      filename
-    )
-    http.post("/inscription/file", formData).then(res => {
+    formData.append("myFile", e, filename)
+    fetch("/inscription/file", {
+      body: formData,
+      method: "POST"
+    }).then(res => {
       if (res.status == 200) this.setState({filename: filename, form: {...this.state.form, avatar: filename}})
+      else  this.props.showFlashMessage("error", "Une erreur est survenue lors de l'envoi de votre fichier.")
+    }).catch((e) => {
+      this.props.showFlashMessage("error", "Une erreur est survenue lors du téléchargement")
     })
   }
   validate() {
@@ -70,13 +85,13 @@ class DefaultThirdStep extends React.Component {
                 Oui
               </div>
               <div className="select-input-autocomplete-container">
-                <TextInput extraClass="text-3 autocomplete-text-input" required={true} value={this.state.search_coach_name} placeholder="Nom du coach" 
+                <TextInput extraClass="text-3 autocomplete-text-input" value={this.state.search_coach_name} placeholder="Nom du coach" 
                  onChange={(e) => { this.getMatchingCoaches(e) }} />
                   <div className={"select-autocomplete-wrapper" + (this.state.show_coaches ? "" : " hidden")}>
                     {
                       this.state.coaches.map((coach) => {
                         return (
-                          <div className="select-autocomplete-option text-3" onClick={() => {
+                          <div key={coach.id} className="select-autocomplete-option text-3" onClick={() => {
                              this.setState({
                               search_coach_name: `${coach.firstname} ${coach.lastname}`,
                               form: {...this.state.form, coaches: [coach.id]},

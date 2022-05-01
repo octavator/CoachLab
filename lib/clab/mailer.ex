@@ -10,6 +10,7 @@ defmodule Clab.Mailer do
      [{:relay, Application.get_env(:clab, :region)},
       {:username, Application.get_env(:clab, :access_key)},
       {:password, Application.get_env(:clab, :secret)},
+      {:port, 587},
       {:tls, :always}
      ]
     )
@@ -31,9 +32,16 @@ defmodule Clab.Mailer do
      [{:relay, Application.get_env(:clab, :region)},
       {:username, Application.get_env(:clab, :access_key)},
       {:password, Application.get_env(:clab, :secret)},
+      {:port, 587},
       {:tls, :always}
      ]
     )
+  end
+
+  # Clab.Mailer.send_invitation_mail("theophile.decagny@gmail.com", %{firstname: "coucou" , lastname: " toi", id: "mabite"})
+  def send_invitation_mail(invited_mail, coach) do
+    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-invitation.html.eex", coach: coach)
+    Clab.Mailer.send_mail([invited_mail], "Votre coach vous a invité à le rejoindre sur CoachLab", content)
   end
 end
 

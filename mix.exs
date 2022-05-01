@@ -37,6 +37,7 @@ defmodule Mix.Tasks.Webcopy do
       if res == {:error, :eisdir} do
         dir_files = File.ls!("web/#{file}")
         Enum.each(dir_files, fn dir_file ->
+          File.mkdir_p!("priv/static/#{file}")
           File.copy("web/#{file}/" <> dir_file, "priv/static/#{file}/" <> dir_file)
           IO.puts "Copied #{dir_file} to priv/static/#{file}"
         end)
