@@ -44,6 +44,18 @@ body {
     flex: 1 1 0;
 }
 
+/* IMAGES */
+
+img {
+    width: 100%;
+    height: 100%;
+}
+
+.round-avatar {
+    border-radius: 50%;
+}
+
+
 /* TEXTS */
 
 /* /!\ Problème avec les accents pour Isidora-Bold */
@@ -54,31 +66,27 @@ body {
 .bg-white {
     background-color: white;
 }
-
 .white-text {
     color: white;
 }
-
 .bold {
     font-weight: bold;
 }
-
 .text-1 {
     font-size: 2.6vw;
 }
-
 .text-2 {
     font-size: 1.7vw;
 }
-
+.text-2-5 {
+    font-size: 1.4vw;
+}
 .text-3 {
     font-size: 1.0vw;
 }
-
 .text-4 {
     font-size: 0.8vw;
 }
-
 .mt-1 {
     margin-top: 10px;
 }
@@ -111,19 +119,21 @@ a {
     display: flex;
     flex-direction: column;
 }
-
 .page-title {
     color: #26619C;
     justify-content: center;
     display: flex;
     margin-bottom: 20px;
 }
-
+.page-title.blue-bg {
+    color: white;
+}
 .page-title.welcome-page-title {
     margin: 20px;
-
-} 
-
+}
+.clickable {
+    cursor: pointer;
+}
 /* BUTTONS */
 .cl-radio {
     cursor: pointer;
@@ -296,6 +306,178 @@ a {
     position: relative;
 }
 
+/* NEW AGENDA */
+
+.new-agenda-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-self: stretch;
+    align-items: center;
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+}
+
+.new-agenda-container {
+    display: flex;
+    flex-direction: column;
+    padding: 6vh 10vw 5vh 10vw;
+    margin: 2vh 10vw;
+    background-color: white;
+    border-radius: 30px;
+    flex: 1;
+    align-self: stretch;
+}
+.new-agenda-title {
+    color: black;
+}
+.new-agenda-header {
+    display: flex;
+    margin-bottom: 5vh;
+    overflow: auto;
+}
+.new-agenda-header-month {
+    display: flex;
+    flex-direction: column;
+    padding: 10px 14px;
+    margin-right: 20px;
+    margin-bottom: 5px;
+    border-radius: 16px;
+    cursor: pointer;
+    font-weight: bolder;
+}
+.new-agenda-month-letter {
+    color: grey;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.new-agenda-month-number {
+    color: black;
+    text-align: center;
+}
+.new-agenda-header-month.selected {
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+}
+.selected .new-agenda-month-letter {
+    color: white;
+}
+
+.new-schedule-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+.new-days-schedule-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+}
+.new-agenda-days-row {
+    display: flex;
+    flex-direction: row;
+    margin: 5px 0;
+}
+.new-agenda-days-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: grey;
+    min-height: 30px;
+    min-width: 30px;
+    width: 2vw;
+    height: 2vw;    
+    margin-right: 5px;
+}
+.new-agenda-day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(90deg, #318CE7 0%, #26619C 100%);
+    color: white;
+    margin: 0 5px;
+    border-radius: 8px;
+    min-height: 30px;
+    min-width: 30px;
+    width: 2vw;
+    height: 2vw;
+    border: 2px solid white;
+    cursor: pointer;
+}
+.new-agenda-day.selected {
+    border: 2px solid #318CE7;
+    color: #318CE7;
+    background: white;
+    font-family: 'Isidora-Bold';
+    width: 26px;
+    height: 26px;
+}
+.hours-schedule-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+}
+.hour-schedule {
+    display: flex;
+    flex-direction: row;
+}
+.hour-schedule-item {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    border-top: 1px solid grey;
+    color: grey;
+    margin-right: 15px;
+    min-width: 40px;
+    width: 4vw;
+    padding-left: 15px;
+    padding-bottom: 1.5vh;
+}
+.appointment-schedule-item {    
+    display: flex;
+    flex: 1 1 0;
+    align-items: center;
+    padding: 5px 1.5vw;
+    color: white;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #318ce740 0%, #26619C40 100%);
+    border-bottom: 1px solid #26619C40;
+}
+.appointment-schedule-item.reserved {
+    background: linear-gradient(90deg, #318ce7 0%, #26619C 100%);
+}
+/* COACH LIST */
+
+.coach-list-wrapper {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10vw;
+    padding: 10px 0;
+}
+
+.coach-list-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: black;
+    padding: 8px 12px;
+    border-radius: 50px;
+    border: 1px solid grey;
+    box-shadow: 0px 0px 3px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 3px 1px darkslategrey;
+}
+.coach-list-row:hover {
+    box-shadow: 0px 0px 5px 2px darkslategrey;
+    -webkit-box-shadow: 0px 0px 5px 2px darkslategrey;
+}
+
+.coach-list-avatar {
+    height: 40px;
+    width: 40px;
+    margin-right: 20px;
+}
+
 /* AGENDA */
 
 .agenda-wrapper {
@@ -313,6 +495,7 @@ a {
 
 .flash-message {
     height: 45px;
+    width: 100%;
     display: flex;
     color: #26619C;
     align-items: center;
@@ -467,6 +650,9 @@ a {
     font-weight: bold;
     color: #318CE7;
     margin-top: 6px;
+}
+.navbar-wrapper.blue-bg .menu-section {
+    color: white;
 }
 
 .navbar-wrapper .menu-section.no-login {
@@ -940,7 +1126,7 @@ a {
 
 .modal {
     width: 100%;
-    position: absolute;
+    position: fixed;
     height: 100%;
     top: 0;
     background-color: gray;
@@ -1098,6 +1284,9 @@ a {
     .text-2 {
         font-size: 3.6vw;
     }
+    .text-2-5 {
+        font-size: 2.4vw;
+    }
     .text-3 {
         font-size: 18px;
     }
@@ -1164,6 +1353,9 @@ a {
     }
     .text-2 {
         font-size: 15px;
+    }
+    .text-2-5 {
+        font-size: 13px;
     }
     .text-3 {
         font-size: 11px;

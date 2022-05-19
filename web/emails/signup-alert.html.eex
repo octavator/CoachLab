@@ -7,8 +7,13 @@
     Email: <%= "#{user.email}" %><br/>
     <%= if user.role == "coach" do %>
         Spécialités : <%= user.specialties |> Enum.join(" | ") %><br/>
+        Description : <%= user[:desc] %><br/>    
     <% else %>
-        Description : <%= "#{user.coach_desc}" %><br/>
+        <%= if !is_nil(user[:coach_desc]) do %>
+            Recherche Coach : <%= "#{user[:coach_desc]}" %><br/>
+        <% end %>
+        <%= if !is_nil(coach) do %>
+            Coach assigné :  <%= "#{coach[:firstname]} #{coach[:lastname]}" %><br/>
+        <% end %>
     <% end %>
-
 </body>

@@ -1,4 +1,4 @@
-import Navbar from './navbar.js'
+import Navbar from './components/navbar.js'
 import Logo from './utils.js'
 
 class Landing extends React.Component {

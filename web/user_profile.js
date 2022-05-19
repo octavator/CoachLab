@@ -1,4 +1,4 @@
-import Navbar from './navbar.js'
+import Navbar from './components/navbar.js'
 
 class UserProfile extends React.Component {
     constructor(props) {

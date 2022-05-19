@@ -1,5 +1,5 @@
-import Modal from './modal.js'
-import Navbar from './navbar.js'
+import Modal from './components/modal.js'
+import Navbar from './components/navbar.js'
 
 class CoachAgenda extends React.Component {
   constructor(props) {
@@ -30,7 +30,7 @@ class CoachAgenda extends React.Component {
     }
   }
   componentDidMount() {
-    http.get(`/api/coach/agenda?coach_id=${btoa(this.state.form.coach_id.replace("=", ""))}`).then(res => {
+    http.get(`/coach/agenda?coach_id=${btoa(this.state.form.coach_id.replace("=", ""))}`).then(res => {
 
       console.log(res.status)
       console.log(res.data)

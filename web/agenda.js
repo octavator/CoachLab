@@ -1,5 +1,5 @@
-import Modal from './modal.js'
-import Navbar from './navbar.js'
+import Modal from './components/modal.js'
+import Navbar from './components/navbar.js'
 
 class Agenda extends React.Component {
   constructor(props) {

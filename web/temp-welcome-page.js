@@ -1,4 +1,4 @@
-import Navbar from './navbar.js'
+import Navbar from './components/navbar.js'
 import {TextInput, Button} from "./components/forms/inputs.js"
 
 class TempWelcomePage extends React.Component {

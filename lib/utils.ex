@@ -16,6 +16,10 @@ defmodule Utils do
       end
     end
 
+    def get_file_extension(path) do
+        List.wrap(path |> String.split(".")) |> List.last()
+    end
+
     def test_file_type(filepath, filename) do
         ext = String.split(filename, ".") |> List.last() |> String.downcase
         {res , 0} = System.cmd("file", [filepath, "--mime-type", "-i"])

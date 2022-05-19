@@ -43,6 +43,29 @@ defmodule Clab.Mailer do
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-invitation.html.eex", coach: coach)
     Clab.Mailer.send_mail([invited_mail], "Votre coach vous a invité à le rejoindre sur CoachLab", content)
   end
+
+  def send_signup_alert(user) do
+    coach_id = List.wrap(user[:coaches]) |> List.first()
+    coach = User.get_user_by_id(coach_id)
+    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-alert.html.eex", user: user, coach: coach)
+    attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
+    Task.start(fn ->
+      Clab.Mailer.send_mail_with_attachments(
+        Application.get_env(:clab, :mailer)[:signup_emails],
+        "[#{Utils.get_role_label(user.role)}] Nouvelle inscription sur CoachLab !",
+        content, attachments)
+    end)
+  end
+
+  def send_confirmation_mail(user) do
+    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-confirmation.html.eex", user: user)
+    Task.start(fn ->
+      Clab.Mailer.send_mail(
+        user.email,
+        "Confirmation de votre inscription sur CoachLab",
+        content)
+    end)
+  end
 end
 
 """

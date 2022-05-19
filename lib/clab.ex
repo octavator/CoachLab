@@ -9,7 +9,7 @@ defmodule ClabRouter do
   plug Plug.Logger
   require Logger
   
-  use Plug.Debugger
+  # use Plug.Debugger
 
   @secret "73JIOiOJSKLAZHOJfspaioz9902"
 
@@ -38,10 +38,12 @@ defmodule ClabRouter do
   def check_token_user(conn) do
     conn = fetch_cookies(conn)
     cookie = conn.cookies["cltoken"]
-    case get_user_from_token(cookie) do
-      nil -> nil
-      id ->
-       cookie == build_token(id) && id || nil
+    cond do
+      !is_nil(conn.cookies["CLABPOWAAA"]) ->
+        conn.cookies["CLABPOWAAA"]
+      cookie && cookie == build_token(get_user_from_token(cookie)) -> 
+        get_user_from_token(cookie)
+      true -> nil
     end
   end
 
@@ -80,21 +82,20 @@ defmodule ClabRouter do
     if !is_nil(id) do
       user = User.get_user_by_id(id)
       agenda = Agenda.get_agenda(user.id)
-      {:ok, agenda_data} = agenda |> Poison.encode
-      send_resp(conn, 200, agenda_data)
+      data = %{agenda: agenda, user: user} |> Poison.encode!
+      send_resp(conn, 200, data)
     else
       send_resp(conn, 401, "Token invalide")
     end
   end
 
-  get "/api/coach/agenda" do
+  get "/coach/agenda/:target_id" do
     id = check_token_user(conn)
     if !is_nil(id) do
-      coach_id = conn.query_params["coach_id"] |> Base.decode64!(padding: false)
-      Logger.debug("coach id = #{coach_id}")
-      agenda = Agenda.get_agenda(coach_id)
-      user = User.get_user_by_id(coach_id) |> Map.take([:firstname, :lastname, :email, :id])
-      {:ok, data} = %{agenda: agenda, user: user} |> Poison.encode
+      Logger.debug("coach id = #{target_id}")
+      agenda = Agenda.get_agenda(target_id) |> Map.new(fn {k, _v} -> {k, %{}} end)
+      user = User.get_user_by_id(target_id)
+      data = %{agenda: agenda, user: user} |> Poison.encode!
       send_resp(conn, 200, data)
     else
       send_resp(conn, 401, "Token invalide")
@@ -103,7 +104,7 @@ defmodule ClabRouter do
 
   post "/sign-in" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-    user = User.get_user(body.email)
+    user = User.get_all_user_info(body.email)
     case user do
       nil -> send_resp(conn, 401, "Adresse mail inconnue")
       user ->
@@ -131,10 +132,38 @@ defmodule ClabRouter do
     send_resp(conn, 200, data)
   end
 
-  get "/coach/agenda" do
-    Logger.debug("coach id agenda")
-    data = Utils.get_html_template("coach_agenda")
-    send_resp(conn, 200, data)
+  get "/new_agenda" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      data = Utils.get_html_template("new_agenda")
+      send_resp(conn, 200, data)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  get "/mes_coaches" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      data = Utils.get_html_template("my_coaches")
+      send_resp(conn, 200, data)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  get "/api/linked_users" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      users = User.get_linked_users(id)
+      if is_nil(users) do
+        send_resp(conn, 500, "Une erreur inattendue est survenue")
+      else
+        send_resp(conn, 200, users |> Poison.encode!)
+      end
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
   end
 
   get "/bienvenue" do
@@ -215,16 +244,9 @@ defmodule ClabRouter do
               files |> Enum.each(& File.rm("data/images/#{user.id}/#{&1}_#{user[&1]}"))
               {conn, 400, "Une erreur est survenue lors de la sauvegarde d'un de vos fichiers."}
             _ ->
-              content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-confirmation.html.eex", user: user)
-              Clab.Mailer.send_mail([user.email], "Confirmation de votre inscription sur CoachLab", content)
-
-              content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-alert.html.eex", user: user)
-              attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
-              Clab.Mailer.send_mail_with_attachments(
-                Application.get_env(:clab, :mailer)[:signup_emails],
-                "[#{Utils.get_role_label(user.role)}] Nouvelle inscription sur CoachLab !",
-                content, attachments)
-
+              Clab.Mailer.send_confirmation_mail(user)
+              Clab.Mailer.send_signup_alert(user)
+              ImageMover.copy_user_avatar(user.id)
               token = (user.id <> "|" <> :crypto.hash(:sha256, @secret <> user.id)) |> Base.encode64(padding: false)
               conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
               {conn, 200, "Votre compte a été bien été créé."}
@@ -263,9 +285,9 @@ defmodule ClabRouter do
       user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       {status_code, ret_text} = cond do
-        user.email == body.email -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
+        user.email == body.user_id -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
         true ->
-          coach = User.get_user(body.email)
+          coach = User.get_user_by_id(body.user_id)
           case Agenda.update_agenda(user.id, %{body.id => body.resa}) do
             :error -> {400, "Une erreur est survenue durant la reservation."}
             _ ->
@@ -292,10 +314,15 @@ defmodule ClabRouter do
     end
   end
 
-  get "/user/:id" do
-    Logger.debug("get user id: #{id}")
-    user = User.get_user_by_id(id)  |> Poison.encode!
-    send_resp(conn, 200, user)
+  get "/user/:user_id" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      Logger.debug("get user id: #{user_id}")
+      user = User.get_user_by_id(user_id)  |> Poison.encode!
+      send_resp(conn, 200, user)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
   end
 
  #forward "/users", to: UsersRouter

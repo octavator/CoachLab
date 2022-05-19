@@ -4,8 +4,8 @@
               {description,"clab"},
               {modules,['Elixir.Agenda','Elixir.Clab',
                         'Elixir.Clab.Application','Elixir.Clab.Mailer',
-                        'Elixir.ClabRouter','Elixir.DataSaver','Elixir.User',
-                        'Elixir.Utils']},
+                        'Elixir.ClabRouter','Elixir.DataSaver',
+                        'Elixir.ImageMover','Elixir.User','Elixir.Utils']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.Clab.Application',[]}}]}.
