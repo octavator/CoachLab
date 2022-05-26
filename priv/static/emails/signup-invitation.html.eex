@@ -1,7 +1,7 @@
 <html>
 <body>
 
-    Bonjour,
+    Bonjour, <br/>
     
     Votre coach  <%= "#{coach.firstname} #{coach.lastname}" %> est à présent disponible sur CoachLab, le premier 
     centre de coaching digital, et il souhaite vous y retrouver ! <br/><br/>

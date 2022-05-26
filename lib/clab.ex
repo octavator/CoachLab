@@ -307,7 +307,7 @@ defmodule ClabRouter do
       coach = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-invitation.html.eex", coach: coach)
-      Clab.Mailer.send_mail([body.email], "Votre coach vous a invité à le rejoindre sur CoachLab", content)
+      Task.start(fn -> Clab.Mailer.send_mail([body.email], "Votre coach vous a invité à le rejoindre sur CoachLab", content) end)
       send_resp(conn, 200, "Ok")
     else
       send_resp(conn, 401, "Token invalide")

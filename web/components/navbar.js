@@ -24,7 +24,7 @@ class Navbar extends React.Component {
               Object.keys(this.props.user).includes("email") && this.props.user.email != "" 
               ?
               <div className="menu-section">
-                {/* <div className="menu-item"><a href="/agenda"> Mon Agenda</a></div> */}
+                <div className={"menu-item text-3"}><a href="/new_agenda"> Mon Agenda</a></div>
 
                 {/* HACK FOR TEMP WELCOME PAGE */}
                 <div className="menu-item"></div>

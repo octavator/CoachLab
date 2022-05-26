@@ -21,7 +21,7 @@ defmodule Clab.Mailer do
       html: content,
       subject: subject,
       cc: ["theophile.decagny@gmail.com"],
-      from: %MimeMail.Address{name: "Coachlab",address: "coachlab@coachlab.fr"}
+      from: %MimeMail.Address{name: "Coachlab",address: "contact@coachlab.fr"}
     ]
     opts = opts ++ Enum.flat_map(attachments, fn attachment ->
       [attach: attachment]

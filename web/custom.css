@@ -240,11 +240,61 @@ a {
     top: -1000px;
 }
 
+.cl-select {
+    padding: 15px 20px 10px 10px;
+    border-radius: 20px;
+    border: 1px #26619C solid;
+    border: 1.5px #26619C solid;
+    color: #26619C;
+    min-width: 200px;
+    width: 15vw;
+    cursor: pointer;
+    position: relative;
+}
+
+.cl-select:focus-visible {
+    padding: 10px 20px 10px 10px;
+    border-radius: 20px;
+    border: 1px #26619C solid;
+    border: 1.5px #26619C solid !important;
+    color: #26619C;
+}
+
+.cl-options-container {
+    display: block;
+    z-index: 10;
+    position: absolute;
+    padding: 5px 20px 10px 10px;
+    margin-top: 11px;
+    border: 1px solid grey;
+    background-color: white;
+    margin-left: -10px;
+    min-width: 200px;
+    width: 15vw;
+    border-radius: 20px;
+    position: absolute;
+}
+.cl-selected-option {
+    padding-left: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.cl-option {
+    cursor: pointer;
+    padding: 10px;
+    border-bottom: 1px solid grey;
+    color: grey;
+}
+.cl-option:hover {
+    background-color: lightgrey;
+    color: #26619C;
+}
 .file-input-label {
     display: flex;
     justify-content: center;
     border-radius: 50px;
-        outline: none;
+    outline: none;
     border: none;
     outline: none;
     text-align: center;
@@ -255,7 +305,6 @@ a {
     font-weight: bold;
     font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
 }
-
 .file-input-label.bg-white {
     background-color: white;
     color: black;
@@ -334,6 +383,7 @@ a {
     display: flex;
     margin-bottom: 5vh;
     overflow: auto;
+    position: relative;
 }
 .new-agenda-header-month {
     display: flex;
@@ -766,8 +816,8 @@ a {
     justify-content: center;
     background: linear-gradient(180deg, #318CE7 13%, white 95%);
     display: flex;
+    flex-direction: column;
     align-items: center;
-    padding-top: 10vh;
 }
 
 .landing-gradient-wrapper-reversed {
@@ -915,6 +965,29 @@ a {
     width: 55%;
     margin-left: auto;
     margin-right: auto;
+}
+
+.landing-mobile-pictures-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    align-items: center;
+    display: none;
+}
+
+.landing-desktop-pictures-container {
+    display: flex;
+    flex-direction: column;
+    width: 37%;
+    align-items: center;
+    margin-top: -10vh;
+    /* flex: 1 1 0; */
+    /* Pour chez paulo -> 5120 * 2880 */
+    /* width: 36%;
+    position: absolute;
+    top: -13vh;
+    left: 18%;
+    align-items: center; */
 }
 
 /* OTHER STEPS */
@@ -1129,7 +1202,7 @@ a {
     position: fixed;
     height: 100%;
     top: 0;
-    background-color: gray;
+    background: #0000006b;
     z-index: 999;
     display: flex;
     align-items: center;
@@ -1214,7 +1287,7 @@ a {
 
 .contact-mail {
     font-weight: bold;
-    margin-left: 20px;
+    margin-left: 45px;
 }
 
 .footer-wrapper {
@@ -1226,18 +1299,17 @@ a {
 }
 
 .footer-copyright {
-    margin-left: 20px;
+    margin-left: 45px;
 }
 
 .footer-white-logo {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    margin-left: 20px;
 }
 
 .footer-white-logo-image {
-    max-width: 280px;
-    height: 60px;
+    max-width: 260px;
+    height: 80px;
     cursor: pointer;
 }
 
@@ -1363,9 +1435,9 @@ a {
     .text-4 {
         font-size: 9px;
     }
-    .landing-gradient-wrapper {
+    /* .landing-gradient-wrapper {
         padding-top: 0;
-    }
+    } */
     .landing-inscription-card {
         margin-bottom: 0;
         width: 65%;
@@ -1397,10 +1469,10 @@ a {
     }
     .contact-mail {
         font-weight: bold;
-        margin-left: 10px;
+        margin-left: 30px;
     }    
     .footer-copyright {
-        margin-left: 10px;
+        margin-left: 30px;
     }
     .footer-white-logo-image {
         height: 40px;
@@ -1408,4 +1480,7 @@ a {
     .invite-mail-block {
         flex-direction: column;
     } 
+    .landing-desktop-pictures-container {
+        width: 60%;
+    }
 }

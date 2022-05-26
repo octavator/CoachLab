@@ -33,6 +33,58 @@ class TextInput extends React.Component {
 }
 
 /*
+  SelectInput component
+
+  props: {
+    label: "Firstname" - field's label // optionnal (hidden)
+    onChange: (e) => {...}  - field's related onChange function // required
+    value: "Firstname" - field's value to bind // required
+    type: "password" - field's type // optionnal (text)
+    extraClass: "myClass" - field's extraClass to add // optionnal ("")
+    required: "Firstname" - is field required // optionnal (false)
+    name: "firstname" - field's HTTP name // optionnal ("")
+    placeholder: "type here" - field's HTTP placeholder // optionnal ("")
+  }
+*/
+
+class SelectInput extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      show_dropdown: false
+    }
+  }
+  render() {
+    return (
+      <div className="select-input-wrapper">
+        <div className="input-group">
+          <label className={"input-label" + (this.props.label ? "" : " hidden")}>{this.props.label}</label>
+
+          <div className={"cl-select " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
+          onClick={() => {this.setState({show_dropdown: !this.state.show_dropdown})}}>
+            <div className="cl-selected-option">{this.props.value}
+              <i className={"fa fa-angle-up" + (this.state.show_dropdown ? "" : " hidden")}></i>
+              <i className={"fa fa-angle-down" + (this.state.show_dropdown ? " hidden" : "")}></i>
+            </div>
+            
+            <div className={"cl-options-container" + (this.state.show_dropdown ? "" : " hidden")}>
+              {this.props.options.map((option, option_idx) => {
+                return (
+                  <div key={option_idx} className={"cl-option text-2"}
+                  onClick={() => { this.props.onClick(option.value)}} >
+                    {option.label}
+                </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </div>              
+    )
+  }
+}
+
+/*
   FileInput component
 
   props: {
@@ -132,4 +184,4 @@ class Button extends React.Component {
   }
 }
 
-export {TextInput, FileInput, TextArea, Button}
+export {TextInput, FileInput, TextArea, Button, SelectInput}

@@ -1,5 +1,7 @@
 import Modal from './modal.js'
 import Navbar from './navbar.js'
+import scrollTo from '../utils.js'
+import {SelectInput} from './forms/inputs.js'
 
 class Agenda extends React.Component {
   constructor(props) {
@@ -23,7 +25,7 @@ class Agenda extends React.Component {
         },
         user: {firstname: "", lastname: ""},
         target_user: {firstname: "", lastname: ""},
-        weekdays: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+        weekdays: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
         hours: ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"],
         months: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
     }
@@ -31,9 +33,10 @@ class Agenda extends React.Component {
   componentDidMount() {
     const urlParams = new URLSearchParams(document.location.search)
     const target_id = urlParams.get("target_id")
+    scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${this.state.day.getDate()})`)
     if (!target_id) {
       http.get("/me/agenda").then(agendaData => {
-        this.setState({schedule: agendaData.data.agenda})
+        this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user})
       }).catch(err => {
         this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
       })
@@ -56,6 +59,9 @@ class Agenda extends React.Component {
       })
     }
   }
+  // componentDidUpdate() {
+  //   scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${this.state.day.getDate()})`)
+  // }
   showFlashMessage(type, message) {
     this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
       setTimeout(() => { this.setState({showFlash: false})}, 5000)
@@ -158,22 +164,44 @@ class Agenda extends React.Component {
           Agenda de&nbsp;<span className="agenda-name-white">{this.state.target_user.firstname + ' ' + this.state.target_user.lastname}</span>
         </h1>
         <div className="new-agenda-container">
-          <h1 className="new-agenda-title text-1">{this.state.months[this.state.month]}</h1>
+          <h1 className="new-agenda-title text-1">
+            {/* <select 
+              className="text-1 cl-select"
+              onChange={(e) => {this.setState({month: e.target.value})}}
+              defaultValue={this.state.month} name="month-selector">
+              {
+                this.state.months.map((month, select_idx) => {
+                  return (
+                    <option value={select_idx} key={select_idx} className={"text-1" +
+                    (this.state.month == month && " selected" || "")}
+                   >
+                     {this.state.months[select_idx]}
+                   </option>      
+                  )
+                })
+              }
+            </select> */}
+            <SelectInput extraClass={"text-1 "} value={this.state.months[this.state.month]} 
+              options={this.state.months.map((month, idx) => {return {label: month, value: idx}}
+            )}
+            onClick={(e) => {this.setState({month: e})}}
+            />
+          </h1>
           <div className="new-agenda-header">
-            { this.state.months.concat(this.state.months).map((month, idx) => {
+            { this_month_days.map((month_day, idx) => {
               return (
               <div key={idx} className={"new-agenda-header-month text-2 " +
-               ((this.state.month + ((this.state.year - today.getFullYear()) * 12)) == idx && " selected" || "")}
-                onClick={() => {this.setState({month: idx % 12, year: this.getSelectedYear(idx)})}}
+               ((this.state.day.getDate() - 1) == idx && " selected" || "")}
+                onClick={() => {this.setState({day: month_day})}}
               >
-                <div className="new-agenda-month-letter">{month.at(0).toUpperCase()}</div>
-                <div className="new-agenda-month-number">{this.state.months.indexOf(month) + 1}</div>
+                <div className="new-agenda-month-letter">{this.state.weekdays[month_day.getDay()].at(0).toUpperCase()}</div>
+                <div className="new-agenda-month-number">{month_day.getDate()}</div>
               </div>
               )
             })}
           </div>
           <div className="new-schedule-container">
-            <div className="new-days-schedule-container">
+            <div className="new-days-schedule-container hidden">
               {
                 this.state.weekdays.map((weekday, idx) => {
                   return (
@@ -182,11 +210,7 @@ class Agenda extends React.Component {
                       {
                         (this_month_days || []).filter(date => { return date.getDay() - 1 == idx || (date.getDay() == 0 && idx == 6)})
                         .map((this_month_weekday, idx) => {
-                          const date = this_month_weekday.getDate()
-                          console.log(this_month_weekday.getTime())
-                          // console.log(this.state.day.getTime())
-                          console.log((this_month_weekday.getTime() == this.state.day.getTime()))
-                          
+                          const date = this_month_weekday.getDate()                          
                           return (
                           <div key={idx} className={"new-agenda-day text-3" + ((this_month_weekday.getTime() == this.state.day.getTime()) ? " selected bold-font" : "")}
                            onClick={() => {this.setState({day: new Date(this.state.year, this.state.month, date)})}}
@@ -202,9 +226,8 @@ class Agenda extends React.Component {
             <div className="hours-schedule-container">
               {
                 this.state.hours.map((hour, idx) => {
-                  console.log(slot_id)
                   const slot_id = this.buildResaId(this.state.day, hour)
-                  const slot = this.state.schedule[slot_id] || (idx == 3)
+                  const slot = this.state.schedule[slot_id]
                   const appointment_message = slot && !this.state.target_id ? "Session coaching Mme Martin" : ""
                   return (
                     <div key={idx} className="hour-schedule">
@@ -220,44 +243,6 @@ class Agenda extends React.Component {
               }
             </div>
           </div>
-          
-          {/* <div className="new-agenda-header">
-            <div className="agenda-header-section hour-column"></div>
-            { this.state.weekdays.map(day => {
-              return <div key={day} className="agenda-header-section">{day}</div> 
-            })}
-          </div>
-
-          <div className="agenda-content-wrapper">
-              <div className="agenda-content-column hour-column">
-                { this.state.hours.map(hour => {
-                  return <div key={hour} className="hour-cell">{hour}h&nbsp;</div> 
-                })}
-              </div>
-
-              { this.state.weekdays.map(day => {
-                return (
-                  <div key={day} className="agenda-content-column">
-                    { this.state.hours.map(hour => {
-                      let slot_id = this.buildResaId(day, hour)
-                      let slot = this.state.schedule[slot_id]
-                      return (
-                        <div key={hour} className="schedule-cell">
-                          <div onClick={() => { !slot
-                          ? this.setState({new_resa_modal: true, form: {...this.state.form, id: slot_id}})
-                          :  this.setState({appointment_details_modal: true, appointment_detailed: slot}) }}
-                            className={(!slot) && cellClass + ' empty' || cellClass}>
-                              { slot ? 
-                              `RDV de ${slot.duration}min ${["true", true].includes(slot.isVideo) ? "avec" : "sans"} visio-conférence`
-                              : "+"}
-                          </div>
-                        </div>
-                      )
-                    }) }
-                  </div>
-                )
-              })}
-            </div> */}
         </div>
       </div>
     )
@@ -267,65 +252,14 @@ class Agenda extends React.Component {
 const domContainer = document.querySelector('.page-wrapper');
 ReactDOM.render(<Agenda/>, domContainer);
 
-// let cellClass = "schedule-cell-content "
-// let firstDate = this.state.currentWeek ? this.state.currentWeek[0].getDate() : ""
-// let lastDate = this.state.currentWeek ? this.state.currentWeek[6].getDate() : ""
-// let lastDateMonth = this.state.currentWeek ? this.state.currentWeek[6].getMonth() : ""
-// let lastDateYear = this.state.currentWeek ? this.state.currentWeek[6].getFullYear() : ""
-// return (
-//   <div>
-//     <Navbar user={this.state.user} />
-//     <div className="agenda-wrapper">
-//       <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
-//       <h1 className="page-title">Agenda de&nbsp;<span className="agenda-name">{this.state.user.firstname + ' ' + this.state.user.lastname}</span></h1>
-//       <h2 className="page-title">
-//         Semaine du {firstDate} au {lastDate} {this.state.months[lastDateMonth]} {lastDateYear}    
-//       </h2>
-//       <div className="week-selectors">
-//         <div onClick={() => {this.showPrevWeek()}} className="previous-week">&lt;&nbsp;Semaine précédente</div>
-//         <div onClick={() => {this.showNextWeek()}} className="next-week">Semaine suivante&nbsp;&gt;</div>
-//       </div>
-//       <Modal toggle={this.state.new_resa_modal} closeFunc={() => {this.setState({new_resa_modal: false})}}
-//         fields={scheduleForm} title="Prendre un RDV" id="appointment"/>
-//       <Modal toggle={this.state.appointment_details_modal} closeFunc={() => {this.setState({appointment_details_modal: false})}}
-//         fields={detailsForm} title="Votre RDV" id="appointment-details"/>
-//       <div className="agenda-header">
-//         <div className="agenda-header-section hour-column"></div>
-//         { this.state.weekdays.map(day => {
-//           return <div key={day} className="agenda-header-section">{day}</div> 
-//         })}
-//       </div>
-
-//       <div className="agenda-content-wrapper">
-//           <div className="agenda-content-column hour-column">
-//             { this.state.hours.map(hour => {
-//               return <div key={hour} className="hour-cell">{hour}h&nbsp;</div> 
-//             })}
-//           </div>
-
-//           { this.state.weekdays.map(day => {
-//             return (
-//               <div key={day} className="agenda-content-column">
-//                 { this.state.hours.map(hour => {
-//                   let slot_id = this.buildResaId(day, hour)
-//                   let slot = this.state.schedule[slot_id]
-//                   return (
-//                     <div key={hour} className="schedule-cell">
-//                       <div onClick={() => { !slot
-//                        ? this.setState({new_resa_modal: true, form: {...this.state.form, id: slot_id}})
-//                       :  this.setState({appointment_details_modal: true, appointment_detailed: slot}) }}
-//                         className={(!slot) && cellClass + ' empty' || cellClass}>
-//                           { slot ? 
-//                           `RDV de ${slot.duration}min ${["true", true].includes(slot.isVideo) ? "avec" : "sans"} visio-conférence`
-//                           : "+"}
-//                       </div>
-//                     </div>
-//                   )
-//                 }) }
-//               </div>
-//             )
-//           })}
-//         </div>
-//     </div>
-// </div>
-// )
+            {/* { this.state.months.concat(this.state.months).map((month, idx) => {
+              return (
+              <div key={idx} className={"new-agenda-header-month text-2 " +
+               ((this.state.month + ((this.state.year - today.getFullYear()) * 12)) == idx && " selected" || "")}
+                onClick={() => {this.setState({month: idx % 12, year: this.getSelectedYear(idx)})}}
+              >
+                <div className="new-agenda-month-letter">{month.at(0).toUpperCase()}</div>
+                <div className="new-agenda-month-number">{this.state.months.indexOf(month) + 1}</div>
+              </div>
+              )
+            })} */}

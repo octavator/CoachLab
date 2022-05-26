@@ -1,6 +1,3 @@
-import Navbar from './components/navbar.js'
-import Logo from './utils.js'
-
 class Landing extends React.Component {
   constructor(props) {
     super(props)
@@ -14,7 +11,6 @@ class Landing extends React.Component {
     }
   }
   componentDidMount() {
-    //@todo redirect to connected landing page if user is recognized
     http.get("/me").then(res => {
       console.log(res.status)
       console.log(res.data)
@@ -59,7 +55,15 @@ class Landing extends React.Component {
           </div> 
           <div className="landing-intermediary-gradiant-wrapper"></div>
           <div className="landing-gradient-wrapper text-1">
-            Se trouver.<br/>Ici et maintenant.
+            {/* <div className="landing-mobile-pictures-container">
+              <img className="landing-picture-mobile" src="priv/static/images/coach.png"/>
+              <img className="landing-picture-mobile" src="priv/static/images/coache.png"/>
+              <img className="landing-picture-mobile" src="priv/static/images/ecran.png"/>
+            </div> */}
+            <div className="landing-desktop-pictures-container">
+              <img className="landing-picture-desktop" src="priv/static/images/mickey_2.png"/>              
+            </div>
+            <div className="landing-picture-text-container">Se trouver.<br/>Ici et maintenant.</div>
           </div>
           {/* FAKE NAVBAR */}
           <div className={"landing-intermediary-connection-header" + (this.state.show_navbar ? "" : " hidden")} >
