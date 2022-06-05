@@ -167,7 +167,6 @@ defmodule ClabRouter do
   end
 
   get "/bienvenue" do
-    Logger.debug("coach id agenda")
     data = Utils.get_html_template("temp-welcome-page")
     send_resp(conn, 200, data)
   end
@@ -261,6 +260,30 @@ defmodule ClabRouter do
     send_resp(conn, status_code, ret_text)
   end
 
+  get "/video" do
+    data = Utils.get_html_template("video")
+    send_resp(conn, 200, data)
+  end
+
+  get "/video-token" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      user = User.get_user_by_id(id)
+      grants = %{"identity" => user.id, "voice" => %{}, "video" => %{}}
+      {:ok, token, _conf} = Jwt.generate_and_sign(
+        %{"grants" => grants, "ttl" => 4800},
+        Joken.Signer.create("HS256", Application.get_env(:clab, :twilio)[:secret], %{
+          "typ" => "JWT",
+          "alg" => "HS256",
+          "cty" => "twilio-fpa;v=1"
+        })
+      )
+      send_resp(conn, 200, token)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
   post "/edit-infos" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
     id = check_token_user(conn)
@@ -288,10 +311,11 @@ defmodule ClabRouter do
         user.email == body.user_id -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
         true ->
           coach = User.get_user_by_id(body.user_id)
-          case Agenda.update_agenda(user.id, %{body.id => body.resa}) do
+          payload = Map.put(body.resa, :coach_id, body.user_id)
+          case Agenda.update_agenda(user.id, %{body.id => payload}) do
             :error -> {400, "Une erreur est survenue durant la reservation."}
             _ ->
-              Agenda.update_agenda(coach.id, %{body.id => body.resa})
+              Agenda.update_agenda(coach.id, %{body.id => payload})
               {200, "Votre rendez-vous a bien été enregistré."}
           end
       end

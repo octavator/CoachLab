@@ -90,7 +90,7 @@ class Agenda extends React.Component {
     return this.state.year + (is_next_year ? 1 : (is_prev_year ? -1 : 0))
   }
   getSlotClickableClass(slot) {
-    const is_clickable =  this.state.target_id && !slot || !this.state.target_id && slot
+    const is_clickable =  this.state.user.role != "coach" && this.state.target_id && !slot || !this.state.target_id && slot
     return (is_clickable ? " clickable" : "")
   }
   resNewSlot() {
@@ -181,7 +181,7 @@ class Agenda extends React.Component {
                 })
               }
             </select> */}
-            <SelectInput extraClass={"text-1 "} value={this.state.months[this.state.month]} 
+            <SelectInput extraClass={"text-2 "} value={this.state.months[this.state.month]} 
               options={this.state.months.map((month, idx) => {return {label: month, value: idx}}
             )}
             onClick={(e) => {this.setState({month: e})}}

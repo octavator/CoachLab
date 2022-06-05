@@ -12,8 +12,6 @@ class SignUp extends React.Component {
       const urlParams = new URLSearchParams(document.location.search)
       const role = urlParams.get("role")
       const coach_id = urlParams.get("coach")
-      console.log("role: ", role)
-      console.log("coach id: ", coach_id)
       let form = role && coach_id  && {role: role, coaches: [coach_id]} || {coaches: []}
       let step = role && 2 || 1
       console.log(role)

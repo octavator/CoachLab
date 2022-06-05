@@ -241,12 +241,12 @@ a {
 }
 
 .cl-select {
-    padding: 15px 20px 10px 10px;
-    border-radius: 20px;
+    padding: 10px 15px 10px 10px;
+    border-radius: 25px;
     border: 1px #26619C solid;
     border: 1.5px #26619C solid;
     color: #26619C;
-    min-width: 200px;
+    min-width: 180px;
     width: 15vw;
     cursor: pointer;
     position: relative;
@@ -264,12 +264,12 @@ a {
     display: block;
     z-index: 10;
     position: absolute;
-    padding: 5px 20px 10px 10px;
+    padding: 5px 14px 10px 10px;
     margin-top: 11px;
     border: 1px solid grey;
     background-color: white;
     margin-left: -10px;
-    min-width: 200px;
+    min-width: 180px;
     width: 15vw;
     border-radius: 20px;
     position: absolute;
@@ -283,7 +283,7 @@ a {
 .cl-option {
     cursor: pointer;
     padding: 10px;
-    border-bottom: 1px solid grey;
+    /* border-bottom: 1px solid grey; */
     color: grey;
 }
 .cl-option:hover {
@@ -378,6 +378,7 @@ a {
 }
 .new-agenda-title {
     color: black;
+    display: flex;
 }
 .new-agenda-header {
     display: flex;
@@ -981,13 +982,7 @@ a {
     width: 37%;
     align-items: center;
     margin-top: -10vh;
-    /* flex: 1 1 0; */
-    /* Pour chez paulo -> 5120 * 2880 */
-    /* width: 36%;
-    position: absolute;
-    top: -13vh;
-    left: 18%;
-    align-items: center; */
+    margin-left: -5vw;
 }
 
 /* OTHER STEPS */

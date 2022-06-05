@@ -49,7 +49,7 @@ defmodule Agenda do
     end
 
     def handle_call({:delete_agenda, user_id}, _from, state) do
-        res = IO.inspect :ets.delete(@table, user_id)
+        res = :ets.insert(@table, {user_id, %{}})
         {:reply, res, state}
     end
 
@@ -67,5 +67,11 @@ defmodule Agenda do
 
     def update_agenda(user_id, data) do
         GenServer.call(__MODULE__, {:update_agenda, {user_id, data}})
+    end
+
+    def clean_agendas() do
+        :ets.tab2list(:agendas) |> Enum.each(fn {user_id, _agenda} -> 
+            delete_agenda(user_id)
+        end)
     end
 end
