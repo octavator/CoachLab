@@ -128,14 +128,9 @@ defmodule ClabRouter do
   end
 
   get "/agenda" do
-    data = Utils.get_html_template("agenda")
-    send_resp(conn, 200, data)
-  end
-
-  get "/new_agenda" do
     id = check_token_user(conn)
     if !is_nil(id) do
-      data = Utils.get_html_template("new_agenda")
+      data = Utils.get_html_template("agenda")
       send_resp(conn, 200, data)
     else
       send_resp(conn, 401, "Token invalide")
@@ -312,6 +307,8 @@ defmodule ClabRouter do
         true ->
           coach = User.get_user_by_id(body.user_id)
           payload = Map.put(body.resa, :coach_id, body.user_id)
+          |> Map.put(:coach_name, coach.lastname)
+          |> Map.put(:user_name, user.lastname)
           case Agenda.update_agenda(user.id, %{body.id => payload}) do
             :error -> {400, "Une erreur est survenue durant la reservation."}
             _ ->

@@ -21,6 +21,7 @@ class Agenda extends React.Component {
         form: {
           duration: "30",
           isVideo: true,
+          isMulti: false,
           id: ""
         },
         user: {firstname: "", lastname: ""},
@@ -59,9 +60,6 @@ class Agenda extends React.Component {
       })
     }
   }
-  // componentDidUpdate() {
-  //   scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${this.state.day.getDate()})`)
-  // }
   showFlashMessage(type, message) {
     this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
       setTimeout(() => { this.setState({showFlash: false})}, 5000)
@@ -74,13 +72,17 @@ class Agenda extends React.Component {
     );
   }
   slotClickEvent(slot, slot_id) {
-    console.log("target id:", this.state.target_id)
-    console.log("slot:", slot)
+    if (this.getSlotClickableClass(slot) == "") return
     if (this.state.target_id) {
-      !slot && this.setState({new_resa_modal: true, form: {...this.state.form, id: slot_id}})
+      this.setState({new_resa_modal: true, form: {...this.state.form, id: slot_id}})
     } else {
       slot && this.setState({appointment_details_modal: true, appointment_detailed: slot})
     }
+  }
+  buildVideoId() {
+    return (this.state.appointment_detailed.id ? 
+      `/video?roomId=${encodeURIComponent(this.state.appointment_detailed.id + "+" + this.state.appointment_detailed.coach_id)}` 
+      : undefined)
   }
   getSelectedYear(idx) {
     const today = new Date()
@@ -111,19 +113,26 @@ class Agenda extends React.Component {
     return(resa_date.toLocaleString())
   }
   render() {
+    console.log(this.buildVideoId(), "video ID")
     let detailsForm = [
       <div key="duration" className="details-duration-section">
         <div className="details-duration-label">Durée:</div>
-        <div className="details-duration-value">{this.state.appointment_detailed.duration}</div>
+        <div className="details-duration-value">{this.state.appointment_detailed.duration + "min"}</div>
       </div>,
-        <div key="isVideo" className="details-isVideo-section">
-            <div className="details-isVideo-label">Visio-conférence:</div>
-            <div className="details-isVideo-value">{this.state.appointment_detailed.isVideo ? "Oui": "Non"}</div>
-        </div>,
-        <div key="visioLink" className={"details-visioLink-section" + (this.state.appointment_detailed.isVideo ? "" : " hidden")  }>
-            <div className="details-visioLink-label">Lien de la visio-conférence:</div>
-            <div className="details-visioLink-value">{this.state.appointment_detailed.isVideo ? "http://superlienvideo.caramel": ""}</div>
-        </div>,
+      <div key="isVideo" className="details-isVideo-section">
+        <div className="details-isVideo-label">Visio-conférence:</div>
+        <div className="details-isVideo-value">{this.state.appointment_detailed.isVideo ? "Oui": "Non"}</div>
+      </div>,
+      <div key="isMulti" className="details-isMulti-section">
+        <div className="details-isMulti-label">Séance de groupe:</div>
+        <div className="details-isMulti-value">{this.state.appointment_detailed.isMulti ? "Oui": "Non"}</div>
+      </div>,
+      <div key="visioLink" className={"details-visioLink-section" + (this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden")  }>
+          <div className="details-visioLink-label">Lien de la visio-conférence:</div>
+          <div className="details-visioLink-value clab-link" onClick={() => { window.open(`${this.buildVideoId()}`, "_blank")}}>
+            {"Cliquez ici pour rejoindre"}
+          </div>
+      </div>,
     ]
     let scheduleForm = [
       <div key="duration" className="input-group select-input">
@@ -136,13 +145,22 @@ class Agenda extends React.Component {
       </div>,
       <div key="isVideo" className="input-group radio-group">
         <label className="input-label">Visio-conférence</label>
-          <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isVideo: e.target.value}}) }}>
-            <label className="radio-label" htmlFor="isVideo">Oui</label>
-            <input type="radio" defaultChecked value={true} id="isVideo" name="isVideo" className="cl-radio"/>
-            <label className="radio-label" htmlFor="isNotVideo">Non</label>
-            <input id="isNotVideo" value={false} name="isVideo" type="radio" className="cl-radio"/>
-          </div>
-        </div>,
+        <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isVideo: e.target.value}}) }}>
+          <label className="radio-label" htmlFor="isVideo">Oui</label>
+          <input type="radio" defaultChecked value={true} id="isVideo" name="isVideo" className="cl-radio"/>
+          <label className="radio-label" htmlFor="isNotVideo">Non</label>
+          <input id="isNotVideo" value={false} name="isVideo" type="radio" className="cl-radio"/>
+        </div>
+      </div>,
+      <div key="isMulti" className="input-group radio-group">
+      <label className="input-label">Séance de groupe</label>
+      <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isMulti: e.target.value}}) }}>
+        <label className="radio-label" htmlFor="isMulti">Oui</label>
+        <input type="radio" defaultChecked value={true} id="isMulti" name="isMulti" className="cl-radio"/>
+        <label className="radio-label" htmlFor="isNotMulti">Non</label>
+        <input id="isNotMulti" value={false} name="isMulti" type="radio" className="cl-radio"/>
+      </div>
+    </div>,    
       <div key="sendbtn" className="input-group">
         <div className="button-group">
           <button onClick={() => { this.resNewSlot() ; this.setState({new_resa_modal: false}) }} className="cl-button primary">Valider</button>
@@ -165,22 +183,6 @@ class Agenda extends React.Component {
         </h1>
         <div className="new-agenda-container">
           <h1 className="new-agenda-title text-1">
-            {/* <select 
-              className="text-1 cl-select"
-              onChange={(e) => {this.setState({month: e.target.value})}}
-              defaultValue={this.state.month} name="month-selector">
-              {
-                this.state.months.map((month, select_idx) => {
-                  return (
-                    <option value={select_idx} key={select_idx} className={"text-1" +
-                    (this.state.month == month && " selected" || "")}
-                   >
-                     {this.state.months[select_idx]}
-                   </option>      
-                  )
-                })
-              }
-            </select> */}
             <SelectInput extraClass={"text-2 "} value={this.state.months[this.state.month]} 
               options={this.state.months.map((month, idx) => {return {label: month, value: idx}}
             )}
@@ -207,8 +209,7 @@ class Agenda extends React.Component {
                   return (
                     <div key={idx} className={"new-agenda-days-row"}>
                       <div className="new-agenda-days-header text-2">{weekday.at(0).toUpperCase()}</div>
-                      {
-                        (this_month_days || []).filter(date => { return date.getDay() - 1 == idx || (date.getDay() == 0 && idx == 6)})
+                      { (this_month_days || []).filter(date => { return date.getDay() - 1 == idx || (date.getDay() == 0 && idx == 6)})
                         .map((this_month_weekday, idx) => {
                           const date = this_month_weekday.getDate()                          
                           return (
@@ -216,8 +217,7 @@ class Agenda extends React.Component {
                            onClick={() => {this.setState({day: new Date(this.state.year, this.state.month, date)})}}
                            >{date}</div>
                           )
-                        })
-                      }
+                        }) }
                     </div>
                   )
                 })
@@ -228,14 +228,23 @@ class Agenda extends React.Component {
                 this.state.hours.map((hour, idx) => {
                   const slot_id = this.buildResaId(this.state.day, hour)
                   const slot = this.state.schedule[slot_id]
-                  const appointment_message = slot && !this.state.target_id ? "Session coaching Mme Martin" : ""
+                  console.log(slot, "slot")
+                  const appointment_message = slot && !this.state.target_id ? `Session coaching avec ${slot.coach_name || ""}` : ""
                   return (
                     <div key={idx} className="hour-schedule">
                       <div className="hour-schedule-item text-2-5">{`${hour}:00`}</div>
                       <div className={"appointment-schedule-item text-2-5 " + 
-                        (slot ? "reserved" : "empty") + this.getSlotClickableClass(slot) }
+                        (slot ? "reserved " : "empty ") + this.getSlotClickableClass(slot) }
                         onClick={() => {this.slotClickEvent(slot, slot_id)}}>
-                          {appointment_message}
+                          <div>{appointment_message}</div>
+                          <div className={"appointment-pictos" + (slot ? " " : " hidden")}>
+                            <div className="appointment-picto">
+                              <img src={`priv/static/images/${slot && slot.isMulti ? "session_groupe.svg" : "session_individuelle.svg"}`} />
+                            </div>
+                            <div className="appointment-picto">
+                              <img src={`priv/static/images/${slot && slot.isVideo ? "session_online.svg" : "session_irl.svg"}`} />
+                            </div>
+                          </div>
                       </div>
                     </div>
                   )

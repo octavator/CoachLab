@@ -24,11 +24,8 @@ class Navbar extends React.Component {
               Object.keys(this.props.user).includes("email") && this.props.user.email != "" 
               ?
               <div className="menu-section">
-                <div className={"menu-item text-3"}><a href="/new_agenda"> Mon Agenda</a></div>
-
-                {/* HACK FOR TEMP WELCOME PAGE */}
-                <div className="menu-item"></div>
-
+                <div className={"menu-item text-3"}><a href="/agenda"> Mon Agenda</a></div>
+                <div className={"menu-item text-3"}><a href="/mes_coaches">{ this.props.user.role == "coach" ? "Mes coachés" : "Mes coachs"}</a></div>
                 <div className="menu-item user-dropdown text-3" onClick={() => {this.setState({show_dropdown: !this.state.show_dropdown})}}>
                   {this.props.user.firstname + ' ' + this.props.user.lastname}&nbsp;<span className="downward-arrow">&#9660;</span>
                 </div>

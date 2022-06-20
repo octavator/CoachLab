@@ -1,4 +1,3 @@
-import Modal from './modal.js'
 import Navbar from './navbar.js'
 
 class MyCoaches extends React.Component {
@@ -50,9 +49,13 @@ class MyCoaches extends React.Component {
             {
               this.state.coaches.map((coach, idx) => {
                 return (
-                  <div key={idx} className="coach-list-row">
+                  <div key={idx} onClick={() => {window.location.href = `/agenda?target_id=${coach.id}`}} className="coach-list-row">
                     <div className="coach-list-avatar">
                       <img className="round-avatar" 
+                        onError={({ currentTarget }) => {
+                          currentTarget.onerror = null; // prevents looping
+                          currentTarget.src="priv/static/images/avatar_placeholder.png";
+                        }}
                         src={`priv/static/images/${coach.id}/avatar.${this.getImageExt(coach.avatar)}`}/>
                     </div>
                     <div className="coach-list-name text-2">{`${coach.firstname} ${coach.lastname}`}</div>

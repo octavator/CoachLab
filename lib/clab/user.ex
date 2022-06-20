@@ -63,6 +63,7 @@ defmodule User do
         :crypto.strong_rand_bytes(32)
         |> Base.url_encode64(padding: false)
         |> String.replace("/", "-")
+        |> String.replace("+", "_")
       )
 
     true = :ets.insert_new(@table, {data.id, data})
