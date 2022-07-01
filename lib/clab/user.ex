@@ -109,20 +109,24 @@ defmodule User do
     :ets.tab2file(@table, @path)
   end
 
+  def get_user(nil), do: nil
   def get_user(email) do
     GenServer.call(__MODULE__, {:get_user, email})
     |> User.format_user()
   end
 
+  def get_user_by_id(nil), do: nil
   def get_user_by_id(id) do
     GenServer.call(__MODULE__, {:get_user_by_id, id})
     |> User.format_user()
   end
 
+  def get_all_user_info_by_id(nil), do: nil
   def get_all_user_info_by_id(id) do
     GenServer.call(__MODULE__, {:get_user_by_id, id})
   end
 
+  def get_all_user_info(nil), do: nil
   def get_all_user_info(email) do
     GenServer.call(__MODULE__, {:get_user, email})
   end

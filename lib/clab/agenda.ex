@@ -5,73 +5,83 @@ defmodule Agenda do
     @path 'data/agendas.ets'
 
     def start_link(args \\ []) do
-        GenServer.start_link(__MODULE__, args, name: __MODULE__)
+      GenServer.start_link(__MODULE__, args, name: __MODULE__)
     end
 
     def init(_args) do
-        if File.exists?(@path) do
-            Logger.info("[ETS] Loading #{@table} from backup")
-            {:ok, _ref} = :ets.file2tab(@path)
-            Logger.info("[ETS] Success loading #{@table}")
-        else
-            :ets.new(@table, [:named_table, :public])
-        end
-        Process.flag(:trap_exit, true)
-        {:ok, %{}}
+      if File.exists?(@path) do
+        Logger.info("[ETS] Loading #{@table} from backup")
+        {:ok, _ref} = :ets.file2tab(@path)
+        Logger.info("[ETS] Success loading #{@table}")
+      else
+        :ets.new(@table, [:named_table, :public])
+      end
+      Process.flag(:trap_exit, true)
+      {:ok, %{}}
     end
 
     def terminate(_reason, _state) do
-        Logger.info("[ETS] Saving #{@table} table in #{@path}")
-        :ets.tab2file(@table, @path)
+      Logger.info("[ETS] Saving #{@table} table in #{@path}")
+      :ets.tab2file(@table, @path)
     end
 
     def handle_info({:EXIT, _from, reason}, state) do
-        Logger.info("[ETS] Saving #{@table} table in #{@path}")
-        :ets.tab2file(@table, @path)
-        {:stop, reason, state}
+      Logger.info("[ETS] Saving #{@table} table in #{@path}")
+      :ets.tab2file(@table, @path)
+      {:stop, reason, state}
     end
 
     def handle_call({:get_agenda, user_id}, _from, state) do
-        [{_key, value}]  = :ets.lookup(@table, user_id)
-        {:reply, value, state}
+      [{_key, value}]  = :ets.lookup(@table, user_id)
+      {:reply, value, state}
     end
 
     def handle_call({:create_agenda, user_id}, _from, state) do
-        res = :ets.insert_new(@table, {user_id, %{}})
-        {:reply, res, state}
+      res = :ets.insert_new(@table, {user_id, %{}})
+      {:reply, res, state}
     end
 
-    def handle_call({:update_agenda, {user_id, data}}, _from, state) do
-        [{_key, old_data}]  = :ets.lookup(@table, user_id)
-        new_data = Map.merge(old_data, data)
-        res = IO.inspect :ets.insert(@table, {user_id, new_data})
-        {:reply, res, state}
+    def handle_call({:update_agenda, {user_id, data, append }}, _from, state) do
+      [{_key, old_data}]  = :ets.lookup(@table, user_id)
+      res = case old_data[data["id"]] do
+        nil ->
+          new_data = Map.merge(old_data, data)
+          :ets.insert(@table, {user_id, new_data})
+        resa ->
+          if append do
+            new_data = update_in(resa, ["coached_ids"], & &1 ++ user_id)
+            :ets.insert(@table, {user_id, new_data})
+          else
+            :error
+          end
+      end
+      {:reply, res, state}
     end
 
     def handle_call({:delete_agenda, user_id}, _from, state) do
-        res = :ets.insert(@table, {user_id, %{}})
-        {:reply, res, state}
+      res = :ets.insert(@table, {user_id, %{}})
+      {:reply, res, state}
     end
 
     def get_agenda(user_id) do
-        GenServer.call(__MODULE__, {:get_agenda, user_id})
+      GenServer.call(__MODULE__, {:get_agenda, user_id})
     end
 
     def create_agenda(data) do
-        GenServer.call(__MODULE__, {:create_agenda, data})
+      GenServer.call(__MODULE__, {:create_agenda, data})
     end
 
     def delete_agenda(user_id) do
-        GenServer.call(__MODULE__, {:delete_agenda, user_id})
+      GenServer.call(__MODULE__, {:delete_agenda, user_id})
     end
 
-    def update_agenda(user_id, data) do
-        GenServer.call(__MODULE__, {:update_agenda, {user_id, data}})
+    def update_agenda(user_id, data, append \\ false) do
+      GenServer.call(__MODULE__, {:update_agenda, {user_id, data, append}})
     end
 
     def clean_agendas() do
-        :ets.tab2list(:agendas) |> Enum.each(fn {user_id, _agenda} -> 
-            delete_agenda(user_id)
-        end)
+      :ets.tab2list(:agendas) |> Enum.each(fn {user_id, _agenda} -> 
+        delete_agenda(user_id)
+      end)
     end
 end

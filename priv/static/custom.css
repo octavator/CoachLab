@@ -132,7 +132,7 @@ a {
     margin: 20px;
 }
 .appointment-schedule-item.clickable:hover {
-    background-color: linear-gradient(90deg, #318ce7 0%, #26619C 100%);
+    background: linear-gradient(90deg, #318ce7 0%, #26619C 100%);
 }
 .clickable {
     cursor: pointer;

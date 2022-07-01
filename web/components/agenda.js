@@ -92,16 +92,21 @@ class Agenda extends React.Component {
     return this.state.year + (is_next_year ? 1 : (is_prev_year ? -1 : 0))
   }
   getSlotClickableClass(slot) {
-    const is_clickable =  this.state.user.role != "coach" && this.state.target_id && !slot || !this.state.target_id && slot
+    //clickable quand sur agenda coach sur un rdv multi que j'ai pris moi meme
+    const is_clickable =  this.state.user.role != "coach" && this.state.target_id && (!slot || slot.isMulti) || !this.state.target_id && slot
     return (is_clickable ? " clickable" : "")
   }
   resNewSlot() {
-    http.post("/new-resa", {id: this.state.form.id, resa: this.state.form, user_id: this.state.target_user.id})
+    http.post("/new-resa", {id: this.state.form.id,
+       resa: {...this.state.form, coached_ids: [this.state.user.id]}, user_id: this.state.target_user.id})
     .then(res => {
-      let schedule = this.state.schedule
-      schedule[this.state.form.id] = this.state.form
-      this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
-      this.setState({schedule: schedule})
+      if (res.status != 200) this.showFlashMessage("error", "Une erreur inconnue est survenue.")
+      else {
+        let schedule = this.state.schedule
+        schedule[this.state.form.id] = this.state.form
+        this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
+        this.setState({schedule: schedule})  
+      }
     })
     .catch(err => {
       this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
@@ -145,7 +150,7 @@ class Agenda extends React.Component {
       </div>,
       <div key="isVideo" className="input-group radio-group">
         <label className="input-label">Visio-conférence</label>
-        <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isVideo: e.target.value}}) }}>
+        <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isVideo: e.target.checked}}) }}>
           <label className="radio-label" htmlFor="isVideo">Oui</label>
           <input type="radio" defaultChecked value={true} id="isVideo" name="isVideo" className="cl-radio"/>
           <label className="radio-label" htmlFor="isNotVideo">Non</label>
@@ -154,11 +159,11 @@ class Agenda extends React.Component {
       </div>,
       <div key="isMulti" className="input-group radio-group">
       <label className="input-label">Séance de groupe</label>
-      <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isMulti: e.target.value}}) }}>
+      <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isMulti: e.target.checked}}) }}>
         <label className="radio-label" htmlFor="isMulti">Oui</label>
-        <input type="radio" defaultChecked value={true} id="isMulti" name="isMulti" className="cl-radio"/>
+        <input type="radio" value={true} id="isMulti" name="isMulti" className="cl-radio"/>
         <label className="radio-label" htmlFor="isNotMulti">Non</label>
-        <input id="isNotMulti" value={false} name="isMulti" type="radio" className="cl-radio"/>
+        <input id="isNotMulti" defaultChecked value={false} name="isMulti" type="radio" className="cl-radio"/>
       </div>
     </div>,    
       <div key="sendbtn" className="input-group">
@@ -169,7 +174,6 @@ class Agenda extends React.Component {
     ]
     const this_month_days = this.getAllDaysInMonth(this.state.month, this.state.year)
     const today = new Date()
-    console.log("agenda keys", Object.keys(this.state.schedule))
     return (
       <div className="new-agenda-wrapper">
         <Navbar user={this.state.user} blue_bg={true} />
@@ -237,7 +241,7 @@ class Agenda extends React.Component {
                         (slot ? "reserved " : "empty ") + this.getSlotClickableClass(slot) }
                         onClick={() => {this.slotClickEvent(slot, slot_id)}}>
                           <div>{appointment_message}</div>
-                          <div className={"appointment-pictos" + (slot ? " " : " hidden")}>
+                          <div className={"appointment-pictos" + (slot && (slot.isMulti || !this.state.target_id) ? " " : " hidden")}>
                             <div className="appointment-picto">
                               <img src={`priv/static/images/${slot && slot.isMulti ? "session_groupe.svg" : "session_individuelle.svg"}`} />
                             </div>

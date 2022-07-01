@@ -93,7 +93,9 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       Logger.debug("coach id = #{target_id}")
-      agenda = Agenda.get_agenda(target_id) |> Map.new(fn {k, _v} -> {k, %{}} end)
+      agenda = Agenda.get_agenda(target_id) |> Map.new(fn {k, v} ->
+        {k, Map.take(v, ["id", "coach_id", "coached_ids", "isMulti", "isVideo", "duration"])}
+      end)
       user = User.get_user_by_id(target_id)
       data = %{agenda: agenda, user: user} |> Poison.encode!
       send_resp(conn, 200, data)
@@ -306,13 +308,15 @@ defmodule ClabRouter do
         user.email == body.user_id -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
         true ->
           coach = User.get_user_by_id(body.user_id)
-          payload = Map.put(body.resa, :coach_id, body.user_id)
-          |> Map.put(:coach_name, coach.lastname)
-          |> Map.put(:user_name, user.lastname)
+          payload = Map.merge(body.resa, %{
+            "coach_id" => body.user_id,
+            "coach_name" => coach.lastname,
+            "user_name" => user.lastname
+          })
           case Agenda.update_agenda(user.id, %{body.id => payload}) do
             :error -> {400, "Une erreur est survenue durant la reservation."}
             _ ->
-              Agenda.update_agenda(coach.id, %{body.id => payload})
+              Agenda.update_agenda(coach.id, %{body.id => payload}, true)
               {200, "Votre rendez-vous a bien été enregistré."}
           end
       end

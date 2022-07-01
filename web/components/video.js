@@ -23,19 +23,26 @@ class ClabVideo extends React.Component {
     }
   }
   componentDidMount() {
+    console.log(this.state.roomId)
     http.get("/me/agenda").then(agendaData => {
       //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
+      let resId = this.state.roomId.split("+")[0]
+      console.log(agendaData)
+      console.log(resId)
+      console.log(agendaData.data.agenda[resId])
+      let resa = agendaData.data.agenda[resId]
+      let roomType = resa.isMulti ? "group": "go"
       if (Video.isSupported) {
         http.get("/video-token").then(token => {
           Video.createLocalVideoTrack().then(track => {
             const localMediaContainer = document.getElementById('local-media')
             localMediaContainer.appendChild(track.attach())
           });
-          this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data})
+          this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data, roomType: roomType})
         })
       } else this.showFlashMessage("error", "Votre navigateur actuel n'est pas compatible avec notre module vidéo.")
     }).catch(err => {
-      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err.response && err.response.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
@@ -55,7 +62,7 @@ class ClabVideo extends React.Component {
   }
   startVideoLive() {
     Video.connect(this.state.token, {
-      name: this.state.roomId, audio: true, video: { }
+      name: this.state.roomId, audio: true, video: { }, type: this.state.roomType
     })
     .then(room => {
       room.participants.forEach(participant => {
