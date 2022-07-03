@@ -92,7 +92,6 @@ class Agenda extends React.Component {
     return this.state.year + (is_next_year ? 1 : (is_prev_year ? -1 : 0))
   }
   getSlotClickableClass(slot) {
-    //clickable quand sur agenda coach sur un rdv multi que j'ai pris moi meme
     const is_clickable =  this.state.user.role != "coach" && this.state.target_id && (!slot || slot.isMulti) || !this.state.target_id && slot
     return (is_clickable ? " clickable" : "")
   }

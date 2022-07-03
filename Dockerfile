@@ -21,7 +21,7 @@ RUN mix compile
 # COPY rel rel
 RUN mix release
 
-FROM alpine:3.14.2
+FROM alpine:3.16
 
 # install runtime dependencies
 RUN apk upgrade --no-cache && apk add --no-cache postgresql-client bash openssl libgcc libstdc++ ncurses-libs file

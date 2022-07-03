@@ -16,6 +16,7 @@ class ClabVideo extends React.Component {
         sendVideo: true,
         room: undefined,
         schedule: {},
+        tracks: [],
         token: "",
         showFlash: false,
         flashType: '',
@@ -27,9 +28,6 @@ class ClabVideo extends React.Component {
     http.get("/me/agenda").then(agendaData => {
       //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
       let resId = this.state.roomId.split("+")[0]
-      console.log(agendaData)
-      console.log(resId)
-      console.log(agendaData.data.agenda[resId])
       let resa = agendaData.data.agenda[resId]
       let roomType = resa.isMulti ? "group": "go"
       if (Video.isSupported) {
@@ -50,14 +48,16 @@ class ClabVideo extends React.Component {
       setTimeout(() => { this.setState({showFlash: false})}, 5000)
     })
   }
-  getRemoteVideo(participant) {
+  getRemoteTracks(participant) {
     participant.tracks.forEach(publication => {
       if (publication.track) {
-        document.getElementById('remote-media').appendChild(publication.track.attach())
+        let tracks = this.state.tracks
+        this.setState({tracks: tracks.concat([publication.track])})
       }
     })
     participant.on('trackSubscribed', track => {
-      document.getElementById('remote-media').appendChild(track.attach())
+      let tracks = this.state.tracks
+      this.setState({tracks: tracks.concat([track])})
     })
   }
   startVideoLive() {
@@ -66,10 +66,10 @@ class ClabVideo extends React.Component {
     })
     .then(room => {
       room.participants.forEach(participant => {
-        this.getRemoteVideo(participant)
+        this.getRemoteTracks(participant)
       })
       room.on('participantConnected', participant => {
-        this.getRemoteVideo(participant)
+        this.getRemoteTracks(participant)
       })
       if (!this.state.sendAudio) {
         room.localParticipant.audioTracks.forEach(publication => {
@@ -81,7 +81,7 @@ class ClabVideo extends React.Component {
           publication.track.disable()
         })    
       }
-      this.setState({room: room})
+      this.setState({room: room, hasJoined: true})
     }, error => {
       this.showFlashMessage("error", error.message || "Une erreur inattendue est survenue.")
     })
@@ -96,36 +96,76 @@ class ClabVideo extends React.Component {
     })
   }
   toggleVideo() {
-    this.setState({sendVideo: this.state.sendVideo ? false : {}})
+    let new_sendVideo = this.state.sendVideo ? false : {}
+    this.setState({sendVideo: new_sendVideo})
     if (!this.state.room) return
     this.state.room.localParticipant.videoTracks.forEach(publication => {
-      if (this.state.sendVideo) publication.track.disable()
-      else publication.track.enable()
+      if (new_sendVideo) publication.track.enable()
+      else publication.track.disable()
+    })
+  }
+  componentDidUpdate() {
+    this.state.tracks.filter(track => track.kind == "video").map((track, idx) => {
+      const target = document.getElementById(`remote-media-${idx}`)
+      const hasVideo = document.querySelector(`#remote-media-${idx} video`)
+      if (target && !hasVideo) {
+        target.appendChild(track.attach())
+        this.handleTrackDisabled(track)
+      }
     })
   }
   handleTrackDisabled(track) {
     track.on('disabled', () => {
       console.log(track)
+      const new_tracks = this.state.tracks.map((t) => {
+        if (t.sid == track.sid) {
+          return {...t, disabled: true}
+        }
+        return t
+      })
+      this.setState({tracks: new_tracks})
       /* Hide the associated <video> element and show an avatar image. */
+      
     });
+    track.on('enabled', () => {
+      console.log(track)
+      const new_tracks = this.state.tracks.map((t) => {
+        if (t.sid == track.sid) {
+          return {...t, disabled: false}
+        }
+        return t
+      })
+      this.setState({tracks: new_tracks})
+      /* Hide the associated <video> element and show an avatar image. */
+      
+    });
+
   }
   render() {
+    console.log(this.state.tracks, "tracks")
     return (
       <div>
         <Navbar blue_bg={true} user={this.state.user} />
         <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
         <div className="video">
-          {/* <h1 className="page-title text-1">{this.state.user.role == "coach" ? 'Vos coachés' : "Vos coachs"}</h1> */}
           <div className="video-wrapper">
-            <div id="local-media" style={{border: "1px solid grey"}}></div>
-            <div id="remote-media" style={{height: "300px", width: "300px", border: "1px solid red"}}></div>
-            <div onClick={() => {this.toggleAudio()}} className="cl-button">
+            <div id="local-media" className="local-media" style={{}}></div>
+            { this.state.tracks.filter(track => track.kind == "video").map((track, idx) => { 
+              return <div className={"participant-block" + (track.disabled ? " hidden" : "")}>
+                <div id={`remote-media-${idx}`} className="remote-media" style={{}}></div>                
+              </div>
+            }) }
+          </div>
+          <div className="flex flex-center mt-2">
+            <div onClick={() => {this.toggleAudio()}} className="cl-button ml-2">
               { this.state.sendAudio ? "Désactiver Audio" : "Activer Audio"}
             </div>
-            <div onClick={() => {this.toggleVideo()}} className="cl-button">
+            <div onClick={() => {this.toggleVideo()}} className="cl-button ml-2">
               { this.state.sendVideo ? "Désactiver Vidéo" : "Activer Vidéo"}
             </div>
-            <div onClick={() => {this.startVideoLive()}} className="cl-button">Go</div>
+            <div onClick={() => {this.startVideoLive()}} className={"cl-button ml-2"  + (this.state.hasJoined ? " hidden" : "")}>
+              Rejoindre la réunion
+            </div>
           </div>
         </div>
     </div>

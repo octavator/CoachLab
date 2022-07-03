@@ -103,6 +103,29 @@ img {
     padding-top: 20px;
 }
 
+.ml-1 {
+    margin-left: 10px;
+}
+
+.ml-2 {
+    margin-left: 20px;
+}
+
+.pl-1 {
+    padding-left: 10px;
+}
+
+.pl-2 {
+    padding-left: 20px;
+}
+.flex {
+    display: flex;
+}
+.flex-center {
+    justify-content: center;
+    align-items: center;
+}
+
 a {
     text-decoration: none;
     cursor: pointer;
@@ -1204,6 +1227,13 @@ a {
     text-align: center;
 }
 
+.video {
+    margin: 15px;
+}
+
+.video-wrapper {
+    display: flex;
+}
 
 /* MODAL */
 
@@ -1264,7 +1294,7 @@ a {
 /* LOGO */
 .navbar-logo-section {
     display: flex;
-    width: 40%;
+    width: 30%;
     margin-left: 20px;
     min-width: 200px;
 }

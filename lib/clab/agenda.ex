@@ -43,16 +43,17 @@ defmodule Agenda do
 
     def handle_call({:update_agenda, {user_id, data, append }}, _from, state) do
       [{_key, old_data}]  = :ets.lookup(@table, user_id)
-      res = case old_data[data["id"]] do
+      new_res = data |> Map.values() |> List.first
+      res = case old_data[new_res["id"]] do
         nil ->
           new_data = Map.merge(old_data, data)
           :ets.insert(@table, {user_id, new_data})
         resa ->
-          if append do
-            new_data = update_in(resa, ["coached_ids"], & &1 ++ user_id)
-            :ets.insert(@table, {user_id, new_data})
-          else
-            :error
+          case append do
+            true ->
+              new_data = update_in(resa, ["coached_ids"], & &1 ++ user_id)
+              :ets.insert(@table, {user_id, new_data})
+            _ -> :error
           end
       end
       {:reply, res, state}
