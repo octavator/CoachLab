@@ -114,7 +114,7 @@ class Agenda extends React.Component {
   buildResaId(date, hour) {
     const resa_date = new Date(date)
     resa_date.setHours(hour, 0, 0)
-    return(resa_date.toLocaleString())
+    return resa_date.toLocaleString('fr-FR', { timeZone: 'UTC' })
   }
   render() {
     console.log(this.buildVideoId(), "video ID")
