@@ -51,7 +51,8 @@ defmodule Agenda do
         resa ->
           case append do
             true ->
-              new_data = update_in(resa, ["coached_ids"], & &1 ++ user_id)
+              new_resa = update_in(resa, ["coached_ids"], & &1 ++ new_res["coached_ids"])
+              new_data = Map.put(old_data, new_res["id"], new_resa)
               :ets.insert(@table, {user_id, new_data})
             _ -> :error
           end

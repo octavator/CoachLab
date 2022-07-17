@@ -46,12 +46,18 @@ class Landing extends React.Component {
       <div>
         <div className="landing-wrapper">
           <div className="landing-first-page-wrapper">
-            <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+            <div className="landing-first-page-buttons">
+              <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
+              <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+            </div>
             <div className="landing-logo-section">
               <img style={{"width": "100%"}} src="priv/static/images/logo_blanc.svg"></img>
             </div>
             <h2 className="landing-page-title">Le centre de coaching digital</h2>
-            <div className="cl-button bg-white text-3 landing-page-mobile-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+            <div className="landing-first-page-buttons">
+              <div className="cl-button bg-white text-3 landing-page-mobile-signup-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
+              <div className="cl-button bg-white text-3 landing-page-mobile-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+            </div>
           </div> 
           <div className="landing-intermediary-gradiant-wrapper"></div>
           <div className="landing-gradient-wrapper text-1">
@@ -68,9 +74,12 @@ class Landing extends React.Component {
           {/* FAKE NAVBAR */}
           <div className={"landing-intermediary-connection-header" + (this.state.show_navbar ? "" : " hidden")} >
             <div className="landing-intermediary-logo" onClick={(e) => {window.scroll({top: 0, left: 0, behavior: 'smooth'})}}>
-                <img className="landing-inline-logo" src="priv/static/images/logo.svg"></img>
-              </div>
+              <img className="landing-inline-logo" src="priv/static/images/logo.svg"></img>
+            </div>
+            <div className="flex">
+              <div className="cl-button text-3 landing-intermediary-connection-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
               <div className="cl-button text-3 landing-intermediary-connection-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+            </div>
           </div>
           <div className="landing-text-section text-2">
             Vous êtes intéressé.e par un coaching, vous souhaitez développer vos capacités dans un domaine particulier... depuis chez vous et en quelques clics ? <br/>

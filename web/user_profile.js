@@ -1,4 +1,5 @@
 import Navbar from './components/navbar.js'
+import { NumberInput, TextInput } from './components/forms/inputs.js'
 
 class UserProfile extends React.Component {
     constructor(props) {
@@ -10,27 +11,29 @@ class UserProfile extends React.Component {
         user: {
           email: "",
           firstname: "",
-          lastname: ""
+          lastname: "",
+          session_price: "50"
         },
         form: {
           email: "",
           firstname: "",
-          lastname: ""
+          lastname: "",
+          session_price: "50"
         }
       }
     }
     componentDidMount() {
       http.get("/me").then(res => {
-        console.log(res.status)
-        console.log(res.data)
-        this.setState({user: res.data, form: res.data})
+        this.setState({user: res.data, form: {...res.data, session_price: "50"}})
+      })
+      .catch(err => {
+        this.showFlashMessage("error", "Une erreur inattendue est survenue")
       })
     }
     sendForm() {
+      if (this.state.user.role != "coach") delete this.state.form.session_price
       http.post("/edit-infos", this.state.form)
       .then(res => {
-        console.log(res.status)
-        console.log(res.data)
         this.showFlashMessage("success", "Vos informations ont bien été mises à jour.")
       })
       .catch(err => {
@@ -43,6 +46,7 @@ class UserProfile extends React.Component {
       })
     }
     render() {
+      console.log(this.state.form)
       return (
         <div>
           <Navbar user={this.state.user} />
@@ -50,17 +54,15 @@ class UserProfile extends React.Component {
             <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
             <h1 className="page-title">Mes informations</h1>
             <div className="infos-content-wrapper infos-form">
-              <div className="input-group">
-                <label className="input-label">Nom</label>
-                <input onChange={(e) => { this.setState({form: {...this.state.form, lastname: e.target.value}}) }} value={this.state.form.lastname} type="text"></input>
-              </div>
-              <div className="input-group">
-                <label className="input-label">Prénom</label>
-                <input onChange={(e) => { this.setState({form: {...this.state.form, firstname: e.target.value}}) }} value={this.state.form.firstname} type="text"></input>
-              </div>
-              <div className="input-group">
-                <label className="input-label">Adresse mail</label>
-                <input onChange={(e) => {this.setState({form: {...this.state.form, email: e.target.value}}) }} value={this.state.form.email} type="text"></input>
+              <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.lastname} bold_label={true} label="Nom"
+                onChange={(e) => { this.setState({form: {...this.state.form, lastname: e}}) }} name="lastname" placeholder="Nom" />
+              <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.firstname} bold_label={true} label="Prenom"
+                onChange={(e) => { this.setState({form: {...this.state.form, firstname: e}}) }} name="firstname" placeholder="Prenom" />
+              <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true} label="Adresse mail"
+                onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }} name="email" placeholder="Adresse mail" />
+              <div className={this.state.user.role != "coach" ? "hidden" : ""}>
+                <NumberInput extraClass="white-bg cl-form-input text-3" required={false} value={this.state.form.session_price} bold_label={true} label="Prix d'une séance"
+                onChange={(e) => { this.setState({form: {...this.state.form, session_price: e}}) }} name="session_price" max={500} min={10} />
               </div>
               <div className="input-group">
                 <div className="button-group">

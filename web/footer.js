@@ -11,8 +11,8 @@ class Footer extends React.Component {
             <img src="priv/static/images/logo_blanc.svg"/>
           </div>
         </div>
-        <div className="footer-copyright text-3" >Copyright © 2022 CoachLab, tous droits réservés.</div>
-        <div className="text-3"><a className="footer-link contact-mail" href="mailto:contact@coachlab.fr">Nous contacter</a></div>
+        <div className="footer-link text-3" >Copyright © 2022 CoachLab, tous droits réservés.</div>
+        <div className="text-3"><a className="footer-link" href="mailto:contact@coachlab.fr"><b>Nous contacter</b></a></div>
       </div>
     )
   }

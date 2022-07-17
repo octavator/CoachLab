@@ -1,7 +1,7 @@
 import Modal from './modal.js'
 import Navbar from './navbar.js'
 import scrollTo from '../utils.js'
-import {SelectInput} from './forms/inputs.js'
+import {SelectInput, RadioButton} from './forms/inputs.js'
 
 class Agenda extends React.Component {
   constructor(props) {
@@ -120,19 +120,19 @@ class Agenda extends React.Component {
     console.log(this.buildVideoId(), "video ID")
     let detailsForm = [
       <div key="duration" className="details-duration-section">
-        <div className="details-duration-label">Durée:</div>
+        <div className="details-duration-label bold">Durée:</div>
         <div className="details-duration-value">{this.state.appointment_detailed.duration + "min"}</div>
       </div>,
       <div key="isVideo" className="details-isVideo-section">
-        <div className="details-isVideo-label">Visio-conférence:</div>
+        <div className="details-isVideo-label bold mt-1">Visio-conférence:</div>
         <div className="details-isVideo-value">{this.state.appointment_detailed.isVideo ? "Oui": "Non"}</div>
       </div>,
       <div key="isMulti" className="details-isMulti-section">
-        <div className="details-isMulti-label">Séance de groupe:</div>
+        <div className="details-isMulti-label bold mt-1">Séance de groupe:</div>
         <div className="details-isMulti-value">{this.state.appointment_detailed.isMulti ? "Oui": "Non"}</div>
       </div>,
       <div key="visioLink" className={"details-visioLink-section" + (this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden")  }>
-          <div className="details-visioLink-label">Lien de la visio-conférence:</div>
+          <div className="details-visioLink-label bold mt-1">Lien de la visio-conférence:</div>
           <div className="details-visioLink-value clab-link" onClick={() => { window.open(`${this.buildVideoId()}`, "_blank")}}>
             {"Cliquez ici pour rejoindre"}
           </div>
@@ -140,7 +140,7 @@ class Agenda extends React.Component {
     ]
     let scheduleForm = [
       <div key="duration" className="input-group select-input">
-        <label className="input-label">Durée</label>
+        <label className="input-label mt-1">Durée</label>
         <select onChange={(e) => { this.setState({form: {...this.state.form, duration: e.target.value}}) }} name="duration" className="infos-form-select duration-select">
           <option value="30">30min</option>
           <option value="45">45min</option>
@@ -148,23 +148,15 @@ class Agenda extends React.Component {
         </select>
       </div>,
       <div key="isVideo" className="input-group radio-group">
-        <label className="input-label">Visio-conférence</label>
-        <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isVideo: e.target.checked}}) }}>
-          <label className="radio-label" htmlFor="isVideo">Oui</label>
-          <input type="radio" defaultChecked value={true} id="isVideo" name="isVideo" className="cl-radio"/>
-          <label className="radio-label" htmlFor="isNotVideo">Non</label>
-          <input id="isNotVideo" value={false} name="isVideo" type="radio" className="cl-radio"/>
-        </div>
+        <label className="input-label mt-1">Visio-conférence ?</label>
+        <RadioButton value={this.state.form.isVideo} onClick={(e) => {this.setState({form: {...this.state.form, isVideo: e}}) }}
+          yesLabel="Oui" noLabel="Non" />
       </div>,
       <div key="isMulti" className="input-group radio-group">
-      <label className="input-label">Séance de groupe</label>
-      <div className="radio-choices" onChange={(e) => { this.setState({form: {...this.state.form, isMulti: e.target.checked}}) }}>
-        <label className="radio-label" htmlFor="isMulti">Oui</label>
-        <input type="radio" value={true} id="isMulti" name="isMulti" className="cl-radio"/>
-        <label className="radio-label" htmlFor="isNotMulti">Non</label>
-        <input id="isNotMulti" defaultChecked value={false} name="isMulti" type="radio" className="cl-radio"/>
-      </div>
-    </div>,    
+        <label className="input-label mt-1">Séance de groupe ?</label>
+        <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
+            yesLabel="Oui" noLabel="Non" />
+      </div>,    
       <div key="sendbtn" className="input-group">
         <div className="button-group">
           <button onClick={() => { this.resNewSlot() ; this.setState({new_resa_modal: false}) }} className="cl-button primary">Valider</button>
@@ -244,7 +236,7 @@ class Agenda extends React.Component {
                             <div className="appointment-picto">
                               <img src={`priv/static/images/${slot && slot.isMulti ? "session_groupe.svg" : "session_individuelle.svg"}`} />
                             </div>
-                            <div className="appointment-picto">
+                            <div className="appointment-picto video">
                               <img src={`priv/static/images/${slot && slot.isVideo ? "session_online.svg" : "session_irl.svg"}`} />
                             </div>
                           </div>

@@ -18,12 +18,10 @@ class Login extends React.Component {
   sendForm() {
     http.post("/sign-in", this.state.form)
     .then(res => {
-      console.log(res.status)
-      console.log(res.data)
-      window.location.href = "/bienvenue";
+      if (res.status == 200) window.location.href = "/bienvenue"
+      else this.showFlashMessage("error", "Une erreur est survenue. Vérifiez vos identifiants.")
     })
     .catch(err => {
-      console.log(err)
       this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
     })
   }
@@ -37,16 +35,12 @@ class Login extends React.Component {
       <div>
         <Navbar user={{}}/>
         <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
-        <h1 className="page-title text-2">Connectez-vous</h1>
+        <h1 className="page-title">Connectez-vous</h1>
         <div className="login-content-wrapper infos-form">
-          <div className="input-group">
-            <label className="input-label text-3">Adresse mail</label>
-            <input className="cl-input bg-white text-3" onChange={(e) => { this.setState({form: {...this.state.form, email: e.target.value}}) }} value={this.state.form.email} name="email" type="email"></input>
-          </div>
-          <div className="input-group">
-            <label className="input-label text-3">Mot de passe</label>
-            <input className="cl-input bg-white text-3" onChange={(e) => { this.setState({form: {...this.state.form, password: e.target.value}}) }} value={this.state.form.password} name="password" type="password"></input>
-          </div>
+          <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true} label="Adresse mail"
+            onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }} name="email" type="email" placeholder="Adresse mail" />
+          <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.password} bold_label={true} label="Mot de passe"
+            onChange={(e) => { this.setState({form: {...this.state.form, password: e}}) }} name="password" type="password" placeholder="Mot de passe" />
           <div className="input-group">
             <div className="button-group">
               <button onClick={() => { this.sendForm() }} className="cl-button text-3 primary">
@@ -54,26 +48,11 @@ class Login extends React.Component {
               </button>
             </div>
           </div>
-        <div className="sign-up-section text-3" onClick={() => {window.location.href = "/inscription"}}>Cliquez-ici pour créer votre compte</div>
+          <div className="sign-up-section text-2-5" onClick={() => {window.location.href = "/inscription"}}><b>Pas encore de compte ? Cliquez-ici pour créer le votre</b></div>
         </div>
       </div>
     )
   }
-  /* 
-          <div className="login-content-wrapper infos-form">
-          <TextInput extraClass=" text-3 " 
-          onChange={(value) => { this.setState({form: {...this.state.form, email: value}}) }}
-          value={this.state.form.email} type="email" name="email" label="Adresse mail" />
-          <TextInput extraClass=" text-3 " 
-          onChange={(value) => { this.setState({form: {...this.state.form, password: value}}) }}
-          value={this.state.form.password} type="password" name="password" label="Adresse mail" />
-
-          <div className="button-group">
-            <Button text="Valider" extraClass="cl-button text-3 primary" onClick={() => { this.sendForm()}} />
-          </div>
-        <div className="sign-up-section text-4" onClick={() => {window.location.href = "/inscription"}}>Cliquez-ici pour créer votre compte</div>
-
-  */
 }
 
 const domContainer = document.querySelector('.login-wrapper');

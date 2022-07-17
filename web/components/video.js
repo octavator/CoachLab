@@ -66,9 +66,11 @@ class ClabVideo extends React.Component {
     })
     .then(room => {
       room.participants.forEach(participant => {
+        // can get user id through this to display user name on top of video console.log(participant, "participant")
         this.getRemoteTracks(participant)
       })
       room.on('participantConnected', participant => {
+        // can get user id through this to display user name on top of video console.log(participant, "participant")
         this.getRemoteTracks(participant)
       })
       if (!this.state.sendAudio) {
@@ -113,6 +115,14 @@ class ClabVideo extends React.Component {
         this.handleTrackDisabled(track)
       }
     })
+    this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => {
+      const target = document.getElementById(`remote-audio-${idx}`)
+      const hasAudio = document.querySelector(`#remote-audio-${idx} audio`)
+      if (target && !hasAudio) {
+        target.appendChild(track.attach())
+        this.handleTrackDisabled(track)
+      }
+    })
   }
   handleTrackDisabled(track) {
     track.on('disabled', () => {
@@ -125,7 +135,6 @@ class ClabVideo extends React.Component {
       })
       this.setState({tracks: new_tracks})
       /* Hide the associated <video> element and show an avatar image. */
-      
     });
     track.on('enabled', () => {
       console.log(track)
@@ -150,6 +159,11 @@ class ClabVideo extends React.Component {
         <div className="video">
           <div className="video-wrapper">
             <div id="local-media" className="local-media" style={{}}></div>
+            { this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => { 
+              return <div>
+                <div id={`remote-audio-${idx}`} className="remote-audio" style={{}}></div>                
+              </div>
+            }) }
             { this.state.tracks.filter(track => track.kind == "video").map((track, idx) => { 
               return <div className={"participant-block" + (track.disabled ? " hidden" : "")}>
                 <div id={`remote-media-${idx}`} className="remote-media" style={{}}></div>                

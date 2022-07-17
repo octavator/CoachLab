@@ -10,6 +10,7 @@
     required: "Firstname" - is field required // optionnal (false)
     name: "firstname" - field's HTTP name // optionnal ("")
     placeholder: "type here" - field's HTTP placeholder // optionnal ("")
+    disabled: can edit field // optionnal (false)
   }
 */
 
@@ -23,9 +24,47 @@ class TextInput extends React.Component {
     return (
       <div className="text-input-wrapper">
         <div className="input-group">
-          <label className={"input-label" + (this.props.label ? "" : " hidden")}>{this.props.label}</label>
-          <input className={"cl-input " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
+          <label className={"input-label" + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
+          <input className={"cl-input " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} disabled={this.props.disabled} name={this.props.name || ""}
            onChange={(e) => { this.props.onChange(e.target.value)}} placeholder={this.props.placeholder} value={this.props.value} type={this.props.type || "text"}></input>
+        </div>
+      </div>              
+    )
+  }
+}
+
+/*
+  NumberInput component
+
+  props: {
+    label: "Firstname" - field's label // optionnal (hidden)
+    onChange: (e) => {...}  - field's related onChange function // required
+    value: "Firstname" - field's value to bind // required
+    type: "password" - field's type // optionnal (text)
+    extraClass: "myClass" - field's extraClass to add // optionnal ("")
+    required: "Firstname" - is field required // optionnal (false)
+    name: "firstname" - field's HTTP name // optionnal ("")
+    placeholder: "type here" - field's HTTP placeholder // optionnal ("")
+    disabled: can edit field // optionnal (false)
+    max: max value // optionnal (500)
+    min: min value // optionnal (10)
+  }
+*/
+
+class NumberInput extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+  render() {
+    return (
+      <div className="text-input-wrapper">
+        <div className="input-group">
+          <label className={"input-label" + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
+          <input className={"cl-input " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} 
+           disabled={this.props.disabled} name={this.props.name || ""} min={this.props.min || 10} max={this.props.max || 500}
+           onChange={(e) => { this.props.onChange(e.target.value)}} value={this.props.value} type={this.props.type || "number"}></input>
         </div>
       </div>              
     )
@@ -58,7 +97,7 @@ class SelectInput extends React.Component {
     return (
       <div className="select-input-wrapper">
         <div className="input-group">
-          <label className={"input-label" + (this.props.label ? "" : " hidden")}>{this.props.label}</label>
+          <label className={"input-label" + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
 
           <div className={"cl-select " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
           onClick={() => {this.setState({show_dropdown: !this.state.show_dropdown})}}>
@@ -146,11 +185,51 @@ class TextArea extends React.Component {
     return (
       <div className="text-area-wrapper">
         <div className="input-group">
-          <label className={"input-label " + (this.props.label ? "text-3" : " hidden")}>{this.props.label}</label>
+          <label className={"input-label " + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
           <textarea className={"cl-textarea " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
            onChange={(e) => { this.props.onChange(e.target.value)}} placeholder={this.props.placeholder} value={this.props.value} rows={this.props.rows || "10"}></textarea>
         </div>
       </div>              
+    )
+  }
+}
+
+
+
+/*
+  RadioButton component
+
+  props: {
+    onClick: () => {...}  - field's related onClick function // required
+    value: true - Current value // optionnal (true)
+    extraClass: "myClass" - field's extraClass to add // optionnal ("")
+    yesLabel: "Oui" - label Yes response // optionnal ("")
+    noLabel: "Oui" - label no response // optionnal ("")
+  }
+*/
+
+class RadioButton extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+    }
+  }
+  render() {
+    return (
+      <div className="radio-choices">
+        <div className="radio-choice" onClick={() => { this.props.onClick(true)}}>
+          <label className={"radio-label" + (this.props.yesLabel ? "" : " hidden")}>{this.props.yesLabel || ""}</label>
+          <div className={"cl-radio ml-1" + (this.props.value ? " selected" : "")}>
+            <div className="cl-radio-inner"/>
+          </div>
+        </div>
+        <div className="radio-choice" onClick={() => { this.props.onClick(false)}}>
+          <label className={"radio-label" + (this.props.noLabel ? "" : " hidden")}>{this.props.noLabel || ""}</label>
+          <div className={"cl-radio ml-1" + (!this.props.value ? " selected" : "")}>
+            <div className="cl-radio-inner"/>
+          </div>
+        </div>
+      </div>
     )
   }
 }
@@ -184,4 +263,4 @@ class Button extends React.Component {
   }
 }
 
-export {TextInput, FileInput, TextArea, Button, SelectInput}
+export {TextInput, FileInput, TextArea, Button, SelectInput, RadioButton, NumberInput}

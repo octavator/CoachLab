@@ -145,6 +145,7 @@ a {
 .page-title {
     color: #26619C;
     justify-content: center;
+    align-items: center;
     display: flex;
     margin-bottom: 20px;
 }
@@ -163,6 +164,19 @@ a {
 /* BUTTONS */
 .cl-radio {
     cursor: pointer;
+    width: 1vw;
+    height: 1vw;
+    border: 1px solid grey;
+    background-color: white;
+    border-radius: 100px;
+}
+
+.cl-radio.selected .cl-radio-inner {
+    height: 85%;
+    width: 85%;
+    border-radius: 100px;
+    border: 1px solid white;
+    background-color: #318ce7;
 }
 
 .cl-button {
@@ -529,6 +543,9 @@ a {
     min-width: 10px;
     padding-left: 1vw;
 }
+.appointment-picto.video {
+    min-width: 15px;
+}
 
 /* COACH LIST */
 
@@ -787,6 +804,10 @@ a {
 .sign-up-section {
     text-align: center;
     cursor: pointer;
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    color: #26619C;
 }
 
 /* LANDING */
@@ -800,12 +821,6 @@ a {
     font-size: 3.1vw;
     margin: 0;
     font-family: Isidora-Bold;
-}
-
-.sign-up-section {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
 }
 
 .landing-signup-button {
@@ -823,6 +838,13 @@ a {
 .landing-inscription-card.bg-white {
     background: white;
     color: black;
+}
+
+.landing-first-page-buttons {
+    position: absolute;
+    display: flex;
+    top: 0;
+    right: 0;
 }
 
 .landing-inscription-card-button.blue-bg {
@@ -892,7 +914,7 @@ a {
     background-color: linear-gradient(90deg, #318CE7, #26619C);
     padding: 10px 36px;
     color: white;
-    margin-right: 40px;
+    margin-right: 20px;
 }
 
 .landing-inscription-card {
@@ -970,6 +992,7 @@ a {
 .landing-intermediary-logo {
     height: 60px;
     cursor: pointer;
+    margin-left: 20px;
 }
 
 .landing-inline-logo {
@@ -1053,6 +1076,7 @@ a {
     display: flex;
     justify-content: center;
     padding-bottom: 5vh;
+    padding-top: 5vh;
     flex-direction: column;
 }
 
@@ -1202,8 +1226,13 @@ a {
 .infos-form {
     display: flex;
     flex-direction: column;
+    align-items: center;
     margin-top: 40px;
     margin: 20px 0;
+}
+
+.cl-input.white-bg {
+    border: 2px solid #26619C;
 }
 
 .input-group {
@@ -1220,7 +1249,7 @@ a {
 
 .input-label {
     width: 100%;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 .centered-text {
@@ -1233,6 +1262,7 @@ a {
 
 .video-wrapper {
     display: flex;
+    flex-wrap: wrap;
 }
 
 /* MODAL */
@@ -1287,6 +1317,12 @@ a {
     justify-content: space-around;
 }
 
+.radio-choice {
+    display: flex;
+    padding: 0 10px;
+    align-items: center;
+}
+
 .details-visioLink-section {
     padding: 12px 8px;
 }
@@ -1325,6 +1361,9 @@ a {
     color: white;
     padding-bottom: 2vh;
 }
+.footer-link {
+    margin-left: 40px;
+}
 
 .footer-link:hover {
     background: white;
@@ -1336,7 +1375,6 @@ a {
 
 .contact-mail {
     font-weight: bold;
-    margin-left: 45px;
 }
 
 .footer-wrapper {
@@ -1345,10 +1383,6 @@ a {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-}
-
-.footer-copyright {
-    margin-left: 45px;
 }
 
 .footer-white-logo {
@@ -1379,9 +1413,6 @@ a {
     color: black;
     margin-top: 20px;
     margin-right: 20px;
-    position: absolute;
-    right: 0;
-    top: 0;
 }
 
 .invite-mail-block {
