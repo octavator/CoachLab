@@ -80,39 +80,33 @@ class NumberInput extends React.Component {
     value: "Firstname" - field's value to bind // required
     type: "password" - field's type // optionnal (text)
     extraClass: "myClass" - field's extraClass to add // optionnal ("")
-    required: "Firstname" - is field required // optionnal (false)
     name: "firstname" - field's HTTP name // optionnal ("")
     placeholder: "type here" - field's HTTP placeholder // optionnal ("")
+    disabled: true // optionnal (false)
   }
 */
 
 class SelectInput extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {
-      show_dropdown: false
-    }
+    this.state = { show_dropdown: false }
   }
   render() {
     return (
       <div className="select-input-wrapper">
         <div className="input-group">
-          <label className={"input-label" + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
-
-          <div className={"cl-select " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
-          onClick={() => {this.setState({show_dropdown: !this.state.show_dropdown})}}>
+          <label className={"input-label mt-1" + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
+          <div className={"cl-select " + (this.props.extraClass ? this.props.extraClass : "text-3")} name={this.props.name || ""}
+           onClick={() => { !this.props.disabled && this.setState({show_dropdown: !this.state.show_dropdown})}}>
             <div className="cl-selected-option">{this.props.value}
-              <i className={"fa fa-angle-up" + (this.state.show_dropdown ? "" : " hidden")}></i>
-              <i className={"fa fa-angle-down" + (this.state.show_dropdown ? " hidden" : "")}></i>
+              <i className={"fa fa-angle-" + (this.state.show_dropdown ? "up" : "down") + (this.props.disabled ? " hidden" : "")} />
             </div>
-            
             <div className={"cl-options-container" + (this.state.show_dropdown ? "" : " hidden")}>
               {this.props.options.map((option, option_idx) => {
                 return (
-                  <div key={option_idx} className={"cl-option text-2"}
-                  onClick={() => { this.props.onClick(option.value)}} >
+                  <div key={option_idx} className={"cl-option"} onClick={() => { this.props.onClick(option.value)}}>
                     {option.label}
-                </div>
+                  </div>
                 )
               })}
             </div>
@@ -185,7 +179,7 @@ class TextArea extends React.Component {
     return (
       <div className="text-area-wrapper">
         <div className="input-group">
-          <label className={"input-label " + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
+        <label className={"input-label " + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
           <textarea className={"cl-textarea " + (this.props.extraClass ? this.props.extraClass : "text-3")} required={this.props.required} name={this.props.name || ""}
            onChange={(e) => { this.props.onChange(e.target.value)}} placeholder={this.props.placeholder} value={this.props.value} rows={this.props.rows || "10"}></textarea>
         </div>
@@ -200,11 +194,13 @@ class TextArea extends React.Component {
   RadioButton component
 
   props: {
+    label: "Firstname" - field's label // optionnal (hidden)
     onClick: () => {...}  - field's related onClick function // required
     value: true - Current value // optionnal (true)
     extraClass: "myClass" - field's extraClass to add // optionnal ("")
     yesLabel: "Oui" - label Yes response // optionnal ("")
     noLabel: "Oui" - label no response // optionnal ("")
+    disabled: true // optional (false)
   }
 */
 
@@ -216,17 +212,21 @@ class RadioButton extends React.Component {
   }
   render() {
     return (
-      <div className="radio-choices">
-        <div className="radio-choice" onClick={() => { this.props.onClick(true)}}>
-          <label className={"radio-label" + (this.props.yesLabel ? "" : " hidden")}>{this.props.yesLabel || ""}</label>
-          <div className={"cl-radio ml-1" + (this.props.value ? " selected" : "")}>
-            <div className="cl-radio-inner"/>
+      <div className="input-group">
+        <label className={"input-label mt-1" + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
+        <div className="radio-choices">
+          {/* if props.disabled, hide not selected container */}
+          <div className="radio-choice" onClick={() => { this.props.onClick(true)}}>
+            <label className={"radio-label" + (this.props.yesLabel ? "" : " hidden")}>{this.props.yesLabel || ""}</label>
+            <div className={"cl-radio ml-1" + (this.props.value ? " selected" : "")}>
+              <div className="cl-radio-inner"/>
+            </div>
           </div>
-        </div>
-        <div className="radio-choice" onClick={() => { this.props.onClick(false)}}>
-          <label className={"radio-label" + (this.props.noLabel ? "" : " hidden")}>{this.props.noLabel || ""}</label>
-          <div className={"cl-radio ml-1" + (!this.props.value ? " selected" : "")}>
-            <div className="cl-radio-inner"/>
+          <div className="radio-choice" onClick={() => { this.props.onClick(false)}}>
+            <label className={"radio-label" + (this.props.noLabel ? "" : " hidden")}>{this.props.noLabel || ""}</label>
+            <div className={"cl-radio ml-1" + (!this.props.value ? " selected" : "")}>
+              <div className="cl-radio-inner"/>
+            </div>
           </div>
         </div>
       </div>

@@ -55,17 +55,12 @@ class Landing extends React.Component {
             </div>
             <h2 className="landing-page-title">Le centre de coaching digital</h2>
             <div className="landing-first-page-buttons">
-              <div className="cl-button bg-white text-3 landing-page-mobile-signup-button" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
-              <div className="cl-button bg-white text-3 landing-page-mobile-signup-button" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
+              <div className="cl-button bg-white text-3 landing-page-mobile-signup-button mr-1" onClick={() => { window.location.href = "/connexion" }}>Je me connecte</div>
+              <div className="cl-button bg-white text-3 landing-page-mobile-signup-button mr-1" onClick={() => { window.location.href = "/inscription" }}>Je m'inscris</div>
             </div>
           </div> 
           <div className="landing-intermediary-gradiant-wrapper"></div>
           <div className="landing-gradient-wrapper text-1">
-            {/* <div className="landing-mobile-pictures-container">
-              <img className="landing-picture-mobile" src="priv/static/images/coach.png"/>
-              <img className="landing-picture-mobile" src="priv/static/images/coache.png"/>
-              <img className="landing-picture-mobile" src="priv/static/images/ecran.png"/>
-            </div> */}
             <div className="landing-desktop-pictures-container">
               <img className="landing-picture-desktop" src="priv/static/images/mickey_2.png"/>              
             </div>

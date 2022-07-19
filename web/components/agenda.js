@@ -7,8 +7,9 @@ class Agenda extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-        new_resa_modal: false,
-        appointment_details_modal: false,
+      new_resa_modal: false,
+      can_edit_new_resa: true,
+      appointment_details_modal: false,
         target_id: undefined,
         schedule: {},
         day: new Date(new Date().setHours(0,0,0,0)),
@@ -19,7 +20,7 @@ class Agenda extends React.Component {
         flashMessage: '',
         appointment_detailed: {},
         form: {
-          duration: "30",
+          duration: "60",
           isVideo: true,
           isMulti: false,
           id: ""
@@ -28,7 +29,8 @@ class Agenda extends React.Component {
         target_user: {firstname: "", lastname: ""},
         weekdays: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
         hours: ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"],
-        months: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
+        months: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
+        durations: [{label: "30min", value: "30"}, {label: "45min", value: "45"}, {label: "1h", value: "60"}]
     }
   }
   componentDidMount() {
@@ -43,14 +45,12 @@ class Agenda extends React.Component {
       })
     } else {
       http.get("/me").then(res => {
-        this.setState({
-          user: res.data,
-        })
         http.get(`/coach/agenda/${target_id}`).then(agendaData => {
           this.setState({
             target_user: agendaData.data.user,
             schedule: agendaData.data.agenda,
-            target_id: target_id
+            target_id: target_id,
+            user: res.data
           })
         }).catch(err => {
           this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
@@ -73,11 +73,11 @@ class Agenda extends React.Component {
   }
   slotClickEvent(slot, slot_id) {
     if (this.getSlotClickableClass(slot) == "") return
-    if (this.state.target_id) {
-      this.setState({new_resa_modal: true, form: {...this.state.form, id: slot_id}})
-    } else {
-      slot && this.setState({appointment_details_modal: true, appointment_detailed: slot})
-    }
+    //my agenda
+    if (!this.state.target_id) return (slot && this.setState({appointment_details_modal: true, appointment_detailed: slot}))
+    //my coach agenda
+    if (!slot) this.setState({new_resa_modal: true, can_edit_new_resa: true, form: {...this.state.form, id: slot_id}})
+    else this.setState({new_resa_modal: true, can_edit_new_resa: false, form: {...slot, id: slot_id}})
   }
   buildVideoId() {
     return (this.state.appointment_detailed.id ? 
@@ -117,7 +117,6 @@ class Agenda extends React.Component {
     return resa_date.toLocaleString('fr-FR', { timeZone: 'UTC' })
   }
   render() {
-    console.log(this.buildVideoId(), "video ID")
     let detailsForm = [
       <div key="duration" className="details-duration-section">
         <div className="details-duration-label bold">Durée:</div>
@@ -139,32 +138,19 @@ class Agenda extends React.Component {
       </div>,
     ]
     let scheduleForm = [
-      <div key="duration" className="input-group select-input">
-        <label className="input-label mt-1">Durée</label>
-        <select onChange={(e) => { this.setState({form: {...this.state.form, duration: e.target.value}}) }} name="duration" className="infos-form-select duration-select">
-          <option value="30">30min</option>
-          <option value="45">45min</option>
-          <option value="60">1h</option>
-        </select>
-      </div>,
-      <div key="isVideo" className="input-group radio-group">
-        <label className="input-label mt-1">Visio-conférence ?</label>
-        <RadioButton value={this.state.form.isVideo} onClick={(e) => {this.setState({form: {...this.state.form, isVideo: e}}) }}
-          yesLabel="Oui" noLabel="Non" />
-      </div>,
-      <div key="isMulti" className="input-group radio-group">
-        <label className="input-label mt-1">Séance de groupe ?</label>
-        <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
-            yesLabel="Oui" noLabel="Non" />
-      </div>,    
-      <div key="sendbtn" className="input-group">
-        <div className="button-group">
-          <button onClick={() => { this.resNewSlot() ; this.setState({new_resa_modal: false}) }} className="cl-button primary">Valider</button>
-        </div>
+      <SelectInput extraClass={"text-3 "} value={this.state.form.duration} disabled={!this.state.can_edit_new_resa} 
+        options={this.state.durations.map(duration => {return {label: duration.label, value: duration.value}} )}
+        onClick={(e) => { this.setState({form: {...this.state.form, duration: e}}) }} label="Durée"
+      />,
+      <RadioButton value={this.state.form.isVideo} onClick={(e) => {this.setState({form: {...this.state.form, isVideo: e}}) }}
+        label="Visio-conférence ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
+      <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
+          label="Séance de groupe ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
+      <div className="input-group flex-end">
+        <button onClick={() => { this.resNewSlot() ; this.setState({new_resa_modal: false}) }} className="cl-button primary">Valider</button>
       </div>
     ]
     const this_month_days = this.getAllDaysInMonth(this.state.month, this.state.year)
-    const today = new Date()
     return (
       <div className="new-agenda-wrapper">
         <Navbar user={this.state.user} blue_bg={true} />
