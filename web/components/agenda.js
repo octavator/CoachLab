@@ -1,7 +1,7 @@
 import Modal from './modal.js'
 import Navbar from './navbar.js'
 import scrollTo from '../utils.js'
-import {SelectInput, RadioButton} from './forms/inputs.js'
+import {SelectInput, RadioButton, TextInput} from './forms/inputs.js'
 
 class Agenda extends React.Component {
   constructor(props) {
@@ -23,6 +23,7 @@ class Agenda extends React.Component {
           duration: "60",
           isVideo: true,
           isMulti: false,
+          sessionTitle: "",
           id: ""
         },
         user: {firstname: "", lastname: ""},
@@ -30,7 +31,7 @@ class Agenda extends React.Component {
         weekdays: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
         hours: ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"],
         months: ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"],
-        durations: [{label: "30min", value: "30"}, {label: "45min", value: "45"}, {label: "1h", value: "60"}]
+        durations: [{label: "30min", value: "30"}, {label: "45min", value: "45"}, {label: "1h", value: "60"}, {label: "1h30", value: "90"}]
     }
   }
   componentDidMount() {
@@ -111,6 +112,12 @@ class Agenda extends React.Component {
       this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
     })
   }
+  getAppointmentTitle(slot) {
+    if (!slot) return ""
+    if (slot.isMulti) return slot.sessionTitle != "" && slot.sessionTitle || "Session de groupe"
+    if (this.state.target_id) return "Coaching individuel"
+    return `Session avec ${slot.coach_name || ""}`
+  }
   buildResaId(date, hour) {
     const resa_date = new Date(date)
     resa_date.setHours(hour, 0, 0)
@@ -118,6 +125,10 @@ class Agenda extends React.Component {
   }
   render() {
     let detailsForm = [
+      <div key="sessionTitle" className="details-sessionTitle-section">
+        <div className="details-sessionTitle-label bold mt-1">Nom de la séance</div>
+        <div className="details-sessionTitle-value">{this.state.appointment_detailed.sessionTitle}</div>
+      </div>,
       <div key="duration" className="details-duration-section">
         <div className="details-duration-label bold">Durée:</div>
         <div className="details-duration-value">{this.state.appointment_detailed.duration + "min"}</div>
@@ -138,10 +149,11 @@ class Agenda extends React.Component {
       </div>,
     ]
     let scheduleForm = [
-      <SelectInput extraClass={"text-3 "} value={this.state.form.duration} disabled={!this.state.can_edit_new_resa} 
+      <TextInput value={this.state.form.sessionTitle} onChange={(e) => {this.setState({form: {...this.state.form, sessionTitle: e}}) }}
+        label="Nom de la séance" disabled={!this.state.can_edit_new_resa} extraClass=" white-bg" Placeholder="Session fitness débutants"/>,
+      <SelectInput extraClass={"text-3 "} value={this.state.durations.find(d => d.value == this.state.form.duration).label} disabled={!this.state.can_edit_new_resa} 
         options={this.state.durations.map(duration => {return {label: duration.label, value: duration.value}} )}
-        onClick={(e) => { this.setState({form: {...this.state.form, duration: e}}) }} label="Durée"
-      />,
+        onClick={(e) => { this.setState({form: {...this.state.form, duration: e}}) }} label="Durée" />,
       <RadioButton value={this.state.form.isVideo} onClick={(e) => {this.setState({form: {...this.state.form, isVideo: e}}) }}
         label="Visio-conférence ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
       <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
@@ -209,8 +221,8 @@ class Agenda extends React.Component {
                 this.state.hours.map((hour, idx) => {
                   const slot_id = this.buildResaId(this.state.day, hour)
                   const slot = this.state.schedule[slot_id]
-                  console.log(slot, "slot")
-                  const appointment_message = slot && !this.state.target_id ? `Session coaching avec ${slot.coach_name || ""}` : ""
+                  console.log(slot)
+                  const appointment_message = this.getAppointmentTitle(slot)
                   return (
                     <div key={idx} className="hour-schedule">
                       <div className="hour-schedule-item text-2-5">{`${hour}:00`}</div>

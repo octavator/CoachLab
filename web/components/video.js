@@ -1,5 +1,6 @@
 import Navbar from './navbar.js'
 const Video = Twilio.Video;
+
 class ClabVideo extends React.Component {
   constructor(props) {
     super(props)

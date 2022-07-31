@@ -94,7 +94,7 @@ defmodule ClabRouter do
     if !is_nil(id) do
       Logger.debug("coach id = #{target_id}")
       agenda = Agenda.get_agenda(target_id) |> Map.new(fn {k, v} ->
-        {k, Map.take(v, ["id", "coach_id", "coached_ids", "isMulti", "isVideo", "duration"])}
+        {k, Map.take(v, ["id", "coach_id", "coached_ids", "isMulti", "isVideo", "duration", "sessionTitle"])}
       end)
       user = User.get_user_by_id(target_id)
       data = %{agenda: agenda, user: user} |> Poison.encode!
@@ -281,6 +281,22 @@ defmodule ClabRouter do
     end
   end
 
+  post "/new_coach" do
+    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      user = User.get_user_by_id(id)
+      user = Map.update(user, :coaches, [body.coach_id], & Enum.uniq(&1 ++ [body.coach_id]))
+      {status_code, ret_text} = case User.edit_user(user.id, user) do
+        :error -> {400, "Erreur durant le changement de vos informations."}
+        _ -> {200, "Vos informations ont été mis à jour."}
+      end
+      send_resp(conn, status_code, ret_text)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
   post "/edit-infos" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
     id = check_token_user(conn)
@@ -310,7 +326,7 @@ defmodule ClabRouter do
           coach = User.get_user_by_id(body.user_id)
           payload = Map.merge(body.resa, %{
             "coach_id" => body.user_id,
-            "coach_name" => coach.lastname,
+            "coach_name" => "#{coach.firstname} #{coach.lastname}",
             "user_name" => user.lastname
           })
           case Agenda.update_agenda(user.id, %{body.id => payload}) do

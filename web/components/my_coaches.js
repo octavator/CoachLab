@@ -1,4 +1,5 @@
 import Navbar from './navbar.js'
+import {TextInput} from './forms/inputs.js'
 
 class MyCoaches extends React.Component {
   constructor(props) {
@@ -12,7 +13,11 @@ class MyCoaches extends React.Component {
         showFlash: false,
         flashType: '',
         flashMessage: '',
-        coaches: []
+        coaches: [],
+        search_coaches: [],
+        search_coach_name: "",
+        show_coaches: false,
+        new_coach_id: ""
     }
   }
   componentDidMount() {
@@ -37,6 +42,24 @@ class MyCoaches extends React.Component {
     if (!filepath) return ""
     const tokens = filepath.split(".")
     return tokens[tokens.length - 1]
+  }
+  addChosenCoach() {
+    if (this.state.new_coach_id == "") return
+    http.post("/new_coach", {coach_id: this.state.new_coach_id}).then(res => {
+      this.showFlashMessage("success", "Votre coach a bien été rajouté. Rafraichissez la page.")
+    })
+  }
+  getMatchingCoaches(input) {
+    if (input.length >= 3) {
+      http.get(`/coach/search?coach_name=${encodeURIComponent(input)}`).then(res => {
+        this.setState({search_coaches: res.data, show_coaches: res.data.length > 0})
+      })
+      .catch(err => {
+        console.log(err.response)
+        this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      })
+    }
+    this.setState({search_coach_name: input})
   }
   render() {
     return (
@@ -63,6 +86,34 @@ class MyCoaches extends React.Component {
                 )
               })
             }
+          </div>
+          <div className={"add-coach-section " + (this.state.user.role == "coach" ? "hidden" : "")}>
+            <h2 className="centered-text mt-2">Ajoutez un coach</h2>
+            <div className="flex input-group inline">
+              <div className="select-input-autocomplete-container mr-2">
+                <TextInput extraClass="text-3 autocomplete-text-input white-bg" value={this.state.search_coach_name} placeholder="Nom du coach" 
+                  onChange={(e) => { this.getMatchingCoaches(e) }} />
+                  <div className={"select-autocomplete-wrapper" + (this.state.show_coaches ? "" : " hidden")}>
+                    {
+                      this.state.search_coaches.map((coach) => {
+                        return (
+                          <div key={coach.id} className="select-autocomplete-option text-3" onClick={() => {
+                              this.setState({
+                              search_coach_name: `${coach.firstname} ${coach.lastname}`,
+                              new_coach_id: coach.id,
+                              show_coaches: false
+                            }) 
+                          }}>
+                            {`${coach.firstname} ${coach.lastname}`}
+                          </div>
+                      )})
+                    }
+                  </div>
+              </div>
+              <button onClick={() => { this.addChosenCoach() }} className="cl-button white-bg text-3 primary">
+                Ajouter
+              </button>
+            </div>
           </div>
         </div>
     </div>

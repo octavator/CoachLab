@@ -188,7 +188,7 @@ defmodule User do
   end
 
   def format_user(user) do
-    user |> Map.take([:firstname, :lastname, :email, :id, :role, :avatar])
+    user |> Map.take([:firstname, :lastname, :email, :id, :role, :avatar, :coaches])
   end
 
   def get_coached_users(coach_id) do

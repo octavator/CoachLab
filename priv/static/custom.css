@@ -93,6 +93,12 @@ img {
 .mt-2 {
     margin-top: 20px;
 }
+.mb-1 {
+    margin-bottom: 10px;
+}
+.mb-2 {
+    margin-bottom: 20px;
+}
 .mr-1 {
     margin-right: 10px;
 }
@@ -753,7 +759,7 @@ a {
     justify-content: space-between;
     flex-grow: 1;
     font-weight: bold;
-    color: #318CE7;
+    color: #26619C;
     margin-top: 6px;
 }
 .navbar-wrapper.blue-bg .menu-section {
@@ -1252,6 +1258,9 @@ a {
     margin-bottom: 5px;
 }
 
+.flex.inline {
+    flex-direction: row;
+}
 .centered-text {
     text-align: center;
 }
@@ -1358,7 +1367,7 @@ a {
     padding-bottom: 2vh;
 }
 .footer-link {
-    margin-left: 40px;
+    margin-left: 35px;
 }
 
 .footer-link:hover {
