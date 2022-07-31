@@ -545,11 +545,11 @@ a {
 }
 .appointment-picto {
     width: 1vw;
-    min-width: 10px;
+    min-width: 20px;
     padding-left: 1vw;
 }
 .appointment-picto.video {
-    min-width: 15px;
+    min-width: 25px;
 }
 
 /* COACH LIST */
@@ -562,7 +562,6 @@ a {
     margin: 0 10vw;
     padding: 10px 0;
 }
-
 .coach-list-row {
     display: flex;
     flex-direction: row;
@@ -582,7 +581,6 @@ a {
     box-shadow: 0px 0px 5px 2px darkslategrey;
     -webkit-box-shadow: 0px 0px 5px 2px darkslategrey;
 }
-
 .coach-list-avatar {
     height: 40px;
     width: 40px;
@@ -1239,6 +1237,7 @@ a {
 
 .cl-input.white-bg {
     border: 2px solid #26619C;
+    border: 1.5px solid #26619C;
 }
 
 .input-group {
@@ -1366,10 +1365,9 @@ a {
     color: white;
     padding-bottom: 2vh;
 }
-.footer-link {
+.footer-text {
     margin-left: 35px;
 }
-
 .footer-link:hover {
     background: white;
     padding: 12px 18px;
