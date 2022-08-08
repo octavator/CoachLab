@@ -296,13 +296,18 @@ a {
     cursor: pointer;
     position: relative;
 }
-
-.cl-select:focus-visible {
+.cl-select:hover {
+    box-shadow: 0px 0px 5px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 5px 1px darkslategrey;
+}
+.cl-select:focus-visible, .cl-select:focus {
     padding: 10px 20px 10px 10px;
     border-radius: 20px;
     border: 1px #26619C solid;
     border: 1.5px #26619C solid !important;
     color: #26619C;
+    box-shadow: 0px 0px 5px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 5px 1px darkslategrey;
 }
 
 .cl-options-container {

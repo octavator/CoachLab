@@ -42,7 +42,9 @@ class Login extends React.Component {
           <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.password} bold_label={true} label="Mot de passe"
             onChange={(e) => { this.setState({form: {...this.state.form, password: e}}) }} name="password" type="password" placeholder="Mot de passe" />
           <Button extraClass="text-3 mt-1 white-bg" onClick={() => { this.sendForm()}} text="Suivant" />
-          <div className="sign-up-section text-2-5" onClick={() => {window.location.href = "/inscription"}}><b>Pas encore de compte ? Cliquez-ici pour créer le votre</b></div>
+          <div className="sign-up-section text-2-5" onClick={() => {window.location.href = "/inscription"}}>
+            <b>Pas encore de compte ? Cliquez-ici pour créer le votre</b>
+          </div>
         </div>
       </div>
     )

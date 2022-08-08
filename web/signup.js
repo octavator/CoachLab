@@ -51,7 +51,7 @@ class SignUp extends React.Component {
             <TextInput value={this.state.form.lastname} onChange={(e) => { this.setState({form: {...this.state.form, lastname: e.target.value}}) }} label="Nom" />
             <div className="input-group">
               <div className="button-group">
-                <button onClick={() => { this.sendForm() }} className="cl-button primary">
+                <button onClick={() => { this.sendForm() }} className="cl-button">
                   Valider
                 </button>
               </div>

@@ -78,7 +78,7 @@ class UserProfile extends React.Component {
               </div>
               <div className="input-group">
                 <div className="button-group mb-2">
-                  <button onClick={() => { this.sendForm() }} className="cl-button primary">
+                  <button onClick={() => { this.sendForm() }} className="cl-button">
                     Valider
                   </button>
                 </div>

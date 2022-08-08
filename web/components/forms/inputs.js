@@ -215,14 +215,15 @@ class RadioButton extends React.Component {
       <div className="input-group">
         <label className={"input-label mt-1" + (this.props.label ? (this.props.bold_label ? " bold" : "") : " hidden")}>{this.props.label}</label>
         <div className="radio-choices">
-          {/* if props.disabled, hide not selected container */}
-          <div className="radio-choice" onClick={() => { this.props.onClick(true)}}>
+          <div className={"radio-choice" + (this.props.disabled && !this.props.value ? " hidden" : "")}
+            onClick={() => { this.props.onClick(true)}}>
             <label className={"radio-label" + (this.props.yesLabel ? "" : " hidden")}>{this.props.yesLabel || ""}</label>
             <div className={"cl-radio ml-1" + (this.props.value ? " selected" : "")}>
               <div className="cl-radio-inner"/>
             </div>
           </div>
-          <div className="radio-choice" onClick={() => { this.props.onClick(false)}}>
+          <div className={"radio-choice" + (this.props.disabled && this.props.value ? " hidden" : "")}
+            onClick={() => { this.props.onClick(false)}}>
             <label className={"radio-label" + (this.props.noLabel ? "" : " hidden")}>{this.props.noLabel || ""}</label>
             <div className={"cl-radio ml-1" + (!this.props.value ? " selected" : "")}>
               <div className="cl-radio-inner"/>

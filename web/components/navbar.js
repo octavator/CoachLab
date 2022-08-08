@@ -7,7 +7,6 @@ class Navbar extends React.Component {
   }
   disconnect() {
     http.get("/logout").then(res => {
-      console.log(res.status)
       window.location.href = "/connexion"
     })
   }
@@ -40,7 +39,7 @@ class Navbar extends React.Component {
             </div>
           </div>
           : 
-          <div></div>
+          <div/>
         }
       </div>
     )
