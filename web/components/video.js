@@ -7,25 +7,24 @@ class ClabVideo extends React.Component {
     const urlParams = new URLSearchParams(document.location.search)
     const roomId = urlParams.get("roomId")
     this.state = {
-        user: {
-          firstname: "",
-          lastname: "",
-          role: "coach"
-        },
-        roomId: roomId,
-        sendAudio: true,
-        sendVideo: true,
-        room: undefined,
-        schedule: {},
-        tracks: [],
-        token: "",
-        showFlash: false,
-        flashType: '',
-        flashMessage: '',
+      user: {
+        firstname: "",
+        lastname: "",
+        role: "coach"
+      },
+      roomId: roomId,
+      sendAudio: true,
+      sendVideo: true,
+      room: undefined,
+      schedule: {},
+      tracks: [],
+      token: "",
+      showFlash: false,
+      flashType: '',
+      flashMessage: '',
     }
   }
   componentDidMount() {
-    console.log(this.state.roomId)
     http.get("/me/agenda").then(agendaData => {
       //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
       let resId = this.state.roomId.split("+")[0]
@@ -52,28 +51,29 @@ class ClabVideo extends React.Component {
   getRemoteTracks(participant) {
     participant.tracks.forEach(publication => {
       if (publication.track) {
-        let tracks = this.state.tracks
+        let tracks = [...this.state.tracks]
+        // let tracks = [...this.state.tracks].filter(track => { console.log(new_track.name, track.name) ;track.name != new_track.name })
         this.setState({tracks: tracks.concat([publication.track])})
       }
     })
-    participant.on('trackSubscribed', track => {
-      let tracks = this.state.tracks
-      this.setState({tracks: tracks.concat([track])})
+    participant.on('trackSubscribed', new_track => {
+      let tracks = [...this.state.tracks]
+      console.log("new track name", new_track.name)
+      console.log("is already in room ?", tracks.some(t => t.name == new_track.name))
+      // let tracks = [...this.state.tracks].filter(track => { console.log(new_track.name, track.name) ;track.name != new_track.name })
+      this.setState({tracks: tracks.concat([new_track])})
     })
   }
   startVideoLive() {
     Video.connect(this.state.token, {
-      name: this.state.roomId, audio: true, video: { }, type: this.state.roomType
+      name: this.state.roomId,
+      audio: {name: `audio+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`},
+      video: {name: `video+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`},
+      type: this.state.roomType
     })
     .then(room => {
-      room.participants.forEach(participant => {
-        // can get user id through this to display user name on top of video console.log(participant, "participant")
-        this.getRemoteTracks(participant)
-      })
-      room.on('participantConnected', participant => {
-        // can get user id through this to display user name on top of video console.log(participant, "participant")
-        this.getRemoteTracks(participant)
-      })
+      room.participants.forEach(participant => this.getRemoteTracks(participant))
+      room.on('participantConnected', participant => this.getRemoteTracks(participant))
       if (!this.state.sendAudio) {
         room.localParticipant.audioTracks.forEach(publication => {
           publication.track.disable()
@@ -98,6 +98,7 @@ class ClabVideo extends React.Component {
       else publication.track.enable()
     })
   }
+
   toggleVideo() {
     let new_sendVideo = this.state.sendVideo ? false : {}
     this.setState({sendVideo: new_sendVideo})
@@ -127,29 +128,19 @@ class ClabVideo extends React.Component {
   }
   handleTrackDisabled(track) {
     track.on('disabled', () => {
-      console.log(track)
       const new_tracks = this.state.tracks.map((t) => {
-        if (t.sid == track.sid) {
-          return {...t, disabled: true}
-        }
+        if (t.sid == track.sid) return {...t, disabled: true}
         return t
       })
       this.setState({tracks: new_tracks})
-      /* Hide the associated <video> element and show an avatar image. */
-    });
+    })
     track.on('enabled', () => {
-      console.log(track)
       const new_tracks = this.state.tracks.map((t) => {
-        if (t.sid == track.sid) {
-          return {...t, disabled: false}
-        }
+        if (t.sid == track.sid) return {...t, disabled: false}
         return t
       })
       this.setState({tracks: new_tracks})
-      /* Hide the associated <video> element and show an avatar image. */
-      
-    });
-
+    })
   }
   render() {
     console.log(this.state.tracks, "tracks")
@@ -159,15 +150,17 @@ class ClabVideo extends React.Component {
         <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
         <div className="video">
           <div className="video-wrapper">
-            <div id="local-media" className="local-media" style={{}}></div>
+            <div className={"local-media-video " + (this.state.sendVideo ? "" : "black-bg")}>
+              <div id="local-media" className={"local-media " + (this.state.sendVideo ? "" : "transparent")} style={{}} />
+            </div>
             { this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => { 
-              return <div>
-                <div id={`remote-audio-${idx}`} className="remote-audio" style={{}}></div>                
+              return <div key={`${track.name}`}>
+                <div id={`remote-audio-${idx}`} className="remote-audio" style={{}} />                
               </div>
             }) }
             { this.state.tracks.filter(track => track.kind == "video").map((track, idx) => { 
-              return <div className={"participant-block" + (track.disabled ? " hidden" : "")}>
-                <div id={`remote-media-${idx}`} className="remote-media" style={{}}></div>                
+              return <div key={`${track.name}`} className={"participant-block" + (track.disabled ? " hidden" : "")}>
+                <div id={`remote-media-${idx}`} className="remote-media" style={{}} />                
               </div>
             }) }
           </div>

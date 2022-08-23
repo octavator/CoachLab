@@ -2,7 +2,7 @@ class Modal extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-        toggle: false
+      toggle: false
     }
   }
 
@@ -15,9 +15,7 @@ class Modal extends React.Component {
           </div>
           <h1 className="page-title">{this.props.title}</h1>
           <div className="infos-form">
-              { this.props.fields.map(field => {
-                return field
-              }) }
+            { this.props.fields.map(field => field) }
           </div>
         </div>
       </div>

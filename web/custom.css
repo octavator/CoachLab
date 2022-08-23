@@ -1278,6 +1278,11 @@ a {
     flex-wrap: wrap;
 }
 
+.transparent {opacity: 0;}
+.local-media-video.black-bg {
+    background: black;
+}
+
 /* MODAL */
 
 .modal {
