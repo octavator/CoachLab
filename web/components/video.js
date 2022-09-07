@@ -1,4 +1,6 @@
 import Navbar from './navbar.js'
+import Flash from './flash.js'
+
 const Video = Twilio.Video;
 
 class ClabVideo extends React.Component {
@@ -29,13 +31,11 @@ class ClabVideo extends React.Component {
       //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
       let resId = this.state.roomId.split("+")[0]
       let resa = agendaData.data.agenda[resId]
+      //@TODO: Gérer room type en créant la room plutot que ad hoc connect
       let roomType = resa.isMulti ? "group": "go"
       if (Video.isSupported) {
         http.get("/video-token").then(token => {
-          Video.createLocalVideoTrack().then(track => {
-            const localMediaContainer = document.getElementById('local-media')
-            localMediaContainer.appendChild(track.attach())
-          });
+          Video.createLocalVideoTrack().then(track => document.getElementById('local-media').appendChild(track.attach()))
           this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data, roomType: roomType})
         })
       } else this.showFlashMessage("error", "Votre navigateur actuel n'est pas compatible avec notre module vidéo.")
@@ -89,7 +89,6 @@ class ClabVideo extends React.Component {
       this.showFlashMessage("error", error.message || "Une erreur inattendue est survenue.")
     })
   }
-
   toggleAudio() {
     this.setState({sendAudio: !this.state.sendAudio})
     if (!this.state.room) return
@@ -98,7 +97,6 @@ class ClabVideo extends React.Component {
       else publication.track.enable()
     })
   }
-
   toggleVideo() {
     let new_sendVideo = this.state.sendVideo ? false : {}
     this.setState({sendVideo: new_sendVideo})
@@ -108,61 +106,55 @@ class ClabVideo extends React.Component {
       else publication.track.disable()
     })
   }
-  componentDidUpdate() {
-    this.state.tracks.filter(track => track.kind == "video").map((track, idx) => {
-      const target = document.getElementById(`remote-media-${idx}`)
-      const hasVideo = document.querySelector(`#remote-media-${idx} video`)
-      if (target && !hasVideo) {
-        target.appendChild(track.attach())
-        this.handleTrackDisabled(track)
-      }
+  toggleTrack(isDisabled, trackId) {
+    const new_tracks = this.state.tracks.map(t => {
+      if (t.sid == trackId) return {...t, disabled: isDisabled}
+      return t
     })
-    this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => {
-      const target = document.getElementById(`remote-audio-${idx}`)
-      const hasAudio = document.querySelector(`#remote-audio-${idx} audio`)
-      if (target && !hasAudio) {
-        target.appendChild(track.attach())
-        this.handleTrackDisabled(track)
-      }
+    this.setState({tracks: new_tracks})
+  }
+  handleTrackToggle(track) {
+    track.on('disabled', () => this.toggleTrack(true, track.sid))
+    track.on('enabled', () => this.toggleTrack(false, track.sid))
+  }
+  attachTracks(type) {
+    this.state.tracks.filter(track => track.kind == type).forEach((track, idx) => {
+      const target = document.getElementById(`remote-${type}-${idx}`)
+      const isAttached = document.querySelector(`#remote-${type}-${idx} ${type}`)
+      if (!target || isAttached) return 
+      target.appendChild(track.attach())
+      this.handleTrackToggle(track)
     })
   }
-  handleTrackDisabled(track) {
-    track.on('disabled', () => {
-      const new_tracks = this.state.tracks.map((t) => {
-        if (t.sid == track.sid) return {...t, disabled: true}
-        return t
-      })
-      this.setState({tracks: new_tracks})
-    })
-    track.on('enabled', () => {
-      const new_tracks = this.state.tracks.map((t) => {
-        if (t.sid == track.sid) return {...t, disabled: false}
-        return t
-      })
-      this.setState({tracks: new_tracks})
-    })
+  componentDidUpdate() {
+    this.attachTracks("video")
+    this.attachTracks("audio")
   }
   render() {
+    // @TODO: tester puis repliquer le component Flash sur les autres pages
+    // this.showFlashMessage("error", "coucou ca marche ?")
+
+    //@TODO: when more than 4 ppl in room, only show the coach's video
     console.log(this.state.tracks, "tracks")
     return (
       <div>
         <Navbar blue_bg={true} user={this.state.user} />
-        <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+        <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <div className="video">
           <div className="video-wrapper">
             <div className={"local-media-video " + (this.state.sendVideo ? "" : "black-bg")}>
               <div id="local-media" className={"local-media " + (this.state.sendVideo ? "" : "transparent")} style={{}} />
             </div>
-            { this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => { 
-              return <div key={`${track.name}`}>
+            { this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => 
+              <div key={`${track.name}`}>
                 <div id={`remote-audio-${idx}`} className="remote-audio" style={{}} />                
               </div>
-            }) }
-            { this.state.tracks.filter(track => track.kind == "video").map((track, idx) => { 
-              return <div key={`${track.name}`} className={"participant-block" + (track.disabled ? " hidden" : "")}>
-                <div id={`remote-media-${idx}`} className="remote-media" style={{}} />                
+            ) }
+            { this.state.tracks.filter(track => track.kind == "video").map((track, idx) => 
+              <div key={`${track.name}`} className={"participant-block" + (track.disabled ? " hidden" : "")}>
+                <div id={`remote-video-${idx}`} className="remote-video" style={{}} />                
               </div>
-            }) }
+            ) }
           </div>
           <div className="flex flex-center mt-2">
             <div onClick={() => {this.toggleAudio()}} className="cl-button ml-2">
@@ -176,7 +168,7 @@ class ClabVideo extends React.Component {
             </div>
           </div>
         </div>
-    </div>
+      </div>
     )
   }
 }
