@@ -161,7 +161,7 @@ a {
     margin: 20px;
 }
 .appointment-schedule-item.clickable:hover {
-    background: linear-gradient(90deg, #318ce7 0%, #26619C 100%);
+    background: linear-gradient(90deg, #318ce740 0%, #26619C40 100%);
 }
 .clickable {
     cursor: pointer;
@@ -539,7 +539,7 @@ a {
     padding: 5px 1.5vw;
     color: white;
     border-radius: 10px;
-    background: linear-gradient(90deg, #318ce740 0%, #26619C40 100%);
+    background: white;
     border-bottom: 1px solid #26619C40;
 }
 .appointment-schedule-item.reserved {
@@ -549,8 +549,13 @@ a {
     display: flex;
 }
 .appointment-picto {
-    width: 1vw;
+    width: 2vw;
     min-width: 20px;
+    padding-left: 1vw;
+}
+.appointment-picto.single {
+    width: 1vw;
+    min-width: 10px;
     padding-left: 1vw;
 }
 .appointment-picto.video {
@@ -587,6 +592,41 @@ a {
     -webkit-box-shadow: 0px 0px 5px 2px darkslategrey;
 }
 .coach-list-avatar {
+    height: 40px;
+    width: 40px;
+    margin-right: 20px;
+}
+
+/* SESSION LIST */
+
+.session-list-wrapper {
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 10vw;
+    padding: 10px 0;
+}
+.session-list-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    color: black;
+    margin: 15px 0;
+    padding: 8px 12px;
+    border-radius: 50px;
+    border: 1px solid grey;
+    box-shadow: 0px 0px 3px 1px darkslategrey;
+    -webkit-box-shadow: 0px 0px 3px 1px darkslategrey;
+    cursor: pointer;
+}
+.session-list-row:hover {
+    box-shadow: 0px 0px 5px 2px darkslategrey;
+    -webkit-box-shadow: 0px 0px 5px 2px darkslategrey;
+}
+.session-list-avatar {
     height: 40px;
     width: 40px;
     margin-right: 20px;

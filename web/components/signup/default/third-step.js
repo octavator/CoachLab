@@ -87,20 +87,21 @@ class DefaultThirdStep extends React.Component {
               <div className="select-input-autocomplete-container">
                 <TextInput extraClass="text-3 autocomplete-text-input" value={this.state.search_coach_name} placeholder="Nom du coach" 
                  onChange={(e) => { this.getMatchingCoaches(e) }} />
-                  <div className={"select-autocomplete-wrapper" + (this.state.show_coaches ? "" : " hidden")}>
+                  <div className={`select-autocomplete-wrapper ${this.state.show_coaches ? "" : "hidden"}`}>
                     {
-                      this.state.coaches.map((coach) => {
-                        return (
-                          <div key={coach.id} className="select-autocomplete-option text-3" onClick={() => {
-                             this.setState({
-                              search_coach_name: `${coach.firstname} ${coach.lastname}`,
-                              form: {...this.state.form, coaches: [coach.id]},
-                              show_coaches: false
-                            }) 
-                          }}>
-                            {`${coach.firstname} ${coach.lastname}`}
-                          </div>
-                      )})
+                      this.state.coaches.map((coach) => 
+                        <div
+                          key={coach.id}
+                          className="select-autocomplete-option text-3"
+                          onClick={() => 
+                          this.setState({
+                            search_coach_name: `${coach.firstname} ${coach.lastname}`,
+                            form: {...this.state.form, coaches: [coach.id]},
+                            show_coaches: false
+                          })} >
+                          {`${coach.firstname} ${coach.lastname}`}
+                        </div>
+                      )
                     }
                 
                  </div>

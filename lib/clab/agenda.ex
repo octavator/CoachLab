@@ -54,7 +54,10 @@ defmodule Agenda do
               new_resa = update_in(resa, ["coached_ids"], & &1 ++ new_res["coached_ids"])
               new_data = Map.put(old_data, new_res["id"], new_resa)
               :ets.insert(@table, {user_id, new_data})
-            _ -> :error
+            _ ->
+              new_resa = Map.put(resa, "sessionTitle", new_res["sessionTitle"])
+              new_data = Map.put(old_data, new_res["id"], new_resa)
+              :ets.insert(@table, {user_id, new_data})
           end
       end
       {:reply, res, state}

@@ -1,4 +1,5 @@
 import Navbar from './navbar.js'
+import Flash from './flash.js'
 import {TextInput, Button} from './forms/inputs.js'
 
 class MyCoaches extends React.Component {
@@ -21,7 +22,7 @@ class MyCoaches extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/me").then(userData => {
+    http.get("/api/me").then(userData => {
       http.get("/api/linked_users").then(myCoaches => {
         this.setState({user: userData.data, coaches: myCoaches.data})
       })
@@ -66,54 +67,53 @@ class MyCoaches extends React.Component {
     return (
       <div>
         <Navbar blue_bg={true} user={this.state.user} />
-        <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+        <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <div className="coach-list">
           <h1 className="page-title text-1">{this.state.user.role == "coach" ? "Vos coachés" : "Vos coachs"}</h1>
           <div className="coach-list-wrapper">
             {
-              this.state.coaches.map((coach, idx) => {
-                return (
-                  <div key={idx} onClick={() => {window.location.href = `/agenda?target_id=${coach.id}`}} className="coach-list-row">
-                    <div className="coach-list-avatar">
-                      <img className="round-avatar" 
-                        onError={({ currentTarget }) => {
-                          currentTarget.onerror = null; // prevents looping
-                          currentTarget.src="priv/static/images/avatar_placeholder.png";
-                        }}
-                        src={`priv/static/images/${coach.id}/avatar.${this.getImageExt(coach.avatar)}`}/>
-                    </div>
-                    <div className="coach-list-name text-2">{`${coach.firstname} ${coach.lastname}`}</div>
+              this.state.coaches.map((coach, idx) =>
+                <div key={idx} onClick={() => window.location.href = `/agenda?target_id=${coach.id}`} className="coach-list-row">
+                  <div className="coach-list-avatar">
+                    <img className="round-avatar" 
+                      onError={({ currentTarget }) => {
+                        currentTarget.onerror = null; // prevents looping
+                        currentTarget.src="priv/static/images/avatar_placeholder.png";
+                      }}
+                      src={`priv/static/images/${coach.id}/avatar.${this.getImageExt(coach.avatar)}`}/>
                   </div>
-                )
-              })
+                  <div className="coach-list-name text-2">{`${coach.firstname} ${coach.lastname}`}</div>
+                </div>
+              )
             }
           </div>
 
-          <div className={"add-coach-section " + (this.state.user.role == "coach" ? "hidden" : "")}>
+          <div className={`add-coach-section ${this.state.user.role == "coach" ? "hidden" : ""}`}>
             <h2 className="centered-text mt-2">Ajoutez un coach</h2>
             <div className="flex input-group inline">
               <div className="select-input-autocomplete-container mr-2">
-                <TextInput extraClass="text-3 autocomplete-text-input white-bg" value={this.state.search_coach_name} placeholder="Nom du coach" 
-                  onChange={(e) => { this.getMatchingCoaches(e) }} />
-                <div className={"select-autocomplete-wrapper" + (this.state.show_coaches ? "" : " hidden")}>
+                <TextInput extraClass="text-3 autocomplete-text-input white-bg" value={this.state.search_coach_name}
+                 placeholder="Nom du coach" onChange={(e) => this.getMatchingCoaches(e) } />
+                <div className={`select-autocomplete-wrapper ${this.state.show_coaches ? "" : "hidden"}`}>
                   {
-                    this.state.search_coaches.map((coach) => {
-                      return (
-                        <div key={coach.id} className="select-autocomplete-option text-3" onClick={() => {
-                          this.setState({
-                            search_coach_name: `${coach.firstname} ${coach.lastname}`,
-                            new_coach_id: coach.id,
-                            show_coaches: false
-                          }) 
-                        }}>
-                          {`${coach.firstname} ${coach.lastname}`}
-                        </div>
-                      )
-                    })
+                    this.state.search_coaches.map((coach) =>
+                      <div
+                        key={coach.id}
+                        className="select-autocomplete-option text-3" 
+                        onClick={() => {
+                        this.setState({
+                          search_coach_name: `${coach.firstname} ${coach.lastname}`,
+                          new_coach_id: coach.id,
+                          show_coaches: false
+                        }) 
+                      }}>
+                        {`${coach.firstname} ${coach.lastname}`}
+                      </div>
+                    )
                   }
                 </div>
               </div>
-              <Button extraClass="cl-button white-bg text-3" onClick={() => { this.addChosenCoach() }} text="Ajouter" />
+              <Button extraClass="cl-button white-bg text-3" onClick={() => this.addChosenCoach() } text="Ajouter" />
             </div>
           </div>
         </div>

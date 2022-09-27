@@ -1,4 +1,5 @@
 import Navbar from './components/navbar.js'
+import Flash from './components/flash.js'
 import {TextInput, Button} from './components/forms/inputs.js'
 
 
@@ -34,7 +35,7 @@ class Login extends React.Component {
     return (
       <div>
         <Navbar user={{}}/>
-        <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+        <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <h1 className="page-title">Connectez-vous</h1>
         <div className="login-content-wrapper infos-form">
           <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true} label="Adresse mail"

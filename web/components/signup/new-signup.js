@@ -1,10 +1,10 @@
-import {TextInput, FileInput} from "../forms/inputs.js"
 import FirstStep from "./first-step.js"
 import CoachSecondStep from "./coach/second-step.js"
 import DefaultSecondStep from "./default/second-step.js"
 import CoachThirdStep from "./coach/third-step.js"
 import DefaultThirdStep from "./default/third-step.js"
 import Navbar from "../../navbar.js"
+import Flash from "../../flash.js"
 
 class SignUp extends React.Component {
     constructor(props) {
@@ -14,7 +14,6 @@ class SignUp extends React.Component {
       const coach_id = urlParams.get("coach")
       let form = role && coach_id  && {role: role, coaches: [coach_id]} || {coaches: []}
       let step = role && 2 || 1
-      console.log(role)
       this.state = {
         form: form,
         steps: [1, 2, 3],
@@ -48,11 +47,10 @@ class SignUp extends React.Component {
       })
     }
     render() {
-      console.log("main form: ", this.state.form)
       return (
         <div className="clab-container">
           <Navbar blue_bg={this.state.step == 1 ? false : true} user={{}}/>
-          <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+          <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
           {
             this.state.step == 1 ? 
               <FirstStep showFlashMessage={this.showFlashMessage} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
@@ -71,7 +69,8 @@ class SignUp extends React.Component {
                     send_form={() => this.sendForm()} 
                     update_form={(data, is_complete) => { this.setStateForm(data, is_complete) }}
                     change_step={(new_step) => { this.setState({step: new_step}) }}
-                  />)                
+                  />
+              )
             )
           }
         </div>

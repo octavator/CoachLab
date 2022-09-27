@@ -11,7 +11,7 @@ class Landing extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/me").then(res => {
+    http.get("/api/me").then(res => {
       window.location.href = "/bienvenue"
     }).catch(e => console.log("not auth"))
 
@@ -61,7 +61,7 @@ class Landing extends React.Component {
           <div className="landing-picture-text-container">Se trouver.<br/>Ici et maintenant.</div>
         </div>
         {/* 2ND NAVBAR */}
-        <div className={"landing-intermediary-connection-header" + (this.state.show_navbar ? "" : " hidden")} >
+        <div className={`landing-intermediary-connection-header ${this.state.show_navbar ? "" : "hidden"}`} >
           <div className="landing-intermediary-logo" onClick={(e) => {window.scroll({top: 0, left: 0, behavior: 'smooth'})}}>
             <img className="landing-inline-logo" src="priv/static/images/logo.svg"/>
           </div>

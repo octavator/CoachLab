@@ -1,7 +1,10 @@
 import Modal from './modal.js'
 import Navbar from './navbar.js'
+import Flash from './flash.js'
 import scrollTo from '../utils.js'
 import {SelectInput, RadioButton, TextInput, Button} from './forms/inputs.js'
+
+//@TODO: allow to select a month from another year than current
 
 class Agenda extends React.Component {
   constructor(props) {
@@ -9,6 +12,7 @@ class Agenda extends React.Component {
     this.state = {
       new_resa_modal: false,
       can_edit_new_resa: true,
+      can_edit_new_resa_name: false,
       appointment_details_modal: false,
       target_id: undefined,
       schedule: {},
@@ -33,14 +37,14 @@ class Agenda extends React.Component {
     const target_id = urlParams.get("target_id")
     scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${this.state.day.getDate()})`)
     if (!target_id) {
-      http.get("/me/agenda").then(agendaData => {
+      http.get("/api/me/agenda").then(agendaData => {
         this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user})
       }).catch(err => {
         this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
       })
     } else {
-      http.get("/me").then(res => {
-        http.get(`/coach/agenda/${target_id}`).then(agendaData => {
+      http.get("/api/me").then(res => {
+        http.get(`/api/coach/agenda/${target_id}`).then(agendaData => {
           this.setState({
             target_user: agendaData.data.user,
             schedule: agendaData.data.agenda,
@@ -70,7 +74,8 @@ class Agenda extends React.Component {
   slotClickEvent(slot, slot_id) {
     if (this.getSlotClickableClass(slot) == "") return
     //my agenda
-    if (!this.state.target_id) return (slot && this.setState({appointment_details_modal: true, appointment_detailed: slot}))
+    if (!this.state.target_id) return (slot && this.setState({ appointment_details_modal: true, appointment_detailed: slot }))
+    // if (!this.state.target_id) return (slot && this.setState({appointment_details_modal: true, appointment_detailed: slot}))
     //my coach agenda
     if (!slot) this.setState({new_resa_modal: true, can_edit_new_resa: true, form: {...this.state.form, id: slot_id}})
     else this.setState({new_resa_modal: true, can_edit_new_resa: false, form: {...slot, id: slot_id}})
@@ -108,11 +113,28 @@ class Agenda extends React.Component {
       this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
     })
   }
-  getAppointmentTitle(slot) {
+  updateRes() {
+    console.log("update resa", {id: this.state.appointment_detailed.id,sessionTitle: this.state.appointment_detailed.sessionTitle})
+    http.post("/update-resa", {
+      id: this.state.appointment_detailed.id,
+      sessionTitle: this.state.appointment_detailed.sessionTitle
+    }).then(res => {
+      if (res.status != 200) return this.showFlashMessage("error", "Une erreur inconnue est survenue.")
+      let schedule = this.state.schedule
+      schedule[this.state.appointment_detailed.id] = this.state.appointment_detailed
+      this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
+      this.setState({schedule: schedule})  
+    })
+    .catch(err => {
+      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+    })
+  }
+  getAppointmentTitle(slot, coached_name) {
     if (!slot) return ""
     if (slot.isMulti) return (slot.sessionTitle != "" ? slot.sessionTitle : "Session de groupe")
-    if (this.state.target_id) return "Coaching individuel"
-    return `Session avec ${slot.coach_name || ""}`
+    if (this.state.target_id && !slot.coached_ids.includes(this.state.user.id)) return ""
+    // @TODO: if session non multi, get le seul coached ids & afficher son prénom + nom 
+    return `Session avec ${coached_name || ""}`
   }
   buildResaId(date, hour) {
     const resa_date = new Date(date)
@@ -120,7 +142,6 @@ class Agenda extends React.Component {
     return resa_date.toLocaleString('fr-FR', { timeZone: 'UTC' })
   }
   defaultForm() {
-    console.log("uh")
     return {
       duration: "60",
       isVideo: true,
@@ -131,10 +152,9 @@ class Agenda extends React.Component {
   }
   render() {
     let detailsForm = [
-      <div key="sessionTitle">
-        <div className="bold mt-1">Nom de la séance</div>
-        <div>{this.state.appointment_detailed.sessionTitle}</div>
-      </div>,
+      <TextInput value={this.state.appointment_detailed.sessionTitle} onChange={(e) => { 
+        this.setState({ appointment_detailed: {...this.state.appointment_detailed, sessionTitle: e} }) 
+      }} label="Nom de la séance" disabled={!this.state.user.role == "coach"} extraClass=" white-bg"/>,
       <div key="duration">
         <div className="bold mt-1">Durée:</div>
         <div>{this.state.appointment_detailed.duration + "min"}</div>
@@ -147,16 +167,21 @@ class Agenda extends React.Component {
         <div className="bold mt-1">Séance de groupe:</div>
         <div>{this.state.appointment_detailed.isMulti ? "Oui": "Non"}</div>
       </div>,
-      <div key="visioLink" className={"details-visioLink-section" + (this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden")  }>
-          <div className="bold mt-1">Lien de la visio-conférence:</div>
-          <div className="clab-link" onClick={() => { window.open(`${this.buildVideoId()}`, "_blank")}}>
-            {"Cliquez ici pour rejoindre"}
-          </div>
+      <div key="visioLink"
+       className={`details-visioLink-section ${this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
+        <div className="bold mt-1">Lien de la visio-conférence:</div>
+        <div className="clab-link" onClick={() => window.open(`${this.buildVideoId()}`, "_blank")}>
+          Cliquez ici pour rejoindre
+        </div>
+      </div>,
+      <div className="input-group">
+        <Button extraClass="cl-button mt-2" onClick={() => this.updateRes() } text="Editer" />
       </div>
+    
     ]
     let scheduleForm = [
       <TextInput value={this.state.form.sessionTitle} onChange={(e) => {this.setState({form: {...this.state.form, sessionTitle: e}}) }}
-        label="Nom de la séance" disabled={!this.state.can_edit_new_resa} extraClass=" white-bg" Placeholder="Session fitness débutants"/>,
+        label="Nom de la séance" disabled={!this.state.can_edit_new_resa && !this.state.can_edit_new_resa_name} extraClass=" white-bg" Placeholder="Session fitness pour débutants"/>,
       <SelectInput value={this.state.durations.find(d => d.value == this.state.form.duration).label} disabled={!this.state.can_edit_new_resa} 
         options={this.state.durations.map(duration => {return {label: duration.label, value: duration.value}} )}
         onClick={(e) => { this.setState({form: {...this.state.form, duration: e}}) }} label="Durée" />,
@@ -172,12 +197,12 @@ class Agenda extends React.Component {
     return (
       <div className="new-agenda-wrapper">
         <Navbar user={this.state.user} blue_bg={true} />
-        <Modal toggle={this.state.new_resa_modal} closeFunc={() => {this.setState({new_resa_modal: false, form: this.defaultForm()})}}
+        <Modal toggle={this.state.new_resa_modal} closeFunc={() => this.setState({new_resa_modal: false, form: this.defaultForm()})}
           fields={scheduleForm} title="Prendre un RDV" id="appointment"/>
-        <Modal toggle={this.state.appointment_details_modal} closeFunc={() => {this.setState({appointment_details_modal: false})}}
+        <Modal toggle={this.state.appointment_details_modal} closeFunc={() => this.setState({appointment_details_modal: false})}
             fields={detailsForm} title="Votre RDV" id="appointment-details"/>
-        <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
-        <h1 className={"page-title blue-bg " + (this.state.target_id ? "" : "hidden")}>
+        <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
+        <h1 className={`page-title blue-bg ${this.state.target_id ? "" : "hidden"}`}>
           Agenda de&nbsp;<span className="agenda-name-white">{this.state.target_user.firstname + ' ' + this.state.target_user.lastname}</span>
         </h1>
         <div className="new-agenda-container">
@@ -194,7 +219,7 @@ class Agenda extends React.Component {
               this_month_days.map((month_day, idx) => {
                 return (
                   <div key={idx} onClick={() => { this.setState({day: month_day}) } } 
-                   className={"new-agenda-header-month text-2 " + (this.state.day.getDate() == idx + 1 && this.state.day.getMonth() == this.state.month ? " selected" : "")} >
+                   className={`new-agenda-header-month text-2 ${this.state.day.getDate() == idx + 1 && this.state.day.getMonth() == this.state.month ? "selected" : ""}`} >
                     <div className="new-agenda-month-letter">{this.state.weekdays[month_day.getDay()].at(0).toUpperCase()}</div>
                     <div className="new-agenda-month-number">{month_day.getDate()}</div>
                   </div>
@@ -209,17 +234,20 @@ class Agenda extends React.Component {
               this.state.hours.map((hour, idx) => {
                 const slot_id = this.buildResaId(this.state.day, hour)
                 const slot = this.state.schedule[slot_id]
-                console.log(slot)
-                const appointment_message = this.getAppointmentTitle(slot)
+                let appointment_message = this.getAppointmentTitle(slot, ``)
+                http.get(`/api/user/${slot.coached_ids[0]}`)
+                .then(res => {
+                  appointment_message = this.getAppointmentTitle(slot, `${res.data.firstname} ${res.data.lastname}`)
+                })
                 return (
                   <div key={idx} className="hour-schedule">
                     <div className="hour-schedule-item text-2-5">{`${hour}:00`}</div>
                     <div className={"appointment-schedule-item text-2-5 " + 
                      (slot ? "reserved " : "empty ") + this.getSlotClickableClass(slot) }
-                     onClick={() => {this.slotClickEvent(slot, slot_id)}}>
+                     onClick={() => this.slotClickEvent(slot, slot_id)}>
                       <div>{appointment_message}</div>
-                      <div className={"appointment-pictos" + (slot && (slot.isMulti || !this.state.target_id) ? " " : " hidden")}>
-                        <div className="appointment-picto">
+                      <div className={`appointment-pictos ${slot && (slot.isMulti || !this.state.target_id) ? "" : "hidden"}`}>
+                        <div className={`appointment-picto ${slot && (slot.isMulti ? "multi" : "single")}`}>
                           <img src={`priv/static/images/${slot && slot.isMulti ? "session_groupe.svg" : "session_individuelle.svg"}`} />
                         </div>
                         <div className="appointment-picto video">

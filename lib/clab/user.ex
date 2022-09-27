@@ -1,6 +1,7 @@
 defmodule User do
   require Logger
   use GenServer
+
   @table :users
   @path 'data/users.ets'
 
@@ -29,7 +30,7 @@ defmodule User do
 
   def handle_call({:get_user, email}, _from, state) do
     users = :ets.tab2list(@table)
-    {_key, value} = users |> Enum.find(fn {_key, user} -> user.email == email end)
+    {_key, value} = Enum.find(users, fn {_key, user} -> user.email == email end)
     {:reply, value, state}
   end
 
@@ -44,28 +45,22 @@ defmodule User do
 
   def handle_call({:search_coach_by_name, name}, _from, state) do
     all_users = :ets.tab2list(@table)
-
-    matching_users =
+    matching_coaches =
       all_users
-      |> Enum.filter(fn {_key, user} ->
-        user.role == "coach" && Utils.equals_string(user.lastname, name)
-      end)
-      |> Enum.map(fn {_key, user} -> user |> User.format_user() end)
+      |> Enum.map(fn {_key, user} -> User.format_user(user) end)
+      |> Enum.filter(& &1.role == "coach" && Utils.equals_string(&1.lastname, name))
 
-    {:reply, matching_users, state}
+    {:reply, matching_coaches, state}
   end
 
   def handle_call({:create_user, data}, _from, state) do
-    data =
-      data
-      |> put_in(
-        [:id],
-        :crypto.strong_rand_bytes(32)
-        |> Base.url_encode64(padding: false)
-        |> String.replace("/", "-")
-        |> String.replace("+", "_")
-      )
+    id = 
+      :crypto.strong_rand_bytes(32)
+      |> Base.url_encode64(padding: false)
+      |> String.replace("/", "-")
+      |> String.replace("+", "_")
 
+    data = Map.put(data, :id, id)
     true = :ets.insert_new(@table, {data.id, data})
     Agenda.create_agenda(data.id)
     {:reply, data, state}
@@ -74,28 +69,25 @@ defmodule User do
   def handle_call({:edit_user, {id, data}}, _from, state) do
     [{_key, old_data}] = :ets.lookup(@table, id)
     new_data = Map.merge(old_data, data)
-    res = IO.inspect(:ets.insert(@table, {id, new_data}))
+    res = :ets.insert(@table, {id, new_data})
     {:reply, res, state}
   end
 
   def handle_call({:delete_user, id}, _from, state) do
-    res = IO.inspect(:ets.delete(@table, id))
+    res = :ets.delete(@table, id)
     {:reply, res, state}
   end
 
   def handle_call({:get_linked_users, user_id}, _from, state) do
     try do
       [{_key, user}] = :ets.lookup(@table, user_id)
-
       data =
         case user.role do
           "coach" ->
             get_coached_users(user[:id])
-
           _ ->
             get_coaching_users(user[:coaches])
         end
-
       {:reply, data, state}
     rescue
       e -> 
@@ -133,26 +125,19 @@ defmodule User do
 
   def create_user(data) do
     all_users = :ets.tab2list(@table)
-
-    email_already_used =
-      !is_nil(all_users |> Enum.find(fn {_key, user} -> user.email == data[:email] end))
-
+    email_already_used = Enum.find(all_users, fn {_key, user} -> user.email == data[:email] end)
     cond do
-      email_already_used ->
+      !is_nil(email_already_used) ->
         :email_already_used
-
       !data[:email] || !data[:password] ->
         :error
-
       true ->
         salt = :rand.uniform() |> to_string |> Base.encode16()
         hashed_pwd = hash_password(data[:password], salt)
-
         updated_data =
-          put_in(data, [:password], hashed_pwd)
-          |> put_in([:salt], salt)
+          Map.put(data, :password, hashed_pwd)
+          |> Map.put(:salt, salt)
           |> Map.delete(:password_check)
-
         GenServer.call(__MODULE__, {:create_user, updated_data})
     end
   end
@@ -174,21 +159,24 @@ defmodule User do
   end
 
   def hash_password(password, salt) do
-    :crypto.hash(:sha256, salt <> password) |> Base.encode16()
+    :crypto.hash(:sha256, salt <> password)
+    |> Base.encode16()
   end
 
-  def create_coach_user() do
+  def create_default_coach_user() do
     User.create_user(%{
       email: "theodecagny@hotmail.fr",
       firstname: "Theophile",
       lastname: "de Cagny",
       password: "azeUIRE$6823z9EZZ",
-      role: "coach"
+      role: "coach",
+      coached_ids: [],
+      session_price: "50"
     })
   end
 
   def format_user(user) do
-    user |> Map.take([:firstname, :lastname, :email, :id, :role, :avatar, :coaches])
+    Map.take(user, [:firstname, :lastname, :email, :id, :role, :avatar, :coaches])
   end
 
   def get_coached_users(coach_id) do
@@ -199,17 +187,17 @@ defmodule User do
         Enum.member?(List.wrap(user[:coaches]), coach_id)
       end)
       |> Enum.map(fn {_key, user} ->
-         user |> User.format_user()
-       end)    
+        User.format_user(user)
+      end)
   end
   def get_coaching_users(coaches_id) do
     all_users = :ets.tab2list(@table)
     all_users
-      |> Enum.filter(fn {_key, user} ->
-        Enum.member?(coaches_id, user[:id])
-      end)
-      |> Enum.map(fn {_key, user} ->
-         user |> User.format_user()
-       end)    
+    |> Enum.filter(fn {_key, user} ->
+      Enum.member?(coaches_id, user[:id])
+    end)
+    |> Enum.map(fn {_key, user} ->
+      User.format_user(user)
+    end)
   end
 end

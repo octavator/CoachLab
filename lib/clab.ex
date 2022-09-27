@@ -61,7 +61,7 @@ defmodule ClabRouter do
     send_resp(conn, 200, data)
   end
 
-  get "/me" do
+  get "/api/me" do
     id = check_token_user(conn)
     if !is_nil(id) do
       user = User.get_user_by_id(id)
@@ -77,7 +77,7 @@ defmodule ClabRouter do
     end
   end
 
-  get "/me/agenda" do
+  get "/api/me/agenda" do
     id = check_token_user(conn)
     if !is_nil(id) do
       user = User.get_user_by_id(id)
@@ -89,7 +89,7 @@ defmodule ClabRouter do
     end
   end
 
-  get "/coach/agenda/:target_id" do
+  get "/api/coach/agenda/:target_id" do
     id = check_token_user(conn)
     if !is_nil(id) do
       Logger.debug("coach id = #{target_id}")
@@ -143,6 +143,16 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       data = Utils.get_html_template("my_coaches")
+      send_resp(conn, 200, data)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  get "/mes_sessions" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      data = Utils.get_html_template("my_sessions")
       send_resp(conn, 200, data)
     else
       send_resp(conn, 401, "Token invalide")
@@ -315,13 +325,14 @@ defmodule ClabRouter do
     end
   end
 
+  #@TODO: envoie de mail si le RDV n'est pas pris par un coaché, pastille sur agenda coach si c'est pas payé,
   post "/new-resa" do
     id = check_token_user(conn)
     if !is_nil(id) do
       user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       {status_code, ret_text} = cond do
-        user.email == body.user_id -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
+        user.id == body.user_id -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
         true ->
           coach = User.get_user_by_id(body.user_id)
           payload = Map.merge(body.resa, %{
@@ -337,6 +348,19 @@ defmodule ClabRouter do
           end
       end
       send_resp(conn, status_code, ret_text)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  post "/update-resa" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      user = User.get_user_by_id(id)
+      body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+      payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle}
+      Agenda.update_agenda(user.id, %{body.id => payload})
+      send_resp(conn, 200, "RDV mis à jour.")
     else
       send_resp(conn, 401, "Token invalide")
     end

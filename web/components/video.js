@@ -27,7 +27,7 @@ class ClabVideo extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/me/agenda").then(agendaData => {
+    http.get("/api/me/agenda").then(agendaData => {
       //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
       let resId = this.state.roomId.split("+")[0]
       let resa = agendaData.data.agenda[resId]
@@ -142,8 +142,8 @@ class ClabVideo extends React.Component {
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <div className="video">
           <div className="video-wrapper">
-            <div className={"local-media-video " + (this.state.sendVideo ? "" : "black-bg")}>
-              <div id="local-media" className={"local-media " + (this.state.sendVideo ? "" : "transparent")} style={{}} />
+            <div className={`local-media-video ${this.state.sendVideo ? "" : "black-bg"}`}>
+              <div id="local-media" className={`local-media ${this.state.sendVideo ? "" : "transparent"}`} style={{}} />
             </div>
             { this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => 
               <div key={`${track.name}`}>
@@ -151,7 +151,7 @@ class ClabVideo extends React.Component {
               </div>
             ) }
             { this.state.tracks.filter(track => track.kind == "video").map((track, idx) => 
-              <div key={`${track.name}`} className={"participant-block" + (track.disabled ? " hidden" : "")}>
+              <div key={`${track.name}`} className={`participant-block ${track.disabled ? "hidden" : ""}`}>
                 <div id={`remote-video-${idx}`} className="remote-video" style={{}} />                
               </div>
             ) }
@@ -163,7 +163,7 @@ class ClabVideo extends React.Component {
             <div onClick={() => {this.toggleVideo()}} className="cl-button ml-2">
               { this.state.sendVideo ? "Désactiver Vidéo" : "Activer Vidéo"}
             </div>
-            <div onClick={() => {this.startVideoLive()}} className={"cl-button ml-2"  + (this.state.hasJoined ? " hidden" : "")}>
+            <div onClick={() => {this.startVideoLive()}} className={`cl-button ml-2 ${this.state.hasJoined ? "hidden" : ""}`}>
               Rejoindre la réunion
             </div>
           </div>

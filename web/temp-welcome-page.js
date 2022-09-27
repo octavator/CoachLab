@@ -1,4 +1,6 @@
 import Navbar from './components/navbar.js'
+import Flash from './components/flash.js'
+
 import {TextInput, Button} from "./components/forms/inputs.js"
 
 class TempWelcomePage extends React.Component {
@@ -13,7 +15,7 @@ class TempWelcomePage extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/me").then(res => {
+    http.get("/api/me").then(res => {
       this.setState({user: res.data})
     })
     .catch(err => {
@@ -41,14 +43,14 @@ class TempWelcomePage extends React.Component {
     return (
       <div className="login-wrapper">
         <Navbar user={this.state.user}/>
-        <div className={"flash-message text-3 " + (this.state.showFlash ? ` ${this.state.flashType}` : " hidden")} >{this.state.flashMessage}</div>
+        <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <h1 className="page-title welcome-page-title text-1">Vous êtes bien inscrit sur CoachLab !</h1>
         <div className="welcome-page-content text-2">
           Votre inscription a bien été prise en compte. <br/><br/>
           Vous serez prévenu par mail dès que la plateforme ouvrira officiellement ses portes.<br/><br/>
           Merci pour votre intérêt et à très bientôt sur CoachLab !
         </div>
-        <div className={"invite-mail-block " + (this.state.user.role == "coach" ? `` : " hidden")} >
+        <div className={`invite-mail-block ${this.state.user.role == "coach" ? `` : " hidden"}`} >
           <TextInput type="email" extraClass="text-3 white-bg" required={true} value={this.state.inviteMail} 
             onChange={(e) => { this.setState({inviteMail: e}) }} name="invite_mail" placeholder="Invitez votre coaché" />
           <Button extraClass="text-3" onClick={() => { this.sendInviteMail()}} text="Suivant"/>
