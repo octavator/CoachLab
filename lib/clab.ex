@@ -93,12 +93,28 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       Logger.debug("coach id = #{target_id}")
-      agenda = Agenda.get_agenda(target_id) |> Map.new(fn {k, v} ->
-        {k, Map.take(v, ["id", "coach_id", "coached_ids", "isMulti", "isVideo", "duration", "sessionTitle"])}
-      end)
+      agenda = Agenda.get_agenda(target_id)
       user = User.get_user_by_id(target_id)
       data = %{agenda: agenda, user: user} |> Poison.encode!
       send_resp(conn, 200, data)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  get "/api/reservation/:resa_id" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      user = User.get_user_by_id(id)
+      reservation = Reservation.get_reservation(resa_id)
+      reservation = if user.role == "coach" do
+        reservation
+      else
+        coached_ids = Enum.filter(reservation["coached_ids"], & &1 == id)
+        Map.take(reservation, ["isMulti", "isVideo", "id", "coach_id"])
+        |> Map.put(["coached_ids"], coached_ids)
+      end
+      send_resp(conn, 200, reservation |> Poison.encode!)
     else
       send_resp(conn, 401, "Token invalide")
     end
@@ -336,14 +352,14 @@ defmodule ClabRouter do
         true ->
           coach = User.get_user_by_id(body.user_id)
           payload = Map.merge(body.resa, %{
-            "coach_id" => body.user_id,
-            "coach_name" => "#{coach.firstname} #{coach.lastname}",
-            "user_name" => user.lastname
+            "coach_id" => coach.id,
+            "coach_name" => "#{coach.firstname} #{coach.lastname}"
           })
-          case Agenda.update_agenda(user.id, %{body.id => payload}) do
+          case Agenda.update_agenda(user.id, %{body.id => body.resa["id"]}) do
             :error -> {400, "Une erreur est survenue durant la reservation."}
             _ ->
-              Agenda.update_agenda(coach.id, %{body.id => payload}, true)
+              Reservation.create_reservation(body.resa["id"], payload)
+              Agenda.update_agenda(coach.id, %{body.id => body.resa["id"]})
               {200, "Votre rendez-vous a bien été enregistré."}
           end
       end
@@ -359,7 +375,7 @@ defmodule ClabRouter do
       user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle}
-      Agenda.update_agenda(user.id, %{body.id => payload})
+      Reservation.update_reservation(user.id, %{body.id => payload})
       send_resp(conn, 200, "RDV mis à jour.")
     else
       send_resp(conn, 401, "Token invalide")

@@ -22,6 +22,8 @@ class Agenda extends React.Component {
       showFlash: false,
       flashType: '',
       flashMessage: '',
+      coached_users: {},
+      reservations: {},
       appointment_detailed: {},
       form: this.defaultForm(),
       user: {firstname: "", lastname: ""},
@@ -50,7 +52,7 @@ class Agenda extends React.Component {
             schedule: agendaData.data.agenda,
             target_id: target_id,
             user: res.data,
-            form: {...this.state.form, coached_ids: [res.data.id]}
+            form: {...this.state.form}
           })
         }).catch(err => {
           this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
@@ -75,14 +77,13 @@ class Agenda extends React.Component {
     if (this.getSlotClickableClass(slot) == "") return
     //my agenda
     if (!this.state.target_id) return (slot && this.setState({ appointment_details_modal: true, appointment_detailed: slot }))
-    // if (!this.state.target_id) return (slot && this.setState({appointment_details_modal: true, appointment_detailed: slot}))
     //my coach agenda
     if (!slot) this.setState({new_resa_modal: true, can_edit_new_resa: true, form: {...this.state.form, id: slot_id}})
     else this.setState({new_resa_modal: true, can_edit_new_resa: false, form: {...slot, id: slot_id}})
   }
   buildVideoId() {
     return (!this.state.appointment_detailed.id ? undefined
-     : `/video?roomId=${encodeURIComponent(this.state.appointment_detailed.id + "+" + this.state.appointment_detailed.coach_id)}`)
+     : `/video?roomId=${encodeURIComponent(this.state.appointment_detailed.id)}`)
   }
   getSelectedYear(idx) {
     const today = new Date()
@@ -98,9 +99,10 @@ class Agenda extends React.Component {
     return (is_clickable ? " clickable" : "")
   }
   resNewSlot() {
+    let ids = this.state.user.role == "coach" ? [] : [this.state.user.id]
     http.post("/new-resa", {
       id: this.state.form.id,
-      resa: this.state.form,
+      resa: {...this.state.form, coached_ids: ids},
       user_id: this.state.target_user.id
     }).then(res => {
       if (res.status != 200) return this.showFlashMessage("error", "Une erreur inconnue est survenue.")
@@ -129,17 +131,18 @@ class Agenda extends React.Component {
       this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
     })
   }
-  getAppointmentTitle(slot, coached_name) {
+  getAppointmentTitle(slot) {
     if (!slot) return ""
     if (slot.isMulti) return (slot.sessionTitle != "" ? slot.sessionTitle : "Session de groupe")
     if (this.state.target_id && !slot.coached_ids.includes(this.state.user.id)) return ""
     // @TODO: if session non multi, get le seul coached ids & afficher son prénom + nom 
-    return `Session avec ${coached_name || ""}`
+    return `Session avec ${slot.coached_ids.includes(this.state.user.id) && "vous" || this.state.coached_users[slot.coached_ids[0]]}`
   }
   buildResaId(date, hour) {
     const resa_date = new Date(date)
     resa_date.setHours(hour, 0, 0)
-    return resa_date.toLocaleString('fr-FR', { timeZone: 'UTC' })
+    const coach_id = this.state.target_id ? this.state.target_id : this.state.user.id
+    return `${resa_date.toLocaleString('fr-FR', { timeZone: 'UTC' })}+${coach_id}`
   }
   defaultForm() {
     return {
@@ -147,7 +150,7 @@ class Agenda extends React.Component {
       isVideo: true,
       isMulti: false,
       sessionTitle: "",
-      id: ""
+      id: "",
     }
   }
   render() {
@@ -233,17 +236,26 @@ class Agenda extends React.Component {
             {
               this.state.hours.map((hour, idx) => {
                 const slot_id = this.buildResaId(this.state.day, hour)
-                const slot = this.state.schedule[slot_id]
-                let appointment_message = this.getAppointmentTitle(slot, ``)
-                http.get(`/api/user/${slot.coached_ids[0]}`)
-                .then(res => {
-                  appointment_message = this.getAppointmentTitle(slot, `${res.data.firstname} ${res.data.lastname}`)
-                })
+                const resa_id = this.state.schedule[slot_id]
+                //get resa and display
+                if (resa_id && !this.state.reservations[resa_id]) {
+                  http.get(`/api/reservation/${encodeURIComponent(resa_id)}`)
+                  .then(res => {
+                    if (!res.data.isMulti) {
+                      http.get(`/user/${res.data.coached_ids[0]}`).then(user_data => {
+                        this.setState({coached_users: {...this.state.coached_users, [res.data.coached_ids[0]]: `${user_data.data.firstname} ${user_data.data.lastname}`}})
+                      })
+                    }
+                    this.setState({reservations: {...this.state.reservations, [resa_id]: res.data}})
+                  })
+                } 
+                let slot = this.state.reservations[resa_id]
+                let appointment_message = this.getAppointmentTitle(slot)
                 return (
                   <div key={idx} className="hour-schedule">
                     <div className="hour-schedule-item text-2-5">{`${hour}:00`}</div>
                     <div className={"appointment-schedule-item text-2-5 " + 
-                     (slot ? "reserved " : "empty ") + this.getSlotClickableClass(slot) }
+                     (resa_id ? "reserved " : "empty ") + this.getSlotClickableClass(resa_id) }
                      onClick={() => this.slotClickEvent(slot, slot_id)}>
                       <div>{appointment_message}</div>
                       <div className={`appointment-pictos ${slot && (slot.isMulti || !this.state.target_id) ? "" : "hidden"}`}>

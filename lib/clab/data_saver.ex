@@ -4,6 +4,7 @@ defmodule DataSaver do
   @backup_path 'data/backup/'
   @backup_interval 1 #hours
   @backup_days 30 #after that we delete backups
+  @tables [:users, :agendas, :reservations]
 
   def start_link(args \\ []) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -16,8 +17,7 @@ defmodule DataSaver do
 
   def handle_info(:tick, state) do
     Logger.info("[ETS] Data Backup now in progress")
-    tables = [:users, :agendas]
-    backup(tables)
+    backup(@tables)
     clean_backups()
     Process.send_after(__MODULE__, :tick, 1000 * 60 * 60 * @backup_interval)
     {:noreply, state}

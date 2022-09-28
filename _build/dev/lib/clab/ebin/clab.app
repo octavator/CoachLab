@@ -7,7 +7,7 @@
                         'Elixir.Clab.Application','Elixir.Clab.AuthPlug',
                         'Elixir.Clab.Mailer','Elixir.ClabRouter',
                         'Elixir.DataSaver','Elixir.ImageMover','Elixir.Jwt',
-                        'Elixir.User','Elixir.Utils']},
+                        'Elixir.Reservation','Elixir.User','Elixir.Utils']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.Clab.Application',[]}}]}.

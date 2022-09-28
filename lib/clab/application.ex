@@ -23,6 +23,7 @@ defmodule Clab.Application do
     children = cowboy_children ++ [
       User,
       Agenda,
+      Reservation,
       DataSaver,
       ImageMover
     ]

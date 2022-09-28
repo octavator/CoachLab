@@ -29,14 +29,15 @@ class ClabVideo extends React.Component {
   componentDidMount() {
     http.get("/api/me/agenda").then(agendaData => {
       //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
-      let resId = this.state.roomId.split("+")[0]
-      let resa = agendaData.data.agenda[resId]
+      // let resId = this.state.roomId.split("+")[0]
+      //@TODO: check resa is paid for current user id or user_id == coach_id
+      // let resa_id = agendaData.data.agenda[resId]
       //@TODO: Gérer room type en créant la room plutot que ad hoc connect
-      let roomType = resa.isMulti ? "group": "go"
+      // let roomType = resa.isMulti ? "group": "go"
       if (Video.isSupported) {
         http.get("/video-token").then(token => {
           Video.createLocalVideoTrack().then(track => document.getElementById('local-media').appendChild(track.attach()))
-          this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data, roomType: roomType})
+          this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data})
         })
       } else this.showFlashMessage("error", "Votre navigateur actuel n'est pas compatible avec notre module vidéo.")
     }).catch(err => {
@@ -68,8 +69,7 @@ class ClabVideo extends React.Component {
     Video.connect(this.state.token, {
       name: this.state.roomId,
       audio: {name: `audio+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`},
-      video: {name: `video+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`},
-      type: this.state.roomType
+      video: {name: `video+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`}
     })
     .then(room => {
       room.participants.forEach(participant => this.getRemoteTracks(participant))

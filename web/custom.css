@@ -123,6 +123,9 @@ img {
 .pl-2 {
     padding-left: 20px;
 }
+.inline-flex {
+    display: inline-flex;
+}
 .flex {
     display: flex;
 }
@@ -1447,6 +1450,10 @@ a {
     max-width: 260px;
     height: 80px;
     cursor: pointer;
+}
+
+.footer-linkedin {
+    width: 2vw;
 }
 
 .welcome-page-content {

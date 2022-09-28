@@ -41,25 +41,10 @@ defmodule Agenda do
       {:reply, res, state}
     end
 
-    def handle_call({:update_agenda, {user_id, data, append }}, _from, state) do
-      [{_key, old_data}]  = :ets.lookup(@table, user_id)
-      new_res = data |> Map.values() |> List.first
-      res = case old_data[new_res["id"]] do
-        nil ->
-          new_data = Map.merge(old_data, data)
-          :ets.insert(@table, {user_id, new_data})
-        resa ->
-          case append do
-            true ->
-              new_resa = update_in(resa, ["coached_ids"], & &1 ++ new_res["coached_ids"])
-              new_data = Map.put(old_data, new_res["id"], new_resa)
-              :ets.insert(@table, {user_id, new_data})
-            _ ->
-              new_resa = Map.put(resa, "sessionTitle", new_res["sessionTitle"])
-              new_data = Map.put(old_data, new_res["id"], new_resa)
-              :ets.insert(@table, {user_id, new_data})
-          end
-      end
+    def handle_call({:update_agenda, {user_id, data}}, _from, state) do
+      [{_key, old_data}] = :ets.lookup(@table, user_id)
+      new_data = Map.merge(old_data, data)
+      res = :ets.insert(@table, {user_id, new_data})
       {:reply, res, state}
     end
 
@@ -80,8 +65,8 @@ defmodule Agenda do
       GenServer.call(__MODULE__, {:delete_agenda, user_id})
     end
 
-    def update_agenda(user_id, data, append \\ false) do
-      GenServer.call(__MODULE__, {:update_agenda, {user_id, data, append}})
+    def update_agenda(user_id, data) do
+      GenServer.call(__MODULE__, {:update_agenda, {user_id, data}})
     end
 
     def clean_agendas() do
