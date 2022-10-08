@@ -44,6 +44,7 @@ defmodule Reservation do
     def handle_call({:update_reservation, {id, data}}, _from, state) do
       [{_key, old_data}] = :ets.lookup(@table, id)
       new_data = Map.merge(old_data, data)
+      IO.inspect(new_data, label: "new_data")
       res = :ets.insert(@table, {id, new_data})
       {:reply, res, state}
     end

@@ -110,8 +110,8 @@ defmodule ClabRouter do
       reservation = if user.role == "coach" do
         reservation
       else
-        coached_ids = Enum.filter(reservation["coached_ids"], & &1 == id)
-        Map.take(reservation, ["isMulti", "isVideo", "id", "coach_id"])
+        coached_ids = Enum.filter(List.wrap(reservation["coached_ids"]), & &1 == id)
+        Map.take(reservation, ["isMulti", "isVideo", "id", "coach_id", "coach_name", "duration", "sessionTitle"])
         |> Map.put(["coached_ids"], coached_ids)
       end
       send_resp(conn, 200, reservation |> Poison.encode!)
@@ -353,6 +353,7 @@ defmodule ClabRouter do
           coach = User.get_user_by_id(body.user_id)
           payload = Map.merge(body.resa, %{
             "coach_id" => coach.id,
+            "coach_avatar" => coach[:avatar],
             "coach_name" => "#{coach.firstname} #{coach.lastname}"
           })
           case Agenda.update_agenda(user.id, %{body.id => body.resa["id"]}) do
@@ -372,10 +373,11 @@ defmodule ClabRouter do
   post "/update-resa" do
     id = check_token_user(conn)
     if !is_nil(id) do
-      user = User.get_user_by_id(id)
+      #@TODO: check user has rights on this resa
+      #user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle}
-      Reservation.update_reservation(user.id, %{body.id => payload})
+      Reservation.update_reservation(body.id, payload)
       send_resp(conn, 200, "RDV mis à jour.")
     else
       send_resp(conn, 401, "Token invalide")

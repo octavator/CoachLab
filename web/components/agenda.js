@@ -116,16 +116,14 @@ class Agenda extends React.Component {
     })
   }
   updateRes() {
-    console.log("update resa", {id: this.state.appointment_detailed.id,sessionTitle: this.state.appointment_detailed.sessionTitle})
     http.post("/update-resa", {
       id: this.state.appointment_detailed.id,
       sessionTitle: this.state.appointment_detailed.sessionTitle
-    }).then(res => {
+    })
+    .then(res => {
       if (res.status != 200) return this.showFlashMessage("error", "Une erreur inconnue est survenue.")
-      let schedule = this.state.schedule
-      schedule[this.state.appointment_detailed.id] = this.state.appointment_detailed
       this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
-      this.setState({schedule: schedule})  
+      this.setState({reservations: {...reservations, [key]: this.state.appointment_detailed}})  
     })
     .catch(err => {
       this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
@@ -135,7 +133,6 @@ class Agenda extends React.Component {
     if (!slot) return ""
     if (slot.isMulti) return (slot.sessionTitle != "" ? slot.sessionTitle : "Session de groupe")
     if (this.state.target_id && !slot.coached_ids.includes(this.state.user.id)) return ""
-    // @TODO: if session non multi, get le seul coached ids & afficher son prénom + nom 
     return `Session avec ${slot.coached_ids.includes(this.state.user.id) && "vous" || this.state.coached_users[slot.coached_ids[0]]}`
   }
   buildResaId(date, hour) {
@@ -237,6 +234,10 @@ class Agenda extends React.Component {
               this.state.hours.map((hour, idx) => {
                 const slot_id = this.buildResaId(this.state.day, hour)
                 const resa_id = this.state.schedule[slot_id]
+                console.log(slot_id, "slot_id")
+                console.log(this.state.schedule, "agenda")
+                console.log(this.state.reservations, "resas")
+                console.log(resa_id, "resa_id")
                 //get resa and display
                 if (resa_id && !this.state.reservations[resa_id]) {
                   http.get(`/api/reservation/${encodeURIComponent(resa_id)}`)

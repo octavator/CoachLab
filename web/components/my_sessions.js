@@ -1,7 +1,6 @@
 import Navbar from './navbar.js'
 import Modal from './modal.js'
 import Flash from './flash.js'
-import {TextInput, Button} from './forms/inputs.js'
 
 class MySessions extends React.Component {
   constructor(props) {
@@ -16,6 +15,7 @@ class MySessions extends React.Component {
       flashType: '',
       flashMessage: '',
       search_input: "",
+      reservations: [],
       agenda: {},
       appointment_detailed: {},
       appointment_details_modal: false
@@ -23,7 +23,15 @@ class MySessions extends React.Component {
   }
   componentDidMount() {
     http.get("/api/me/agenda").then(res => {
-      this.setState({user: res.data.user, agenda: res.data.agenda})
+      this.setState({user: res.data.user, agenda: res.data.agenda}, () => {
+        let ids = Object.values(this.state.agenda)
+        ids.forEach(id => {
+          http.get(`/api/reservation/${encodeURIComponent(id)}`).then(res => {
+            this.setState({reservations: [...this.state.reservations, res.data]})
+          })
+        })
+        
+      })
     }).catch(err => {
       this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
     })
@@ -41,12 +49,12 @@ class MySessions extends React.Component {
     console.log(this.state.agenda)
     let detailsForm = [
       <div key="sessionTitle">
-        <div className="bold mt-1">Nom de la séance</div>
+        <div className="bold mt-1">Nom de la séance:</div>
         <div>{this.state.appointment_detailed.sessionTitle}</div>
       </div>,
       <div key="duration">
         <div className="bold mt-1">Durée:</div>
-        <div>{this.state.appointment_detailed.duration + "min"}</div>
+        <div>{this.state.appointment_detailed.duration + " min"}</div>
       </div>,
       <div key="isVideo">
         <div className="bold mt-1">Visio-conférence:</div>
@@ -74,8 +82,10 @@ class MySessions extends React.Component {
           <h1 className="page-title text-1">{"Vos sessions"}</h1>
           <div className="session-list-wrapper">
             {
-              Object.values(this.state.agenda).map((session, idx) => 
-                <div key={idx} onClick={() => this.setState({appointment_details_modal: true, appointment_detailed: session}) } className="session-list-row">
+              this.state.reservations.map((resa, idx) => 
+              {
+                console.log(resa)
+                return <div key={idx} onClick={() => this.setState({appointment_details_modal: true, appointment_detailed: resa}) } className="session-list-row">
                   <div className="session-list-avatar">
                     <img className="round-avatar" 
                       onError={({ currentTarget }) => {
@@ -84,8 +94,9 @@ class MySessions extends React.Component {
                       }}
                       src="priv/static/images/avatar_placeholder.png"/>
                   </div>
-                  <div className="session-list-name text-2">{`${session.name || "Session coaching"} avec ${session.coach_name}`}</div>
+                  <div className="session-list-name text-2">{`${resa.name || "Session coaching"} avec ${resa.coach_name}`}</div>
                 </div>
+              }
               )
               // src={`priv/static/images/${session.coach_id}/avatar.${this.getImageExt(session.avatar)}`}/>
             }

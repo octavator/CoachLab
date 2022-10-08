@@ -29,3 +29,7 @@ be found at [https://hexdocs.pm/clab](https://hexdocs.pm/clab).
 
 to compile changes to js & html
 ```npm run build```
+
+# renew certificates
+
+```certbot renew``` génère un fichier privkey.pem et fullchain.pem dont le contenu est à copier dans les fichiers privkey.pem et certificate.pem à la racine du repo quand on docker build
