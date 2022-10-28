@@ -126,6 +126,9 @@ img {
 .inline-flex {
     display: inline-flex;
 }
+.flex-column {
+    flex-direction: column;
+}
 .flex {
     display: flex;
 }
@@ -144,6 +147,26 @@ a {
 .hidden {
     display: none !important;
 }
+
+.green-check {
+    background-color: rgb(26, 142, 26);
+}
+
+
+.red-cross {
+    background-color: rgb(184, 18, 18);
+}
+
+.round-icon {
+    width: 2vw;
+    height: 2vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    color: white;
+}
+
 
 .clab-container {
     height: 100%;
@@ -261,6 +284,11 @@ a {
     -webkit-box-shadow: 0px 0px 6px 1px darkslategrey;
     border: none;
     outline: none;
+}
+
+.cl-input[disabled] {
+    background-color: #d3d3d357;
+    cursor: not-allowed;
 }
 
 .cl-form-input {
@@ -660,7 +688,7 @@ a {
 }
 
 .flash-message.success{
-    background-color: lightgreen;
+    background-color: rgb(144, 188, 238);
 }
 
 .flash-message.error{
@@ -825,9 +853,11 @@ a {
     padding: 12px 24px;
 }
 
-/* .menu-section .menu-item:hover {
-    color: white;
-} */
+.menu-section .menu-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 .menu-dropdown-list {
     position: absolute;
@@ -1421,18 +1451,9 @@ a {
 .footer-text {
     margin-left: 35px;
 }
-.footer-link:hover {
-    background: white;
-    padding: 12px 18px;
-    cursor: pointer;
-    border-radius: 30px;
-    color: #318ce7;
-}
-
 .contact-mail {
     font-weight: bold;
 }
-
 .footer-wrapper {
     height: 100%;
     width: 100%;
@@ -1440,18 +1461,15 @@ a {
     flex-direction: column;
     justify-content: space-around;
 }
-
 .footer-white-logo {
     display: flex;
     margin-left: 20px;
 }
-
 .footer-white-logo-image {
     max-width: 260px;
     height: 80px;
     cursor: pointer;
 }
-
 .footer-linkedin {
     width: 2vw;
 }
@@ -1550,6 +1568,23 @@ a {
     }
     .landing-info-card-picto-img {
         width: 50%;
+    }
+    .round-icon {
+        height: 3vh;
+        width: 3vh;
+    }
+    .session-list-name {
+        flex-shrink: 12;
+    }
+    .menu-item.user-dropdown {
+        max-width: 30%;
+    }
+    .navbar-logo-section {
+        min-width: 75px;
+        width: 25%;
+    } 
+    .navbar-logo-section .logo-wrapper {
+        width: auto;
     }
 }
 

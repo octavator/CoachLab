@@ -1,1 +1,1 @@
-var http=axios.create({baseURL:window.location.origin,timeout:3000});
+const http=axios.create({baseURL:window.location.origin,timeout:3000});

@@ -25,6 +25,8 @@ defmodule Clab.MixProject do
       {:mailibex, github: "kbrw/mailibex", branch: "master"},
       {:gen_smtp, "~> 1.1.1"},
       {:joken, "~> 2.4"},
+      {:httpoison, "~> 1.8"},
+      {:hackney, "~> 1.17"}
     ]
   end
 end

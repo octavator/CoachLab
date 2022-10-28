@@ -14,9 +14,9 @@ class Navbar extends React.Component {
     return (
       <div className={`navbar-wrapper ${this.props.blue_bg ? "blue-bg" : ""}`}>
         <div className="navbar-logo-section">
-          <div onClick={() => window.location.href = "/"} className="logo-wrapper">
+          <a href="/" class="logo-wrapper">
             <img src={`priv/static/images/${this.props.blue_bg ? "logo_blanc.svg" : "logo.svg"}`}/>
-          </div>
+          </a>
         </div>
 
         {

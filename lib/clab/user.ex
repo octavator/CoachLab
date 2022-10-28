@@ -4,6 +4,7 @@ defmodule User do
 
   @table :users
   @path 'data/users.ets'
+  @secret "Pa4z=7lfce2bHh$3W2ma2zlpe6ez!0r"
 
   def start_link(args \\ []) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -163,32 +164,18 @@ defmodule User do
     |> Base.encode16()
   end
 
-  def create_default_coach_user() do
-    User.create_user(%{
-      email: "theodecagny@hotmail.fr",
-      firstname: "Theophile",
-      lastname: "de Cagny",
-      password: "azeUIRE$6823z9EZZ",
-      role: "coach",
-      coached_ids: [],
-      session_price: "50"
-    })
-  end
-
   def format_user(user) do
-    Map.take(user, [:firstname, :lastname, :email, :id, :role, :avatar, :coaches])
+    Map.take(user, [:firstname, :lastname, :email, :id, :role, :avatar, :coaches, :session_price, :price_id])
   end
 
   def get_coached_users(coach_id) do
-    all_users = :ets.tab2list(@table)
-    Logger.info("looking for coached users  by #{coach_id} in user list")
-    all_users
-      |> Enum.filter(fn {_key, user} ->
-        Enum.member?(List.wrap(user[:coaches]), coach_id)
-      end)
-      |> Enum.map(fn {_key, user} ->
-        User.format_user(user)
-      end)
+    :ets.tab2list(@table)
+    |> Enum.filter(fn {_key, user} ->
+      Enum.member?(List.wrap(user[:coaches]), coach_id)
+    end)
+    |> Enum.map(fn {_key, user} ->
+      User.format_user(user)
+    end)
   end
   def get_coaching_users(coaches_id) do
     all_users = :ets.tab2list(@table)
@@ -200,4 +187,26 @@ defmodule User do
       User.format_user(user)
     end)
   end
+
+  def change_password(password, token) do    
+    decoded_token = Base.decode64!(token, padding: false)
+    @secret <> user_email = decoded_token
+    user = User.get_all_user_info(user_email)
+    hashed_password = hash_password(password, user.salt)
+    User.edit_user(user.id, %{password: hashed_password})
+  end
+
+  def create_reset_hash(user_email) do
+    Base.encode64(@secret <> user_email, padding: false)
+  end
 end
+
+#  User.create_user(%{
+#   email: "theodecagny@hotmail.fr",
+#   firstname: "Theophile",
+#   lastname: "de Cagny",
+#   password: "azeUIRE$6823z9EZZ",
+#   role: "coach",
+#   coached_ids: [],
+#   session_price: "50"
+# })

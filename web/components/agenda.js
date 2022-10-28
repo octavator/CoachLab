@@ -1,4 +1,5 @@
 import Modal from './modal.js'
+import ShowResaModal from './modals/show_resa.js'
 import Navbar from './navbar.js'
 import Flash from './flash.js'
 import scrollTo from '../utils.js'
@@ -37,12 +38,14 @@ class Agenda extends React.Component {
   componentDidMount() {
     const urlParams = new URLSearchParams(document.location.search)
     const target_id = urlParams.get("target_id")
-    scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${this.state.day.getDate()})`)
+    const nth_child = Math.max(this.state.day.getDate() - 3, 0)
+
+    scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${nth_child})`)
     if (!target_id) {
       http.get("/api/me/agenda").then(agendaData => {
         this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user})
       }).catch(err => {
-        this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+        this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
       })
     } else {
       http.get("/api/me").then(res => {
@@ -55,10 +58,10 @@ class Agenda extends React.Component {
             form: {...this.state.form}
           })
         }).catch(err => {
-          this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+          this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
         })
       }).catch(err => {
-        this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+        this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
       })
     }
   }
@@ -81,10 +84,6 @@ class Agenda extends React.Component {
     if (!slot) this.setState({new_resa_modal: true, can_edit_new_resa: true, form: {...this.state.form, id: slot_id}})
     else this.setState({new_resa_modal: true, can_edit_new_resa: false, form: {...slot, id: slot_id}})
   }
-  buildVideoId() {
-    return (!this.state.appointment_detailed.id ? undefined
-     : `/video?roomId=${encodeURIComponent(this.state.appointment_detailed.id)}`)
-  }
   getSelectedYear(idx) {
     const today = new Date()
     let is_next_year = idx > 11 && this.state.year <= today.getFullYear()
@@ -102,31 +101,19 @@ class Agenda extends React.Component {
     let ids = this.state.user.role == "coach" ? [] : [this.state.user.id]
     http.post("/new-resa", {
       id: this.state.form.id,
+      //@TODO: coach doit pouvoir prendre lui meme rdv pour qqun
+      coached_user: this.state.user.id,
       resa: {...this.state.form, coached_ids: ids},
       user_id: this.state.target_user.id
     }).then(res => {
       if (res.status != 200) return this.showFlashMessage("error", "Une erreur inconnue est survenue.")
-      let schedule = this.state.schedule
-      schedule[this.state.form.id] = this.state.form
+      let schedule = {...this.state.schedule, [this.state.form.id]: this.state.form.id}
+      let reservations = {...this.state.reservations, [this.state.form.id]: {...this.state.form, coached_ids: ids}}
       this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
-      this.setState({schedule: schedule})  
+      this.setState({schedule: schedule, reservations: reservations, new_resa_modal: false, form: this.defaultForm()})  
     })
     .catch(err => {
-      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
-    })
-  }
-  updateRes() {
-    http.post("/update-resa", {
-      id: this.state.appointment_detailed.id,
-      sessionTitle: this.state.appointment_detailed.sessionTitle
-    })
-    .then(res => {
-      if (res.status != 200) return this.showFlashMessage("error", "Une erreur inconnue est survenue.")
-      this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
-      this.setState({reservations: {...reservations, [key]: this.state.appointment_detailed}})  
-    })
-    .catch(err => {
-      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err.response && err?.response?.data  || "Une erreur inattendue est survenue.")
     })
   }
   getAppointmentTitle(slot) {
@@ -151,34 +138,6 @@ class Agenda extends React.Component {
     }
   }
   render() {
-    let detailsForm = [
-      <TextInput value={this.state.appointment_detailed.sessionTitle} onChange={(e) => { 
-        this.setState({ appointment_detailed: {...this.state.appointment_detailed, sessionTitle: e} }) 
-      }} label="Nom de la séance" disabled={!this.state.user.role == "coach"} extraClass=" white-bg"/>,
-      <div key="duration">
-        <div className="bold mt-1">Durée:</div>
-        <div>{this.state.appointment_detailed.duration + "min"}</div>
-      </div>,
-      <div key="isVideo">
-        <div className="bold mt-1">Visio-conférence:</div>
-        <div>{this.state.appointment_detailed.isVideo ? "Oui": "Non"}</div>
-      </div>,
-      <div key="isMulti">
-        <div className="bold mt-1">Séance de groupe:</div>
-        <div>{this.state.appointment_detailed.isMulti ? "Oui": "Non"}</div>
-      </div>,
-      <div key="visioLink"
-       className={`details-visioLink-section ${this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
-        <div className="bold mt-1">Lien de la visio-conférence:</div>
-        <div className="clab-link" onClick={() => window.open(`${this.buildVideoId()}`, "_blank")}>
-          Cliquez ici pour rejoindre
-        </div>
-      </div>,
-      <div className="input-group">
-        <Button extraClass="cl-button mt-2" onClick={() => this.updateRes() } text="Editer" />
-      </div>
-    
-    ]
     let scheduleForm = [
       <TextInput value={this.state.form.sessionTitle} onChange={(e) => {this.setState({form: {...this.state.form, sessionTitle: e}}) }}
         label="Nom de la séance" disabled={!this.state.can_edit_new_resa && !this.state.can_edit_new_resa_name} extraClass=" white-bg" Placeholder="Session fitness pour débutants"/>,
@@ -190,7 +149,7 @@ class Agenda extends React.Component {
       <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
         label="Séance de groupe ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
       <div className="input-group">
-        <Button extraClass="cl-button mt-2" onClick={() => { this.resNewSlot() ; this.setState({new_resa_modal: false, form: this.defaultForm()}) }} text="Valider" />
+        <Button extraClass="cl-button mt-2" onClick={() => { this.resNewSlot() }} text="Valider" />
       </div>
     ]
     const this_month_days = this.getAllDaysInMonth(this.state.month, this.state.year)
@@ -199,8 +158,9 @@ class Agenda extends React.Component {
         <Navbar user={this.state.user} blue_bg={true} />
         <Modal toggle={this.state.new_resa_modal} closeFunc={() => this.setState({new_resa_modal: false, form: this.defaultForm()})}
           fields={scheduleForm} title="Prendre un RDV" id="appointment"/>
-        <Modal toggle={this.state.appointment_details_modal} closeFunc={() => this.setState({appointment_details_modal: false})}
-            fields={detailsForm} title="Votre RDV" id="appointment-details"/>
+        <ShowResaModal toggle={this.state.appointment_details_modal} closeFunc={() => this.setState({appointment_details_modal: false})}
+         user={this.state.user} appointment_detailed={this.state.appointment_detailed}
+         showFlashMessage={(e, m) => this.showFlashMessage(e, m)} updateResa={(resa) => {this.setState({appointment_details_modal: false, reservations: {...this.state.reservations, [resa.id]: resa}})}}/>
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <h1 className={`page-title blue-bg ${this.state.target_id ? "" : "hidden"}`}>
           Agenda de&nbsp;<span className="agenda-name-white">{this.state.target_user.firstname + ' ' + this.state.target_user.lastname}</span>
@@ -234,16 +194,11 @@ class Agenda extends React.Component {
               this.state.hours.map((hour, idx) => {
                 const slot_id = this.buildResaId(this.state.day, hour)
                 const resa_id = this.state.schedule[slot_id]
-                console.log(slot_id, "slot_id")
-                console.log(this.state.schedule, "agenda")
-                console.log(this.state.reservations, "resas")
-                console.log(resa_id, "resa_id")
-                //get resa and display
                 if (resa_id && !this.state.reservations[resa_id]) {
                   http.get(`/api/reservation/${encodeURIComponent(resa_id)}`)
                   .then(res => {
                     if (!res.data.isMulti) {
-                      http.get(`/user/${res.data.coached_ids[0]}`).then(user_data => {
+                      http.get(`/api/user/${res.data.coached_ids[0]}`).then(user_data => {
                         this.setState({coached_users: {...this.state.coached_users, [res.data.coached_ids[0]]: `${user_data.data.firstname} ${user_data.data.lastname}`}})
                       })
                     }
@@ -251,6 +206,7 @@ class Agenda extends React.Component {
                   })
                 } 
                 let slot = this.state.reservations[resa_id]
+                let is_paid = (slot && slot.paid || []).length >= (slot && slot.coached_ids || []).length
                 let appointment_message = this.getAppointmentTitle(slot)
                 return (
                   <div key={idx} className="hour-schedule">
@@ -268,7 +224,11 @@ class Agenda extends React.Component {
                         </div>
                       </div>
                     </div>
-                  </div>
+                    <div className="appointment-payment flex flex-center">
+                      <div className={`green-check round-icon ml-1 ${!slot || !is_paid  ? " hidden" : ""}`}><i className="fa fa-check" aria-hidden="true"/></div>
+                      <div className={`red-cross round-icon ml-1 ${is_paid ? " hidden" : ""}`}><i className="fa fa-times" aria-hidden="true"/></div>
+                      </div>
+                    </div>
                 )
               })
             }

@@ -19,7 +19,7 @@ class TempWelcomePage extends React.Component {
       this.setState({user: res.data})
     })
     .catch(err => {
-      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   sendInviteMail() {
@@ -31,7 +31,7 @@ class TempWelcomePage extends React.Component {
       } else this.showFlashMessage("error", "Une erreur est survenue lors de l'envoi.")
     })
     .catch(err => {
-      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {

@@ -2,6 +2,7 @@ import Config
 
 config :clab,
   env: :dev,
+  url: "http://localhost:4001",
   test_key: "test value",
   region: "email-smtp.eu-west-1.amazonaws.com",
   access_key: "AKIA6L3JFYZIQWKZOPXX",
@@ -15,6 +16,13 @@ config :clab,
     sid: "SKed2b73fe00dff7739b4eb7a75ef06066",
     secret: "BdTj70ASVynmNuUWYWraE35imHVqyEcF",
     name: "clab-test"
+  },
+  stripe: %{
+    url: "https://api.stripe.com/v1/",
+    test_sid: "pk_test_51LK7W0DPLkquZzcad6zgw8FB7qrjWzcZstCLnaqCsht6n1QELcIvNXbpUA7EkCfdU226HrNKNoSUAXVJiBAveRXl00sZzpzTHO",
+    test_secret: "sk_test_51LK7W0DPLkquZzca1QxqnYrijHZKdn2k8ACuTlBfwTFkjfhO1c4VIRJzeMtqofmX2c32nCqQg4gg1Gr1qdEjI8Ep00RNMs6YDp",
+    test_mode: true,
+    live_secret: "sk_azerty"
   }
 
 import_config "#{config_env()}.exs"

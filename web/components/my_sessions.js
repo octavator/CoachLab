@@ -1,5 +1,5 @@
 import Navbar from './navbar.js'
-import Modal from './modal.js'
+import ShowResaModal from './modals/show_resa.js'
 import Flash from './flash.js'
 
 class MySessions extends React.Component {
@@ -17,6 +17,7 @@ class MySessions extends React.Component {
       search_input: "",
       reservations: [],
       agenda: {},
+      payment_link: "",
       appointment_detailed: {},
       appointment_details_modal: false
     }
@@ -33,7 +34,7 @@ class MySessions extends React.Component {
         
       })
     }).catch(err => {
-      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
@@ -41,42 +42,25 @@ class MySessions extends React.Component {
       setTimeout(() => this.setState({showFlash: false}), 5000)
     })
   }
-  buildVideoId() {
-    return (!this.state.appointment_detailed.id ? undefined
-     : `/video?roomId=${encodeURIComponent(this.state.appointment_detailed.id + "+" + this.state.appointment_detailed.coach_id)}`)
+  showResaModal(resa) {
+    if (resa.paid?.includes(this.state.user.id)) return this.setState({ appointment_details_modal: true, appointment_detailed: resa})
+    http.get(`/api/payment_link/${encodeURIComponent(resa.id)}`).then(res => {
+      this.setState({ payment_link: res.data, appointment_details_modal: true, appointment_detailed: resa})
+      }).catch(err => {
+      this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+    })
+  }
+  getImageExt(filepath) {
+    if (!filepath) return ""
+    const tokens = filepath.split(".")
+    return tokens[tokens.length - 1]
   }
   render() {
-    console.log(this.state.agenda)
-    let detailsForm = [
-      <div key="sessionTitle">
-        <div className="bold mt-1">Nom de la séance:</div>
-        <div>{this.state.appointment_detailed.sessionTitle}</div>
-      </div>,
-      <div key="duration">
-        <div className="bold mt-1">Durée:</div>
-        <div>{this.state.appointment_detailed.duration + " min"}</div>
-      </div>,
-      <div key="isVideo">
-        <div className="bold mt-1">Visio-conférence:</div>
-        <div>{this.state.appointment_detailed.isVideo ? "Oui": "Non"}</div>
-      </div>,
-      <div key="isMulti">
-        <div className="bold mt-1">Séance de groupe:</div>
-        <div>{this.state.appointment_detailed.isMulti ? "Oui": "Non"}</div>
-      </div>,
-      <div key="visioLink"
-       className={`details-visioLink-section ${this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
-        <div className="bold mt-1">Lien de la visio-conférence:</div>
-        <div className="clab-link" onClick={() => window.open(`${this.buildVideoId()}`, "_blank")}>
-          Cliquez ici pour rejoindre
-        </div>
-      </div>
-    ]
     return (
       <div>
         <Navbar blue_bg={true} user={this.state.user} />
-        <Modal toggle={this.state.appointment_details_modal} closeFunc={() => this.setState({appointment_details_modal: false})}
-          fields={detailsForm} title="Votre RDV" id="appointment-details" />
+        <ShowResaModal toggle={this.state.appointment_details_modal} closeFunc={() => this.setState({appointment_details_modal: false})} updateResa={() => {}}
+         user={this.state.user} appointment_detailed={this.state.appointment_detailed} payment_link={this.state.payment_link} showFlashMessage={this.showFlashMessage}/>
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <div className="session-list">
           <h1 className="page-title text-1">{"Vos sessions"}</h1>
@@ -84,21 +68,22 @@ class MySessions extends React.Component {
             {
               this.state.reservations.map((resa, idx) => 
               {
-                console.log(resa)
-                return <div key={idx} onClick={() => this.setState({appointment_details_modal: true, appointment_detailed: resa}) } className="session-list-row">
+                let is_paid = (resa.paid || []).includes(this.state.user.id)
+                return <div key={idx} onClick={() => this.showResaModal(resa) } className="session-list-row">
                   <div className="session-list-avatar">
                     <img className="round-avatar" 
                       onError={({ currentTarget }) => {
                         currentTarget.onerror = null; // prevents looping
                         currentTarget.src="priv/static/images/avatar_placeholder.png";
                       }}
-                      src="priv/static/images/avatar_placeholder.png"/>
+                      src={`priv/static/images/${resa.coach_id}/${resa.coach_avatar}`}/>
                   </div>
                   <div className="session-list-name text-2">{`${resa.name || "Session coaching"} avec ${resa.coach_name}`}</div>
+                  <div className={`green-check round-icon ml-2 ${!is_paid ? " hidden" : ""}`}><i className="fa fa-check" aria-hidden="true"/></div>
+                  <div className={`red-cross round-icon ml-2 ${is_paid ? " hidden" : ""}`}><i className="fa fa-times" aria-hidden="true"/></div>
                 </div>
               }
               )
-              // src={`priv/static/images/${session.coach_id}/avatar.${this.getImageExt(session.avatar)}`}/>
             }
           </div>
         </div>

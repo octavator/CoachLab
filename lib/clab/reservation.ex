@@ -51,7 +51,28 @@ defmodule Reservation do
 
     def handle_call({:add_coached_id, {id, coached_id}}, _from, state) do
       [{_key, resa}] = :ets.lookup(@table, id)
-      resa = update_in(resa[:coached_ids], & [&1 | coached_id])
+      resa = update_in(resa, ["coached_ids"], fn coached_ids -> Enum.uniq(List.wrap(coached_ids) ++ [coached_id]) end)
+      res = :ets.insert(@table, {id, resa})
+      {:reply, res, state}
+    end
+
+    def handle_call({:confirm_payment, {id, coached_id}}, _from, state) do
+      [{_key, resa}] = :ets.lookup(@table, id)
+      resa = update_in(resa, ["paid"], fn payments -> Enum.uniq(List.wrap(payments) ++ [coached_id]) end)
+      :ets.insert(@table, {id, resa})
+      {:reply, resa, state}
+    end
+
+    def handle_call({:cancel_resa, {id, coached_id}}, _from, state) do
+      [{_key, resa}] = :ets.lookup(@table, id)
+      resa = update_in(resa, ["coached_ids"], & Enum.reject(&1, fn id -> id == coached_id end))
+      Agenda.update_agenda(coached_id, %{resa.id => nil})
+      resa = if (length(resa[:coached_ids]) == 0) do
+        Agenda.update_agenda(resa.coach_id, %{resa.id => nil})
+        nil
+      else
+        resa
+      end
       res = :ets.insert(@table, {id, resa})
       {:reply, res, state}
     end
@@ -77,8 +98,15 @@ defmodule Reservation do
       GenServer.call(__MODULE__, {:update_reservation, {id, data}})
     end
 
+    def cancel_resa(id, coached_id) do
+      GenServer.call(__MODULE__, {:cancel_resa, {id, coached_id}})
+    end
+
     def add_coached_id(id, coached_id) do
       GenServer.call(__MODULE__, {:add_coached_id, {id, coached_id}})
+    end
+    def confirm_payment(id, coached_id) do
+      GenServer.call(__MODULE__, {:confirm_payment, {id, coached_id}})
     end
 
     def clean_reservations() do

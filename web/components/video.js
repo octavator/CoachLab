@@ -27,7 +27,6 @@ class ClabVideo extends React.Component {
     }
   }
   componentDidMount() {
-    window.addEventListener('beforeunload', this.leaveRoomIfJoined);
     http.get("/api/me/agenda").then(agendaData => {
       //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
       // let resId = this.state.roomId.split("+")[0]
@@ -42,7 +41,7 @@ class ClabVideo extends React.Component {
         })
       } else this.showFlashMessage("error", "Votre navigateur actuel n'est pas compatible avec notre module vidéo.")
     }).catch(err => {
-      this.showFlashMessage("error", err.response && err.response.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err.response && err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
@@ -50,14 +49,10 @@ class ClabVideo extends React.Component {
       setTimeout(() => { this.setState({showFlash: false})}, 5000)
     })
   }
-  leaveRoomIfJoined() {
-    if (this.state.room) this.state.room.disconnect()
-  }
   getRemoteTracks(participant) {
     participant.tracks.forEach(publication => {
       if (publication.track) {
         let tracks = [...this.state.tracks]
-        // let tracks = [...this.state.tracks].filter(track => { console.log(new_track.name, track.name) ;track.name != new_track.name })
         this.setState({tracks: tracks.concat([publication.track])})
       }
     })
@@ -80,12 +75,9 @@ class ClabVideo extends React.Component {
       room.on('participantConnected', participant => this.getRemoteTracks(participant))
       room.on('participantDisconnected',
         (participant) => {
-          console.log(Array.from(participant.tracks.keys()), "tracks to delete")
           let new_tracks = [...this.state.tracks].filter(track => !Array.from(participant.tracks.keys()).includes(track.sid))
           //@TODO: flash message when someone leaves
-          console.log("tracks", this.state.tracks)
           this.setState({tracks: new_tracks})
-          console.log("participant disconencted ! ", participant)
         })
       if (!this.state.sendAudio) {
         room.localParticipant.audioTracks.forEach(publication => {
@@ -144,9 +136,6 @@ class ClabVideo extends React.Component {
     this.attachTracks("audio")
   }
   render() {
-    // @TODO: tester puis repliquer le component Flash sur les autres pages
-    // this.showFlashMessage("error", "coucou ca marche ?")
-
     //@TODO: when more than 4 ppl in room, only show the coach's video
     console.log(this.state.tracks, "tracks")
     return (

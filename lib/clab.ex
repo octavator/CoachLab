@@ -28,7 +28,7 @@ defmodule ClabRouter do
 
   #@TODO: replace auth checks with a custom plug
   #@TODO: add expiration to token (1 month ?)
-  #@TODO: auto delete of very old backups and tmp_files
+  #@TODO: auto delete of very old tmp_files
 
   def build_token(id) do
     (id <> "|" <> :crypto.hash(:sha256, @secret <> id))
@@ -66,7 +66,7 @@ defmodule ClabRouter do
     if !is_nil(id) do
       user = User.get_user_by_id(id)
       if !is_nil(user) do
-        data = Map.take(user, [:role, :phone, :lastname, :firstname, :id, :email])
+        data = Map.take(user, [:role, :phone, :lastname, :firstname, :id, :email, :avatar, :session_price])
         {:ok, user_data} = data |> Poison.encode
         send_resp(conn, 200, user_data)
       else
@@ -83,6 +83,25 @@ defmodule ClabRouter do
       user = User.get_user_by_id(id)
       agenda = Agenda.get_agenda(user.id)
       data = %{agenda: agenda, user: user} |> Poison.encode!
+      send_resp(conn, 200, data)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  # post "/stripe_webhooks" do
+  #   body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+
+  #   if body.type == "checkout.session.completed", do: IO.inspect(body)
+  #   send_resp(conn, 200, "ok")
+  # end
+
+  get "/payment_success" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      resa_id = conn.query_params["id"] |> URI.decode()
+      Reservation.confirm_payment(resa_id, id)
+      data = Utils.get_html_template("payment_success")
       send_resp(conn, 200, data)
     else
       send_resp(conn, 401, "Token invalide")
@@ -111,10 +130,23 @@ defmodule ClabRouter do
         reservation
       else
         coached_ids = Enum.filter(List.wrap(reservation["coached_ids"]), & &1 == id)
-        Map.take(reservation, ["isMulti", "isVideo", "id", "coach_id", "coach_name", "duration", "sessionTitle"])
+        Map.take(reservation, ["isMulti", "isVideo", "id", "coach_id", "coach_name", "duration", "sessionTitle", "paid"])
         |> Map.put(["coached_ids"], coached_ids)
       end
       send_resp(conn, 200, reservation |> Poison.encode!)
+    else
+      send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  get "/api/payment_link/:resa_id" do
+    id = check_token_user(conn)
+    if !is_nil(id) do
+      resa_id = resa_id |> URI.decode()
+      reservation = Reservation.get_reservation(resa_id)
+      coach = User.get_user_by_id(reservation["coach_id"])
+      res = Stripe.create_payment_link(coach[:price_id], id, resa_id)
+      send_resp(conn, 200, res["url"] |> Poison.encode!)
     else
       send_resp(conn, 401, "Token invalide")
     end
@@ -195,7 +227,12 @@ defmodule ClabRouter do
   end
 
   get "/profil" do
-    data = Utils.get_html_template("user_profile")
+    data = Utils.get_html_template("profile")
+    send_resp(conn, 200, data)
+  end
+
+  get "/infos" do
+    data = Utils.get_html_template("user_infos")
     send_resp(conn, 200, data)
   end
 
@@ -236,7 +273,6 @@ defmodule ClabRouter do
 
   get "/coach/search" do
     coach_name = conn.query_params["coach_name"] |> URI.decode()
-    Logger.debug("coach search: #{coach_name}")
     users = User.search_coach_by_name(coach_name)  |> Poison.encode!
     send_resp(conn, 200, users)
   end
@@ -333,7 +369,9 @@ defmodule ClabRouter do
       {status_code, ret_text} = cond do
         edit_ret == :error -> {400, "Erreur durant le changement de vos informations."}
         existing_user  -> {400, "Cette adresse mail est déjà utilisée."}
-        true ->  {200, "Vos informations ont été mis à jour."}
+        true ->
+          if (body[:session_price] && body[:session_price] != user[:session_price]), do: Stripe.create_product_price(Map.put(user, :session_price, body.session_price))
+          {200, "Vos informations ont été mis à jour."}
       end
       send_resp(conn, status_code, ret_text)
     else
@@ -345,18 +383,17 @@ defmodule ClabRouter do
   post "/new-resa" do
     id = check_token_user(conn)
     if !is_nil(id) do
-      user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       {status_code, ret_text} = cond do
-        user.id == body.user_id -> {400, "Erreur: Vous ne pouvez prendre un rendez-vous avec vous-même."}
         true ->
           coach = User.get_user_by_id(body.user_id)
           payload = Map.merge(body.resa, %{
             "coach_id" => coach.id,
             "coach_avatar" => coach[:avatar],
-            "coach_name" => "#{coach.firstname} #{coach.lastname}"
+            "coach_name" => "#{coach.firstname} #{coach.lastname}",
+            #@TODO si pris par user, delete resa au bout d'une heure si pas payéé ?
           })
-          case Agenda.update_agenda(user.id, %{body.id => body.resa["id"]}) do
+          case Agenda.update_agenda(body.coached_user, %{body.id => body.resa["id"]}) do
             :error -> {400, "Une erreur est survenue durant la reservation."}
             _ ->
               Reservation.create_reservation(body.resa["id"], payload)
@@ -397,10 +434,9 @@ defmodule ClabRouter do
     end
   end
 
-  get "/user/:user_id" do
+  get "/api/user/:user_id" do
     id = check_token_user(conn)
     if !is_nil(id) do
-      Logger.debug("get user id: #{user_id}")
       user = User.get_user_by_id(user_id)  |> Poison.encode!
       send_resp(conn, 200, user)
     else
@@ -408,7 +444,31 @@ defmodule ClabRouter do
     end
   end
 
- #forward "/users", to: UsersRouter
+  get "/nouveau-mot-de-passe" do
+    data = Utils.get_html_template("new_password")
+    send_resp(conn, 200, data)
+  end
+
+  get "/mot-de-passe-oublie" do
+    data = Utils.get_html_template("forgotten_password")
+    send_resp(conn, 200, data)
+  end
+
+  get "/api/send_password_reset" do
+    mail = conn.query_params["mail"] |> URI.decode()
+    hash = User.create_reset_hash(mail)
+    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/forgotten-password.html.eex", hash: hash)
+    Task.start(fn -> Clab.Mailer.send_mail([mail], "Ré-initialisez votre mot de passe CoachLab", content) end)
+    send_resp(conn, 200, "OK")
+  end
+
+  post "/api/change_password" do
+    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    User.change_password(body.password, body.token)
+    send_resp(conn, 200, "OK")
+  end
+
+  #forward "/users", to: UsersRouter
 
   match _ do
     send_resp(conn, 404, "Erreur 404: page introuvable")

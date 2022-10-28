@@ -36,6 +36,7 @@ class TextInput extends React.Component {
            value={this.props.value}
            type={this.props.type || "text"}
            onChange={(e) => this.props.onChange(e.target.value)}
+           onKeyDown={(e) => this.props.onKeyDown && this.props.onKeyDown(e)}
           />
         </div>
       </div>              

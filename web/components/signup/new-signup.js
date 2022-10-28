@@ -32,7 +32,7 @@ class SignUp extends React.Component {
       })
       .catch(err => {
         console.log(err.response)
-        this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+        this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
       })
     }
     setStateForm(new_form, is_complete = false) {

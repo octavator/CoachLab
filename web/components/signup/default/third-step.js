@@ -19,7 +19,7 @@ class DefaultThirdStep extends React.Component {
     const urlParams = new URLSearchParams(document.location.search)
     const coach_id = urlParams.get("coach")
     if (coach_id) {
-      http.get(`/user/${coach_id}`).then(res => {
+      http.get(`/api/user/${coach_id}`).then(res => {
         console.log(res.status)
         console.log(res.data)
         if (res.status == 200) this.setState({
@@ -42,7 +42,7 @@ class DefaultThirdStep extends React.Component {
       })
       .catch(err => {
         console.log(err.response)
-        this.props.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+        this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
       })
     }
     this.setState({search_coach_name: input})
@@ -50,7 +50,8 @@ class DefaultThirdStep extends React.Component {
   uploadFile(e) {
     console.log(e)
     const formData = new FormData()
-    const filename = `avatar_${this.props.user_form.lastname}_${e.name}`.replace(" ", "-")
+    // const filename = `avatar_${this.props.user_form.lastname}_${e.name}`.replace(" ", "-")
+    const filename = `avatar_${this.props.user_form.lastname}`.replace(" ", "-").replace("/","")
     formData.append("myFile", e, filename)
     fetch("/inscription/file", {
       body: formData,
@@ -70,7 +71,7 @@ class DefaultThirdStep extends React.Component {
   }
   sendForm() {
     if (this.validate()) {
-      this.props.update_form(this.state.form, true)
+      this.props.update_form({...this.state.form, coaches: this.state.form.coaches || []}, true)
     }
   }
   render() {

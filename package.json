@@ -9,8 +9,8 @@
   },
   "scripts": {
     "start": "iex -S mix",
-    "watch": "npx babel --watch web --presets react-app/prod --out-dir priv/static",
-    "build": " mix webcopy && npx babel web --presets react-app/prod --minified --out-dir priv/static && mix compile"
+    "watch": "npx babel --watch web --presets @babel/preset-env --out-dir priv/static",
+    "build": " mix webcopy && npx babel web --presets  @babel/preset-react --minified --out-dir priv/static && mix compile"
   },
   "repository": {
     "type": "git",
@@ -24,11 +24,13 @@
   },
   "homepage": "https://github.com/octavator/CoachLab#readme",
   "dependencies": {
-    "axios": "^0.24.0",
-    "babel-cli": "^6.26.0",
-    "babel-preset-react-app": "^3.1.2"
+    "@babel/core": "^7.12.1",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.1",
+    "axios": "^0.24.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.19.3",
     "webpack-cli": "^4.9.1"
   }
 }

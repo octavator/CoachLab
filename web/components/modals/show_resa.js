@@ -1,0 +1,84 @@
+import Modal from '../modal.js'
+import {TextInput, Button} from '../forms/inputs.js'
+
+class ShowResaModal extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      sessionTitle: this.props.appointment_detailed?.sessionTitle || "",
+      appointment_detailed: {}
+    }
+  }
+  componentDidUpdate(prevProps) {
+    if (prevProps.appointment_detailed !== this.props.appointment_detailed) {
+      this.setState({sessionTitle: this.props.appointment_detailed?.sessionTitle});
+    }
+  }
+  buildVideoId() {
+    return (!this.props.appointment_detailed.id ? undefined
+     : `/video?roomId=${encodeURIComponent(this.props.appointment_detailed.id)}`)
+  }
+  updateResa() {
+    http.post("/update-resa", {
+      id: this.props.appointment_detailed.id,
+      sessionTitle: this.state.sessionTitle
+    })
+    .then(res => {
+      if (res.status != 200) return this.props.showFlashMessage("error", "Une erreur inconnue est survenue.")
+      this.props.updateResa({...this.props.appointment_detailed, sessionTitle: this.state.sessionTitle})
+      this.props.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
+    })
+    .catch(err => {
+      this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+    })
+  }
+  render() {
+    let fields = [
+      <div key="sessionTitle">
+        <TextInput value={this.state.sessionTitle} onChange={(e) => {this.setState({sessionTitle: e}) }}
+          label="Nom de la séance:" bold_label="true" disabled={this.props.appointment_detailed.coach_id != this.props.user.id} extraClass=" white-bg" Placeholder="Thème de la session"/>,
+      </div>,
+      <div key="duration">
+        <div className="bold mt-1">Durée:</div>
+        <div>{this.props.appointment_detailed.duration + " min"}</div>
+      </div>,
+      <div key="isVideo">
+        <div className="bold mt-1">Visio-conférence:</div>
+        <div>{this.props.appointment_detailed.isVideo ? "Oui": "Non"}</div>
+      </div>,
+      <div className={this.props.appointment_detailed.isVideo ? "hidden" : ""} key="adresse">
+        <div className="bold mt-1">Lieu:</div>
+        <div>{this.props.appointment_detailed.address}</div>
+      </div>,    
+      <div key="isMulti">
+        <div className="bold mt-1">Séance de groupe:</div>
+        <div>{this.props.appointment_detailed.isMulti ? "Oui": "Non"}</div>
+      </div>,
+      <div key="visioLink"
+      className={`details-visioLink-section ${this.props.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
+        <div className="bold mt-1">Lien de la visio-conférence:</div>
+        <div className="clab-link" onClick={() => window.open(`${this.buildVideoId()}`, "_blank")}>
+          Cliquez ici pour rejoindre
+        </div>
+      </div>,
+      <div key="payment"
+      className={`details-payment-section ${this.props.appointment_detailed.paid?.includes(this.props.user.id) || 
+       this.props.appointment_detailed.coach_id == this.props.user.id ? " hidden" : ""}`}>
+        <div className="bold mt-1">Lien de paiement de la session:</div>
+        <div className="clab-link" onClick={() => window.open(`${this.props.payment_link}`, "_blank")}>
+          Cliquez ici pour payer
+        </div>
+      </div>,
+      <div className="input-group">
+        <Button extraClass="cl-button mt-2" onClick={() => { this.updateResa() }} text="Valider" />
+      </div>
+    
+    ]
+    return (
+      <Modal toggle={this.props.toggle} closeFunc={() => this.props.closeFunc()}
+        fields={fields} title="Votre RDV" id="appointment-details" />
+    )
+  }
+}
+
+export default ShowResaModal

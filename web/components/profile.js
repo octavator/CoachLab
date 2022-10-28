@@ -1,7 +1,8 @@
-import Navbar from './components/navbar.js'
-import { NumberInput, TextInput, Button } from './components/forms/inputs.js'
+import Navbar from './navbar.js'
+import Flash from './flash.js'
+import { NumberInput, TextInput, Button } from './forms/inputs.js'
 
-class UserProfile extends React.Component {
+class Profile extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -25,7 +26,8 @@ class UserProfile extends React.Component {
   }
   componentDidMount() {
     http.get("/api/me").then(res => {
-      this.setState({user: res.data, form: {...res.data, session_price: "50"}})
+      console.log("me")
+      this.setState({user: res.data, form: {...this.state.form, ...res.data}})
     })
     .catch(err => {
       this.showFlashMessage("error", "Une erreur inattendue est survenue")
@@ -50,7 +52,7 @@ class UserProfile extends React.Component {
       } else this.showFlashMessage("error", "Une erreur est survenue lors de l'envoi.")
     })
     .catch(err => {
-      this.showFlashMessage("error", err.response.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
@@ -59,6 +61,7 @@ class UserProfile extends React.Component {
     })
   }
   render() {
+    console.log(this.state.form)
     return (
       <div>
         <Navbar user={this.state.user} />
@@ -100,4 +103,4 @@ class UserProfile extends React.Component {
 }
 
 const domContainer = document.querySelector('.user-profile');
-ReactDOM.render(<UserProfile/>, domContainer);
+ReactDOM.render(<Profile/>, domContainer);

@@ -1,1 +1,1 @@
-var scrollTo=function scrollTo(containerSelector,targetSelector){var container=document.querySelector(containerSelector);var target=document.querySelector(targetSelector);container.scrollLeft=target.offsetLeft};export default scrollTo;
+const scrollTo=function(containerSelector,targetSelector){const container=document.querySelector(containerSelector);const target=document.querySelector(targetSelector);container.scrollLeft=target.offsetLeft};export default scrollTo;
