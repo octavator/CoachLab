@@ -129,6 +129,21 @@ img {
 .flex-column {
     flex-direction: column;
 }
+.flex-row {
+    flex-direction: row;
+}
+.flex-space-between {
+    justify-content: space-between;
+}
+.flex-space-around {
+    justify-content: space-around;
+}
+.flex-center-y {
+    align-items: center;
+}
+.flex-center-x {
+    justify-content: center;
+}
 .flex {
     display: flex;
 }
@@ -623,9 +638,9 @@ a {
     -webkit-box-shadow: 0px 0px 5px 2px darkslategrey;
 }
 .coach-list-avatar {
-    height: 40px;
-    width: 40px;
-    margin-right: 20px;
+    height: 4vw;
+    width: 4vw;
+    margin-right: 1vw;
 }
 
 /* SESSION LIST */
@@ -658,9 +673,9 @@ a {
     -webkit-box-shadow: 0px 0px 5px 2px darkslategrey;
 }
 .session-list-avatar {
-    height: 40px;
-    width: 40px;
-    margin-right: 20px;
+    height: 4vw;
+    width: 4vw;
+    margin-right: 2vw;
 }
 
 /* AGENDA */
@@ -688,7 +703,8 @@ a {
 }
 
 .flash-message.success{
-    background-color: rgb(144, 188, 238);
+    background-color: rgb(23, 153, 0);
+    color: white;
 }
 
 .flash-message.error{
@@ -1346,6 +1362,10 @@ a {
     margin: 15px;
 }
 
+.session-list-picto.video {
+    margin: 5px;
+}
+
 .video-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -1573,7 +1593,7 @@ a {
         height: 3vh;
         width: 3vh;
     }
-    .session-list-name {
+    .session-list-infos {
         flex-shrink: 12;
     }
     .menu-item.user-dropdown {
@@ -1586,6 +1606,11 @@ a {
     .navbar-logo-section .logo-wrapper {
         width: auto;
     }
+    .session-list-avatar {
+        height: 4vh;
+        width: 4vh;
+        margin-right: 2vh;
+    }    
 }
 
 /* RESPONSIVE -- SMARTPHONES */

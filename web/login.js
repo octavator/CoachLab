@@ -52,6 +52,9 @@ class Login extends React.Component {
           <a className="sign-up-section text-2-5" href="/inscription">
             <b>Pas encore de compte ? Cliquez-ici pour créer le votre</b>
           </a>
+          <a className="sign-up-section text-3" href="/nouveau-mot-de-passe">
+            <b>Vous avez oublié votre mot de passe ?</b>
+          </a>
         </div>
       </div>
     )

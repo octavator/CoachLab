@@ -28,12 +28,14 @@ class NewPassword extends React.Component {
   render() {
     return (
       <div>
+        <Navbar user={{}} blue_bg={true} />
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
-        <div className="infos-wrapper flex flex-center flex-column">
+        <div className="infos-wrapper flex flex-center flex-column mt-2">
+          <h1 className="page-title">Réinitialisez votre mot de passe</h1>
           <TextInput type="email" extraClass="text-3 white-bg" required={true} value={this.state.email} 
             onChange={(e) => { this.setState({email: e}) }}  placeholder="coach@gmail.com"
              name="email" bold_label={true} label="Votre email" />
-          <Button extraClass="text-3 white-bg cl-form-button" onClick={() => { this.sendForm()}} text="Envoyer" />
+          <Button extraClass="text-3 white-bg mt-2" onClick={() => { this.sendForm()}} text="Envoyer" />
         </div>
       </div>
     )

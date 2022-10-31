@@ -2,7 +2,7 @@ import Modal from './modal.js'
 import ShowResaModal from './modals/show_resa.js'
 import Navbar from './navbar.js'
 import Flash from './flash.js'
-import scrollTo from '../utils.js'
+import {scrollTo} from '../utils.js'
 import {SelectInput, RadioButton, TextInput, Button} from './forms/inputs.js'
 
 //@TODO: allow to select a month from another year than current
@@ -134,6 +134,7 @@ class Agenda extends React.Component {
       isVideo: true,
       isMulti: false,
       sessionTitle: "",
+      address: "",
       id: "",
     }
   }
@@ -146,6 +147,9 @@ class Agenda extends React.Component {
         onClick={(e) => { this.setState({form: {...this.state.form, duration: e}}) }} label="Durée" />,
       <RadioButton value={this.state.form.isVideo} onClick={(e) => {this.setState({form: {...this.state.form, isVideo: e}}) }}
         label="Visio-conférence ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
+      <TextInput value={this.state.form.address} onChange={(e) => {this.setState({form: {...this.state.form, address: e}}) }}
+        label={ this.state.form.isVideo ? undefined : `Addresse de la séance`} disabled={!this.state.can_edit_new_resa && !this.state.can_edit_new_resa_name}
+        extraClass={`white-bg ${this.state.form.isVideo ? "hidden" : ""}`} Placeholder="20 avenue Jean Moulin, Paris"/>,
       <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
         label="Séance de groupe ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
       <div className="input-group">
@@ -217,10 +221,10 @@ class Agenda extends React.Component {
                       <div>{appointment_message}</div>
                       <div className={`appointment-pictos ${slot && (slot.isMulti || !this.state.target_id) ? "" : "hidden"}`}>
                         <div className={`appointment-picto ${slot && (slot.isMulti ? "multi" : "single")}`}>
-                          <img src={`priv/static/images/${slot && slot.isMulti ? "session_groupe.svg" : "session_individuelle.svg"}`} />
+                          <img src={`priv/static/images/${slot && slot.isMulti ? "session_groupe_blanc.svg" : "session_individuelle_blanc.svg"}`} />
                         </div>
                         <div className="appointment-picto video">
-                          <img src={`priv/static/images/${slot && slot.isVideo ? "session_online.svg" : "session_irl.svg"}`} />
+                          <img src={`priv/static/images/${slot && slot.isVideo ? "session_online_blanc.svg" : "session_irl_blanc.svg"}`} />
                         </div>
                       </div>
                     </div>

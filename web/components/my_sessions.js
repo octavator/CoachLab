@@ -1,6 +1,7 @@
 import Navbar from './navbar.js'
 import ShowResaModal from './modals/show_resa.js'
 import Flash from './flash.js'
+import {resIdToDate, formatDate} from '../utils.js'
 
 class MySessions extends React.Component {
   constructor(props) {
@@ -66,7 +67,7 @@ class MySessions extends React.Component {
           <h1 className="page-title text-1">{"Vos sessions"}</h1>
           <div className="session-list-wrapper">
             {
-              this.state.reservations.map((resa, idx) => 
+              this.state.reservations.sort((a, b) => resIdToDate(b.id).getTime() - resIdToDate(a.id).getTime()).map((resa, idx) => 
               {
                 let is_paid = (resa.paid || []).includes(this.state.user.id)
                 return <div key={idx} onClick={() => this.showResaModal(resa) } className="session-list-row">
@@ -78,7 +79,23 @@ class MySessions extends React.Component {
                       }}
                       src={`priv/static/images/${resa.coach_id}/${resa.coach_avatar}`}/>
                   </div>
-                  <div className="session-list-name text-2">{`${resa.name || "Session coaching"} avec ${resa.coach_name}`}</div>
+                  <div className="session-list-infos text-2">
+                    {`${resa.name || "Session coaching"} avec ${resa.coach_name}`}
+                    <div className="session-details flex flex-row flex-space-between flex-center-y">
+                      <div className="session-list-infos mt-1">
+                        {formatDate(resIdToDate(resa.id))}
+                      </div>
+                      <div className={`appointment-pictos`}>
+                        <div className={`appointment-picto ${resa?.isMulti ? "multi" : "single"}`}>
+                          <img src={`priv/static/images/${resa?.isMulti ? "session_groupe_bleu.svg" : "session_individuelle_bleu.svg"}`} />
+                        </div>
+                        <div className="appointment-picto session-list-picto video">
+                          <img src={`priv/static/images/${resa?.isVideo ? "session_online_bleu.svg" : "session_irl_bleu.svg"}`} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                      
                   <div className={`green-check round-icon ml-2 ${!is_paid ? " hidden" : ""}`}><i className="fa fa-check" aria-hidden="true"/></div>
                   <div className={`red-cross round-icon ml-2 ${is_paid ? " hidden" : ""}`}><i className="fa fa-times" aria-hidden="true"/></div>
                 </div>

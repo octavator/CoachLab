@@ -6,12 +6,13 @@ class ShowResaModal extends React.Component {
     super(props)
     this.state = {
       sessionTitle: this.props.appointment_detailed?.sessionTitle || "",
+      address: this.props.appointment_detailed?.address || "",
       appointment_detailed: {}
     }
   }
   componentDidUpdate(prevProps) {
     if (prevProps.appointment_detailed !== this.props.appointment_detailed) {
-      this.setState({sessionTitle: this.props.appointment_detailed?.sessionTitle});
+      this.setState({address: this.props.appointment_detailed?.address, sessionTitle: this.props.appointment_detailed?.sessionTitle})
     }
   }
   buildVideoId() {
@@ -21,11 +22,12 @@ class ShowResaModal extends React.Component {
   updateResa() {
     http.post("/update-resa", {
       id: this.props.appointment_detailed.id,
-      sessionTitle: this.state.sessionTitle
+      sessionTitle: this.state.sessionTitle,
+      address: this.state.address
     })
     .then(res => {
       if (res.status != 200) return this.props.showFlashMessage("error", "Une erreur inconnue est survenue.")
-      this.props.updateResa({...this.props.appointment_detailed, sessionTitle: this.state.sessionTitle})
+      this.props.updateResa({...this.props.appointment_detailed, sessionTitle: this.state.sessionTitle, address: this.state.address})
       this.props.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
     })
     .catch(err => {
@@ -61,6 +63,14 @@ class ShowResaModal extends React.Component {
           Cliquez ici pour rejoindre
         </div>
       </div>,
+      <div key="address"
+      className={`details-address-section ${this.props.appointment_detailed.isVideo ? "hidden" : ""}`}>
+        <div className="bold mt-1"></div>
+        <TextInput value={this.state.address} onChange={(e) => {this.setState({address: e}) }}
+          label="Adresse de la séance:" bold_label="true" disabled={this.props.appointment_detailed.coach_id != this.props.user.id}
+          extraClass={`white-bg ${this.props.appointment_detailed.isVideo ? "hidden" : ""}`} Placeholder="Thème de la session"/>,
+      </div>,      
+    
       <div key="payment"
       className={`details-payment-section ${this.props.appointment_detailed.paid?.includes(this.props.user.id) || 
        this.props.appointment_detailed.coach_id == this.props.user.id ? " hidden" : ""}`}>

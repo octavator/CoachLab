@@ -130,7 +130,7 @@ defmodule ClabRouter do
         reservation
       else
         coached_ids = Enum.filter(List.wrap(reservation["coached_ids"]), & &1 == id)
-        Map.take(reservation, ["isMulti", "isVideo", "id", "coach_id", "coach_name", "duration", "sessionTitle", "paid"])
+        Map.take(reservation, ["isMulti", "isVideo", "id", "coach_id", "coach_name", "duration", "sessionTitle", "paid", "address"])
         |> Map.put(["coached_ids"], coached_ids)
       end
       send_resp(conn, 200, reservation |> Poison.encode!)
@@ -413,7 +413,7 @@ defmodule ClabRouter do
       #@TODO: check user has rights on this resa
       #user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle}
+      payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle, "address" => body.address}
       Reservation.update_reservation(body.id, payload)
       send_resp(conn, 200, "RDV mis à jour.")
     else
@@ -456,6 +456,8 @@ defmodule ClabRouter do
 
   get "/api/send_password_reset" do
     mail = conn.query_params["mail"] |> URI.decode()
+    ## Checks user exists
+    _u = User.get_user(mail)
     hash = User.create_reset_hash(mail)
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/forgotten-password.html.eex", hash: hash)
     Task.start(fn -> Clab.Mailer.send_mail([mail], "Ré-initialisez votre mot de passe CoachLab", content) end)

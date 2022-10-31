@@ -31,6 +31,7 @@ class ForgottenPassword extends React.Component {
   render() {
     return (
       <div>
+        <Navbar user={{}} blue_bg={true} />
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <div className="infos-wrapper flex flex-center flex-column">
           <TextInput type="password" extraClass="text-3 white-bg" required={true} value={this.state.password}
