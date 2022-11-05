@@ -26,7 +26,8 @@ defmodule Clab.MixProject do
       {:gen_smtp, "~> 1.1.1"},
       {:joken, "~> 2.4"},
       {:httpoison, "~> 1.8"},
-      {:hackney, "~> 1.17"}
+      {:hackney, "~> 1.17"},
+      {:timex, "~> 3.7"}
     ]
   end
 end

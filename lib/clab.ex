@@ -8,7 +8,7 @@ defmodule ClabRouter do
   use Plug.Router
   plug Plug.Logger
   require Logger
-  
+  use Timex
   # use Plug.Debugger
 
   @secret "73JIOiOJSKLAZHOJfspaioz9902"
@@ -328,16 +328,21 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       user = User.get_user_by_id(id)
-      grants = %{"identity" => user.id, "voice" => %{}, "video" => %{}}
-      {:ok, token, _conf} = Jwt.generate_and_sign(
-        %{"grants" => grants, "ttl" => 4800},
-        Joken.Signer.create("HS256", Application.get_env(:clab, :twilio)[:secret], %{
-          "typ" => "JWT",
-          "alg" => "HS256",
-          "cty" => "twilio-fpa;v=1"
-        })
-      )
-      send_resp(conn, 200, token)
+      res_id = conn.query_params["roomId"] |> URI.decode() |> String.replace(":00 ", ":00+")
+      dt = Reservation.get_date_from_id(res_id)
+      time_diff = Timex.diff(Timex.now("Europe/Paris"), dt, :minutes) 
+      resa = Reservation.get_reservation(res_id)
+      cond do
+        time_diff > 90 ->
+          send_resp(conn, 403, "La séance est terminée.")
+        time_diff < 15 ->
+          send_resp(conn, 403, "La séance n'est pas encore accessible. Vous pourrez y accéder 15 minutes avant.")
+        resa["coach_id"] == user.id || Enum.member?(List.wrap(resa["paid"]), user.id) ->
+          token = Jwt.create_twilio_token(user)
+          send_resp(conn, 200, token)
+        true ->
+          send_resp(conn, 403, "Vous n'avez pas payé pour cette séance")
+        end
     else
       send_resp(conn, 401, "Token invalide")
     end

@@ -18,6 +18,7 @@ class ClabVideo extends React.Component {
       sendAudio: true,
       sendVideo: true,
       room: undefined,
+      dominantSpeaker: undefined,
       schedule: {},
       tracks: [],
       token: "",
@@ -28,20 +29,23 @@ class ClabVideo extends React.Component {
   }
   componentDidMount() {
     http.get("/api/me/agenda").then(agendaData => {
-      //@TODO: empecher un mec de rentrer dans la room s'il a pas payé
-      // let resId = this.state.roomId.split("+")[0]
-      //@TODO: check resa is paid for current user id or user_id == coach_id
-      // let resa_id = agendaData.data.agenda[resId]
       //@TODO: Gérer room type en créant la room plutot que ad hoc connect
       // let roomType = resa.isMulti ? "group": "go"
       if (Video.isSupported) {
-        http.get("/video-token").then(token => {
+        //@TODO: Base encode room Ids ?
+        http.get(`/video-token?roomId=${this.state.roomId}`).then(token => {
+          http.get(`/video-create-room?roomId=${this.state.roomId}`).then(token => {
+          })
           Video.createLocalVideoTrack().then(track => document.getElementById('local-media').appendChild(track.attach()))
+
           this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data})
+        }).catch(err => {
+          this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
         })
+
       } else this.showFlashMessage("error", "Votre navigateur actuel n'est pas compatible avec notre module vidéo.")
     }).catch(err => {
-      this.showFlashMessage("error", err.response && err?.response?.data || "Une erreur inattendue est survenue.")
+      this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
@@ -58,9 +62,6 @@ class ClabVideo extends React.Component {
     })
     participant.on('trackSubscribed', new_track => {
       let tracks = [...this.state.tracks]
-      console.log("new track name", new_track.name)
-      console.log("is already in room ?", tracks.some(t => t.name == new_track.name))
-      // let tracks = [...this.state.tracks].filter(track => { console.log(new_track.name, track.name) ;track.name != new_track.name })
       this.setState({tracks: tracks.concat([new_track])})
     })
   }
@@ -68,17 +69,21 @@ class ClabVideo extends React.Component {
     Video.connect(this.state.token, {
       name: this.state.roomId,
       audio: {name: `audio+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`},
-      video: {name: `video+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`}
+      video: {name: `video+${this.state.user.id}+${this.state.user.firstname} ${this.state.user.lastname}`},
+      dominantSpeaker: true
     })
     .then(room => {
       room.participants.forEach(participant => this.getRemoteTracks(participant))
       room.on('participantConnected', participant => this.getRemoteTracks(participant))
-      room.on('participantDisconnected',
-        (participant) => {
-          let new_tracks = [...this.state.tracks].filter(track => !Array.from(participant.tracks.keys()).includes(track.sid))
-          //@TODO: flash message when someone leaves
-          this.setState({tracks: new_tracks})
-        })
+      room.on('participantDisconnected', (participant) => {
+        let new_tracks = [...this.state.tracks].filter(track => !Array.from(participant.tracks.keys()).includes(track.sid))
+        //@TODO: flash message when someone leaves
+        this.setState({tracks: new_tracks})
+      })
+      room.on('dominantSpeakerChanged', participant => {
+        console.log('The new dominant speaker in the Room is:', participant);
+        this.setState({dominantSpeaker: participant})
+      })
       if (!this.state.sendAudio) {
         room.localParticipant.audioTracks.forEach(publication => {
           publication.track.disable()
@@ -137,7 +142,6 @@ class ClabVideo extends React.Component {
   }
   render() {
     //@TODO: when more than 4 ppl in room, only show the coach's video
-    console.log(this.state.tracks, "tracks")
     return (
       <div>
         <Navbar blue_bg={true} user={this.state.user} />
@@ -149,23 +153,24 @@ class ClabVideo extends React.Component {
             </div>
             { this.state.tracks.filter(track => track.kind == "audio").map((track, idx) => 
               <div key={`${track.name}`}>
-                <div id={`remote-audio-${idx}`} className="remote-audio" style={{}} />                
+                <div id={`remote-audio-${idx}`} className="remote-audio" style={{}} />
               </div>
             ) }
-            { this.state.tracks.filter(track => track.kind == "video").map((track, idx) => 
-              <div key={`${track.name}`} className={`participant-block ${track.disabled ? "hidden" : ""}`}>
-                <div id={`remote-video-${idx}`} className="remote-video" style={{}} />                
+            { this.state.tracks.filter(track => track.kind == "video").map((track, idx) =>
+              <div key={`${track.name}`} className={`participant-block ${track.disabled ? "hidden" : ""}
+               ${this.state.dominantSpeaker.videoTracks.some(userTrack => userTrack.sid == track.sid) ? "loudest" : ""}`}>
+                <div id={`remote-video-${idx}`} className="remote-video" style={{}} />
               </div>
             ) }
           </div>
           <div className="flex flex-center mt-2">
-            <div onClick={() => {this.toggleAudio()}} className="cl-button ml-2">
+            <div onClick={() => this.toggleAudio()} className="cl-button ml-2">
               { this.state.sendAudio ? "Désactiver Audio" : "Activer Audio"}
             </div>
-            <div onClick={() => {this.toggleVideo()}} className="cl-button ml-2">
+            <div onClick={() => this.toggleVideo()} className="cl-button ml-2">
               { this.state.sendVideo ? "Désactiver Vidéo" : "Activer Vidéo"}
             </div>
-            <div onClick={() => {this.startVideoLive()}} className={`cl-button ml-2 ${this.state.hasJoined ? "hidden" : ""}`}>
+            <div onClick={() => this.startVideoLive()} className={`cl-button ml-2 ${this.state.hasJoined ? "hidden" : ""}`}>
               Rejoindre la réunion
             </div>
           </div>

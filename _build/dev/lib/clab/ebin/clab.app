@@ -1,7 +1,7 @@
 {application,clab,
              [{applications,[kernel,stdlib,elixir,logger,crypto,eex,plug,
                              cowboy,plug_cowboy,poison,mailibex,gen_smtp,
-                             joken,httpoison,hackney]},
+                             joken,httpoison,hackney,timex]},
               {description,"clab"},
               {modules,['Elixir.Agenda','Elixir.Clab',
                         'Elixir.Clab.Application','Elixir.Clab.AuthPlug',

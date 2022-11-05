@@ -1376,6 +1376,10 @@ a {
     background: black;
 }
 
+.participant-block.loudest {
+    border: 3px solid #26619C;
+}
+
 /* MODAL */
 
 .modal {

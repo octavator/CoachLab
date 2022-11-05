@@ -1,7 +1,7 @@
 const scrollTo = function(containerSelector, targetSelector) {
     const container = document.querySelector(containerSelector);
     const target = document.querySelector(targetSelector);
-    container.scrollLeft = target.offsetLeft
+    if (container && target) container.scrollLeft = target.offsetLeft
 }
 
 const resIdToDate = function(res_id) {

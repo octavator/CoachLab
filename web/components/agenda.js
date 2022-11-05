@@ -40,7 +40,6 @@ class Agenda extends React.Component {
     const target_id = urlParams.get("target_id")
     const nth_child = Math.max(this.state.day.getDate() - 3, 0)
 
-    scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${nth_child})`)
     if (!target_id) {
       http.get("/api/me/agenda").then(agendaData => {
         this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user})
@@ -64,6 +63,7 @@ class Agenda extends React.Component {
         this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
       })
     }
+    scrollTo(".new-agenda-header", `.new-agenda-header-month:nth-child(${nth_child})`)
   }
   showFlashMessage(type, message) {
     this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
@@ -132,7 +132,7 @@ class Agenda extends React.Component {
     return {
       duration: "60",
       isVideo: true,
-      isMulti: false,
+      isMulti: this?.state?.target_id ? false : true,
       sessionTitle: "",
       address: "",
       id: "",
@@ -151,7 +151,7 @@ class Agenda extends React.Component {
         label={ this.state.form.isVideo ? undefined : `Addresse de la séance`} disabled={!this.state.can_edit_new_resa && !this.state.can_edit_new_resa_name}
         extraClass={`white-bg ${this.state.form.isVideo ? "hidden" : ""}`} Placeholder="20 avenue Jean Moulin, Paris"/>,
       <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
-        label="Séance de groupe ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
+        label="Séance de groupe ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa || this.state.target_id} />,
       <div className="input-group">
         <Button extraClass="cl-button mt-2" onClick={() => { this.resNewSlot() }} text="Valider" />
       </div>
@@ -180,11 +180,11 @@ class Agenda extends React.Component {
           {/* DAY SELECTION */}
           <div className="new-agenda-header">
             {
-              this_month_days.map((month_day, idx) => {
+              this_month_days?.map((month_day, idx) => {
                 return (
                   <div key={idx} onClick={() => { this.setState({day: month_day}) } } 
-                   className={`new-agenda-header-month text-2 ${this.state.day.getDate() == idx + 1 && this.state.day.getMonth() == this.state.month ? "selected" : ""}`} >
-                    <div className="new-agenda-month-letter">{this.state.weekdays[month_day.getDay()].at(0).toUpperCase()}</div>
+                   className={`new-agenda-header-month text-2 ${this.state?.day.getDate() == idx + 1 && this.state?.day.getMonth() == this.state?.month ? "selected" : ""}`} >
+                    <div className="new-agenda-month-letter">{this.state?.weekdays[month_day.getDay()].at(0).toUpperCase()}</div>
                     <div className="new-agenda-month-number">{month_day.getDate()}</div>
                   </div>
                 )

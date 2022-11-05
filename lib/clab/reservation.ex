@@ -1,117 +1,126 @@
 defmodule Reservation do
-    require Logger
-    use GenServer
-    @table :reservations
-    @path 'data/reservations.ets'
+  require Logger
+  use GenServer
+  @table :reservations
+  @path 'data/reservations.ets'
 
-    def start_link(args \\ []) do
-      GenServer.start_link(__MODULE__, args, name: __MODULE__)
-    end
+  def start_link(args \\ []) do
+    GenServer.start_link(__MODULE__, args, name: __MODULE__)
+  end
 
-    def init(_args) do
-      if File.exists?(@path) do
-        Logger.info("[ETS] Loading #{@table} from backup")
-        {:ok, _ref} = :ets.file2tab(@path)
-        Logger.info("[ETS] Success loading #{@table}")
-      else
-        :ets.new(@table, [:named_table, :public])
-      end
-      Process.flag(:trap_exit, true)
-      {:ok, %{}}
+  def init(_args) do
+    if File.exists?(@path) do
+      Logger.info("[ETS] Loading #{@table} from backup")
+      {:ok, _ref} = :ets.file2tab(@path)
+      Logger.info("[ETS] Success loading #{@table}")
+    else
+      :ets.new(@table, [:named_table, :public])
     end
+    Process.flag(:trap_exit, true)
+    {:ok, %{}}
+  end
 
-    def terminate(_reason, _state) do
-      Logger.info("[ETS] Saving #{@table} table in #{@path}")
-      :ets.tab2file(@table, @path)
-    end
+  def terminate(_reason, _state) do
+    Logger.info("[ETS] Saving #{@table} table in #{@path}")
+    :ets.tab2file(@table, @path)
+  end
 
-    def handle_info({:EXIT, _from, reason}, state) do
-      Logger.info("[ETS] Saving #{@table} table in #{@path}")
-      :ets.tab2file(@table, @path)
-      {:stop, reason, state}
-    end
+  def handle_info({:EXIT, _from, reason}, state) do
+    Logger.info("[ETS] Saving #{@table} table in #{@path}")
+    :ets.tab2file(@table, @path)
+    {:stop, reason, state}
+  end
 
-    def handle_call({:get_reservation, res_id}, _from, state) do
-      [{_key, value}]  = :ets.lookup(@table, res_id)
-      {:reply, value, state}
-    end
+  def handle_call({:get_reservation, res_id}, _from, state) do
+    [{_key, value}]  = :ets.lookup(@table, res_id)
+    {:reply, value, state}
+  end
 
-    def handle_call({:create_reservation, {id, data}}, _from, state) do
-      res = :ets.insert_new(@table, {id, data})
-      {:reply, res, state}
-    end
+  def handle_call({:create_reservation, {id, data}}, _from, state) do
+    res = :ets.insert_new(@table, {id, data})
+    {:reply, res, state}
+  end
 
-    def handle_call({:update_reservation, {id, data}}, _from, state) do
-      [{_key, old_data}] = :ets.lookup(@table, id)
-      new_data = Map.merge(old_data, data)
-      IO.inspect(new_data, label: "new_data")
-      res = :ets.insert(@table, {id, new_data})
-      {:reply, res, state}
-    end
+  def handle_call({:update_reservation, {id, data}}, _from, state) do
+    [{_key, old_data}] = :ets.lookup(@table, id)
+    new_data = Map.merge(old_data, data)
+    IO.inspect(new_data, label: "new_data")
+    res = :ets.insert(@table, {id, new_data})
+    {:reply, res, state}
+  end
 
-    def handle_call({:add_coached_id, {id, coached_id}}, _from, state) do
-      [{_key, resa}] = :ets.lookup(@table, id)
-      resa = update_in(resa, ["coached_ids"], fn coached_ids -> Enum.uniq(List.wrap(coached_ids) ++ [coached_id]) end)
-      res = :ets.insert(@table, {id, resa})
-      {:reply, res, state}
-    end
+  def handle_call({:add_coached_id, {id, coached_id}}, _from, state) do
+    [{_key, resa}] = :ets.lookup(@table, id)
+    resa = update_in(resa, ["coached_ids"], fn coached_ids -> Enum.uniq(List.wrap(coached_ids) ++ [coached_id]) end)
+    res = :ets.insert(@table, {id, resa})
+    {:reply, res, state}
+  end
 
-    def handle_call({:confirm_payment, {id, coached_id}}, _from, state) do
-      [{_key, resa}] = :ets.lookup(@table, id)
-      resa = update_in(resa, ["paid"], fn payments -> Enum.uniq(List.wrap(payments) ++ [coached_id]) end)
-      :ets.insert(@table, {id, resa})
-      {:reply, resa, state}
-    end
+  def handle_call({:confirm_payment, {id, coached_id}}, _from, state) do
+    [{_key, resa}] = :ets.lookup(@table, id)
+    resa = update_in(resa, ["paid"], fn payments -> Enum.uniq(List.wrap(payments) ++ [coached_id]) end)
+    :ets.insert(@table, {id, resa})
+    {:reply, resa, state}
+  end
 
-    def handle_call({:cancel_resa, {id, coached_id}}, _from, state) do
-      [{_key, resa}] = :ets.lookup(@table, id)
-      resa = update_in(resa, ["coached_ids"], & Enum.reject(&1, fn id -> id == coached_id end))
-      Agenda.update_agenda(coached_id, %{resa.id => nil})
-      resa = if (length(resa[:coached_ids]) == 0) do
-        Agenda.update_agenda(resa.coach_id, %{resa.id => nil})
-        nil
-      else
-        resa
-      end
-      res = :ets.insert(@table, {id, resa})
-      {:reply, res, state}
+  def handle_call({:cancel_resa, {id, coached_id}}, _from, state) do
+    [{_key, resa}] = :ets.lookup(@table, id)
+    resa = update_in(resa, ["coached_ids"], & Enum.reject(&1, fn id -> id == coached_id end))
+    Agenda.update_agenda(coached_id, %{resa.id => nil})
+    resa = if (length(resa[:coached_ids]) == 0) do
+      Agenda.update_agenda(resa.coach_id, %{resa.id => nil})
+      nil
+    else
+      resa
     end
+    res = :ets.insert(@table, {id, resa})
+    {:reply, res, state}
+  end
 
-    def handle_call({:delete_reservation, id}, _from, state) do
-      res = :ets.delete(@table, id)
-      {:reply, res, state}
-    end
+  def handle_call({:delete_reservation, id}, _from, state) do
+    res = :ets.delete(@table, id)
+    {:reply, res, state}
+  end
 
-    def get_reservation(id) do
-      GenServer.call(__MODULE__, {:get_reservation, id})
-    end
+  def get_reservation(id) do
+    GenServer.call(__MODULE__, {:get_reservation, id})
+  end
 
-    def create_reservation(id, data) do
-      GenServer.call(__MODULE__, {:create_reservation, {id, data}})
-    end
+  def create_reservation(id, data) do
+    GenServer.call(__MODULE__, {:create_reservation, {id, data}})
+  end
 
-    def delete_reservation(id) do
-      GenServer.call(__MODULE__, {:delete_reservation, id})
-    end
+  def delete_reservation(id) do
+    GenServer.call(__MODULE__, {:delete_reservation, id})
+  end
 
-    def update_reservation(id, data) do
-      GenServer.call(__MODULE__, {:update_reservation, {id, data}})
-    end
+  def update_reservation(id, data) do
+    GenServer.call(__MODULE__, {:update_reservation, {id, data}})
+  end
 
-    def cancel_resa(id, coached_id) do
-      GenServer.call(__MODULE__, {:cancel_resa, {id, coached_id}})
-    end
+  def cancel_resa(id, coached_id) do
+    GenServer.call(__MODULE__, {:cancel_resa, {id, coached_id}})
+  end
 
-    def add_coached_id(id, coached_id) do
-      GenServer.call(__MODULE__, {:add_coached_id, {id, coached_id}})
-    end
-    def confirm_payment(id, coached_id) do
-      GenServer.call(__MODULE__, {:confirm_payment, {id, coached_id}})
-    end
+  def add_coached_id(id, coached_id) do
+    GenServer.call(__MODULE__, {:add_coached_id, {id, coached_id}})
+  end
+  def confirm_payment(id, coached_id) do
+    GenServer.call(__MODULE__, {:confirm_payment, {id, coached_id}})
+  end
 
-    def clean_reservations() do
-      :ets.tab2list(:reservations) |> Enum.each(fn {id, _reservation} -> 
-        delete_reservation(id)
-      end)
-    end
+  def clean_reservations() do
+    :ets.tab2list(:reservations) |> Enum.each(fn {id, _reservation} -> 
+      delete_reservation(id)
+    end)
+  end
+
+  def get_date_from_id(id) do
+    datetime_str = String.replace(List.first(String.split(id, "+")), " ", "T")
+    year = List.first(String.split(Enum.at(String.split(datetime_str, "/"), 2), "T"))
+    month = Enum.at(String.split(datetime_str, "/"), 1)
+    day = Enum.at(String.split(datetime_str, "/"), 0)
+    date = "#{year}-#{month}-#{day}"
+    Timex.parse!("#{date}T#{List.last(String.split(datetime_str, "T"))}Z", "{ISO:Extended:Z}")
+  end
 end
