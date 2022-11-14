@@ -126,7 +126,7 @@ defmodule ClabRouter do
     if !is_nil(id) do
       user = User.get_user_by_id(id)
       reservation = Reservation.get_reservation(resa_id)
-      reservation = if user.role == "coach" do
+      reservation = if user.id == reservation.coach_id do
         reservation
       else
         coached_ids = Enum.filter(List.wrap(reservation["coached_ids"]), & &1 == id)
@@ -335,9 +335,13 @@ defmodule ClabRouter do
       cond do
         time_diff > 90 ->
           send_resp(conn, 403, "La séance est terminée.")
-        time_diff < 15 ->
+        time_diff < -15 ->
           send_resp(conn, 403, "La séance n'est pas encore accessible. Vous pourrez y accéder 15 minutes avant.")
-        resa["coach_id"] == user.id || Enum.member?(List.wrap(resa["paid"]), user.id) ->
+        resa["coach_id"] == user.id ->
+          Twilio.create_room(resa)
+          token = Jwt.create_twilio_token(user)
+          send_resp(conn, 200, token)
+        Enum.member?(List.wrap(resa["paid"]), user.id) ->
           token = Jwt.create_twilio_token(user)
           send_resp(conn, 200, token)
         true ->
@@ -389,40 +393,48 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      {status_code, ret_text} = cond do
-        true ->
-          coach = User.get_user_by_id(body.user_id)
-          payload = Map.merge(body.resa, %{
-            "coach_id" => coach.id,
-            "coach_avatar" => coach[:avatar],
-            "coach_name" => "#{coach.firstname} #{coach.lastname}",
-            #@TODO si pris par user, delete resa au bout d'une heure si pas payéé ?
-          })
-          case Agenda.update_agenda(body.coached_user, %{body.id => body.resa["id"]}) do
-            :error -> {400, "Une erreur est survenue durant la reservation."}
-            _ ->
-              Reservation.create_reservation(body.resa["id"], payload)
-              Agenda.update_agenda(coach.id, %{body.id => body.resa["id"]})
-              {200, "Votre rendez-vous a bien été enregistré."}
-          end
-      end
+      coach = User.get_user_by_id(body.user_id)
+      payload = Map.merge(body.resa, %{
+        "coach_id" => coach.id,
+        "coach_avatar" => coach[:avatar],
+        "coach_name" => "#{coach.firstname} #{coach.lastname}",
+      })
+      {status_code, ret_text} = Agenda.reserve_agendas(payload.id, payload.coached_ids, payload)
       send_resp(conn, status_code, ret_text)
     else
       send_resp(conn, 401, "Token invalide")
     end
   end
 
-  post "/update-resa" do
+  post "/api/update-resa" do
     id = check_token_user(conn)
     if !is_nil(id) do
-      #@TODO: check user has rights on this resa
       #user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+      #@TODO: modify coached_ids and send mail to new ids
       payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle, "address" => body.address}
-      Reservation.update_reservation(body.id, payload)
-      send_resp(conn, 200, "RDV mis à jour.")
-    else
+      if Reservation.update_reservation(body.id, payload, id) == :error do
+        send_resp(conn, 403, "Vous n'avez pas l'autorisation de modifier cette reservation.")
+      else
+        send_resp(conn, 200, "RDV mis à jour.")
+      end
+      else
       send_resp(conn, 401, "Token invalide")
+    end
+  end
+
+  get "/api/susbcribe-resa" do
+    id = check_token_user(conn)
+    cond do
+      is_nil(id) ->
+        send_resp(conn, 401, "Token invalide")
+      User.get_user_by_id(id)[:role] != "default" ->
+        send_resp(conn, 403, "Un coach ne peut pas s'inscrire à une séance.")
+      true ->
+        #@TODO: send payment mail
+        res_id = conn.query_params["id"] |> URI.decode()
+        Reservation.add_coached_id(res_id, id)
+        send_resp(conn, 200, "RDV mis à jour.")  
     end
   end
 

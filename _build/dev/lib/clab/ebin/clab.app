@@ -8,7 +8,8 @@
                         'Elixir.Clab.Mailer','Elixir.ClabRouter',
                         'Elixir.DataSaver','Elixir.ImageMover','Elixir.Jwt',
                         'Elixir.Reservation','Elixir.Stripe',
-                        'Elixir.StripeApi','Elixir.User','Elixir.Utils']},
+                        'Elixir.StripeApi','Elixir.Twilio','Elixir.TwilioApi',
+                        'Elixir.User','Elixir.Utils']},
               {registered,[]},
               {vsn,"0.1.0"},
               {mod,{'Elixir.Clab.Application',[]}}]}.

@@ -34,8 +34,8 @@ class ClabVideo extends React.Component {
       if (Video.isSupported) {
         //@TODO: Base encode room Ids ?
         http.get(`/video-token?roomId=${this.state.roomId}`).then(token => {
-          http.get(`/video-create-room?roomId=${this.state.roomId}`).then(token => {
-          })
+          // http.get(`/video-create-room?roomId=${this.state.roomId}`).then(token => {
+          // })
           Video.createLocalVideoTrack().then(track => document.getElementById('local-media').appendChild(track.attach()))
 
           this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data})
@@ -158,7 +158,7 @@ class ClabVideo extends React.Component {
             ) }
             { this.state.tracks.filter(track => track.kind == "video").map((track, idx) =>
               <div key={`${track.name}`} className={`participant-block ${track.disabled ? "hidden" : ""}
-               ${this.state.dominantSpeaker.videoTracks.some(userTrack => userTrack.sid == track.sid) ? "loudest" : ""}`}>
+               ${this.state.dominantSpeaker?.videoTracks?.some(userTrack => userTrack.sid == track.sid) ? "loudest" : ""}`}>
                 <div id={`remote-video-${idx}`} className="remote-video" style={{}} />
               </div>
             ) }

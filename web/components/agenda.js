@@ -92,9 +92,9 @@ class Agenda extends React.Component {
     return this.state.year + (is_next_year ? 1 : (is_prev_year ? -1 : 0))
   }
   getSlotClickableClass(slot) {
-    const ownExistingSlot = !this.state.target_id && slot
+    const coachOwnAgenda = !this.state.target_id && this.state.user.role == "coach"
     const coachOpenSlot = !slot || slot.isMulti
-    const is_clickable =  this.state.user.role != "coach" && this.state.target_id && coachOpenSlot || ownExistingSlot
+    const is_clickable = coachOwnAgenda || this.state.target_id && coachOpenSlot
     return (is_clickable ? " clickable" : "")
   }
   resNewSlot() {
@@ -132,7 +132,7 @@ class Agenda extends React.Component {
     return {
       duration: "60",
       isVideo: true,
-      isMulti: this?.state?.target_id ? false : true,
+      isMulti: false,
       sessionTitle: "",
       address: "",
       id: "",

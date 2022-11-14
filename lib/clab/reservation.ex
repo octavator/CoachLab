@@ -41,24 +41,31 @@ defmodule Reservation do
     {:reply, res, state}
   end
 
-  def handle_call({:update_reservation, {id, data}}, _from, state) do
+  def handle_call({:update_reservation, {id, data, user_id}}, _from, state) do
     [{_key, old_data}] = :ets.lookup(@table, id)
-    new_data = Map.merge(old_data, data)
-    IO.inspect(new_data, label: "new_data")
-    res = :ets.insert(@table, {id, new_data})
+    res = if (user_id == old_data["coach_id"]) do
+      :ets.insert(@table, {id, Map.merge(old_data, data)})
+    else
+      :error
+    end
     {:reply, res, state}
   end
 
   def handle_call({:add_coached_id, {id, coached_id}}, _from, state) do
     [{_key, resa}] = :ets.lookup(@table, id)
-    resa = update_in(resa, ["coached_ids"], fn coached_ids -> Enum.uniq(List.wrap(coached_ids) ++ [coached_id]) end)
-    res = :ets.insert(@table, {id, resa})
-    {:reply, res, state}
+    cond do
+      Enum.member?(coached_id, resa["coached_ids"]) ->
+        :error  
+      true ->
+        resa = update_in(resa, ["coached_ids"], &List.wrap(&1) ++ [coached_id])
+        res = :ets.insert(@table, {id, resa})
+        {:reply, res, state}  
+    end
   end
 
   def handle_call({:confirm_payment, {id, coached_id}}, _from, state) do
     [{_key, resa}] = :ets.lookup(@table, id)
-    resa = update_in(resa, ["paid"], fn payments -> Enum.uniq(List.wrap(payments) ++ [coached_id]) end)
+    resa = update_in(resa, ["paid"], &Enum.uniq(List.wrap(&1) ++ [coached_id]))
     :ets.insert(@table, {id, resa})
     {:reply, resa, state}
   end
@@ -94,8 +101,8 @@ defmodule Reservation do
     GenServer.call(__MODULE__, {:delete_reservation, id})
   end
 
-  def update_reservation(id, data) do
-    GenServer.call(__MODULE__, {:update_reservation, {id, data}})
+  def update_reservation(id, data, user_id) do
+    GenServer.call(__MODULE__, {:update_reservation, {id, data, user_id}})
   end
 
   def cancel_resa(id, coached_id) do

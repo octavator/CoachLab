@@ -7,28 +7,45 @@ class ShowResaModal extends React.Component {
     this.state = {
       sessionTitle: this.props.appointment_detailed?.sessionTitle || "",
       address: this.props.appointment_detailed?.address || "",
-      appointment_detailed: {}
+      appointment_detailed: {},
+      coached_ids: this.props.appointment_detailed?.coached_ids || []
     }
   }
   componentDidUpdate(prevProps) {
     if (prevProps.appointment_detailed !== this.props.appointment_detailed) {
-      this.setState({address: this.props.appointment_detailed?.address, sessionTitle: this.props.appointment_detailed?.sessionTitle})
+      this.setState({
+        address: this.props.appointment_detailed?.address,
+        sessionTitle: this.props.appointment_detailed?.sessionTitle,
+        coached_ids: this.props.appointment_detailed?.coached_ids
+      })
     }
   }
   buildVideoId() {
     return (!this.props.appointment_detailed.id ? undefined
      : `/video?roomId=${encodeURIComponent(this.props.appointment_detailed.id)}`)
   }
+  subscribeResa() {
+    http.get(`/api/subscribe-resa?id=${this.props.appointment_detailed.id}`)
+    .then(res => {
+      if (res.status != 200) return this.props.showFlashMessage("error", "Une erreur inconnue est survenue.")
+      this.props.updateResa({...this.props.appointment_detailed, coached_ids: [...this.props.appointment_detailed.coached_ids, this.state.user.id]})
+      this.props.showFlashMessage("success", "Vous êtes bien inscrit à la séance. N'oubliez pas de la régler au moins 48h avant.")
+    })
+    .catch(err => {
+      this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+    })
+  }
   updateResa() {
-    http.post("/update-resa", {
+    http.post("/api/update-resa", {
       id: this.props.appointment_detailed.id,
       sessionTitle: this.state.sessionTitle,
-      address: this.state.address
+      address: this.state.address,
+      coached_ids: this.state.coached_ids
     })
     .then(res => {
       if (res.status != 200) return this.props.showFlashMessage("error", "Une erreur inconnue est survenue.")
       this.props.updateResa({...this.props.appointment_detailed, sessionTitle: this.state.sessionTitle, address: this.state.address})
-      this.props.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
+      this.props.showFlashMessage("success", "Votre rendez-vous a bien été modifié.")
     })
     .catch(err => {
       this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
@@ -38,7 +55,8 @@ class ShowResaModal extends React.Component {
     let fields = [
       <div key="sessionTitle">
         <TextInput value={this.state.sessionTitle} onChange={(e) => {this.setState({sessionTitle: e}) }}
-          label="Nom de la séance:" bold_label="true" disabled={this.props.appointment_detailed.coach_id != this.props.user.id} extraClass=" white-bg" Placeholder="Thème de la session"/>,
+          label="Nom de la séance:" bold_label="true" disabled={this.props.appointment_detailed.coach_id != this.props.user.id} extraClass=" white-bg" Placeholder="Thème de la session"
+        />,
       </div>,
       <div key="duration">
         <div className="bold mt-1">Durée:</div>
@@ -68,7 +86,8 @@ class ShowResaModal extends React.Component {
         <div className="bold mt-1"></div>
         <TextInput value={this.state.address} onChange={(e) => {this.setState({address: e}) }}
           label="Adresse de la séance:" bold_label="true" disabled={this.props.appointment_detailed.coach_id != this.props.user.id}
-          extraClass={`white-bg ${this.props.appointment_detailed.isVideo ? "hidden" : ""}`} Placeholder="Thème de la session"/>,
+          extraClass={`white-bg ${this.props.appointment_detailed.isVideo ? "hidden" : ""}`} Placeholder="Thème de la session"
+        />,
       </div>,      
     
       <div key="payment"
@@ -80,7 +99,10 @@ class ShowResaModal extends React.Component {
         </div>
       </div>,
       <div className="input-group">
-        <Button extraClass="cl-button mt-2" onClick={() => { this.updateResa() }} text="Valider" />
+        <Button extraClass="cl-button mt-2" 
+         onClick={() => { this.props.user.id == this.props.appointment_detailed.coach_id ? this.updateResa() : this.subscribeResa() }} 
+         text="Valider" 
+        />
       </div>
     
     ]

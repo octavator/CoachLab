@@ -25,6 +25,24 @@ defmodule Agenda do
       :ets.tab2file(@table, @path)
     end
 
+    def reserve_agendas(resa_id, coached_ids, payload) do
+      try do
+        updated_coach_agenda = Enum.all?(coached_ids, & Agenda.update_agenda(&1, %{resa_id => resa_id}))
+        if updated_coach_agenda do
+          Reservation.create_reservation(resa_id, payload)
+          Agenda.update_agenda(payload["coach_id"], %{resa_id => resa_id})
+          {200, "Votre rendez-vous a bien été enregistré."}
+        else
+          Enum.each(coached_ids, & Reservation.cancel_resa(resa_id, &1))
+          {400, "Une erreur est survenue durant la reservation."}
+        end
+      rescue
+        e ->
+          Logger.error("[RESERVATION] Error during creation of reservation  #{resa_id}: #{inspect(e)}")
+          {500, "Une erreur inattendue est survenue durant la reservation."}
+      end
+    end
+
     def handle_info({:EXIT, _from, reason}, state) do
       Logger.info("[ETS] Saving #{@table} table in #{@path}")
       :ets.tab2file(@table, @path)
