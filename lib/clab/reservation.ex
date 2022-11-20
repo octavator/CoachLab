@@ -45,6 +45,8 @@ defmodule Reservation do
     [{_key, old_data}] = :ets.lookup(@table, id)
     res = if (user_id == old_data["coach_id"]) do
       :ets.insert(@table, {id, Map.merge(old_data, data)})
+      Enum.each(List.wrap(data["coached_ids"]) -- List.wrap(old_data["coached_ids"]), 
+       & Task.start( fn -> Reservation.send_payment_link(id, &1) end))
     else
       :error
     end

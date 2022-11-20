@@ -40,7 +40,7 @@ class DefaultThirdStep extends React.Component {
         console.log(err.response)
         this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
       })
-    }
+    } else this.setState({show_coaches: false})
     this.setState({search_coach_name: input})
   }
   uploadFile(e) {

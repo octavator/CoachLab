@@ -17,7 +17,7 @@ class Login extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/api/me").then(_res => {
+    http.get("/api/me").then(res => {
       if (res.status == 200) return window.location.href = "/bienvenue"
     }).catch(_e => console.log("not auth"))
   }

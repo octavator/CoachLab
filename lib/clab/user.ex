@@ -31,7 +31,10 @@ defmodule User do
 
   def handle_call({:get_user, email}, _from, state) do
     users = :ets.tab2list(@table)
-    {_key, value} = Enum.find(users, fn {_key, user} -> user.email == email end)
+    value = case Enum.find(users, fn {_key, user} -> user.email == email end) do
+      nil -> nil
+      {_key, value} -> value
+    end
     {:reply, value, state}
   end
 
@@ -164,8 +167,9 @@ defmodule User do
     |> Base.encode16()
   end
 
+  def format_user(nil), do: nil
   def format_user(user) do
-    Map.take(user, [:firstname, :lastname, :email, :id, :role, :avatar, :coaches, :session_price, :price_id])
+      Map.take(user, [:firstname, :lastname, :email, :id, :role, :avatar, :coaches, :session_price, :price_id])
   end
 
   def get_coached_users(coach_id) do

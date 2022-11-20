@@ -61,20 +61,22 @@ defmodule Clab.Mailer do
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-confirmation.html.eex", user: user)
     Task.start(fn ->
       Clab.Mailer.send_mail(
-        user.email,
+        [user.email],
         "Confirmation de votre inscription sur CoachLab",
         content)
     end)
   end
 
   def send_payment_link(user, coach, resa) do
-    payment_link = Stripe.create_product_price(coach)
+    resa_id = resa["id"]
+    price_id = Stripe.create_product_price(coach)
+    payment_link = Stripe.create_payment_link(price_id, user.id, resa_id)
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/resa-payment-link.html.eex",
      user: user, coach: coach, resa: resa, payment_link: payment_link)
     Task.start(fn ->
         Clab.Mailer.send_mail(
-        user.email,
-        "Paiement de votre session avec #{coach.firstname} #{coach.lastname}",
+        [user.email],
+        "Paiement de votre session avec #{coach.firstname} #{coach.lastname} le #{List.first(String.split(resa_id, " "))}",
         content
         )
      end)

@@ -60,7 +60,7 @@ class MyCoaches extends React.Component {
       .catch(err => {
         this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
       })
-    }
+    } else this.setState({show_coaches: false})
     this.setState({search_coach_name: input})
   }
   render() {

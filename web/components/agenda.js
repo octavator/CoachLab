@@ -30,7 +30,7 @@ class Agenda extends React.Component {
       reservations: {},
       appointment_detailed: {},
       form: this.defaultForm(),
-      user: {firstname: "", lastname: ""},
+      user: {firstname: "", lastname: "", role: "default"},
       target_user: {firstname: "", lastname: ""},
       weekdays: ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
       hours: ["8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21"],
@@ -81,11 +81,12 @@ class Agenda extends React.Component {
   }
   slotClickEvent(slot, slot_id) {
     if (this.getSlotClickableClass(slot) == "") return
-    //my agenda
-    if (!this.state.target_id) return (slot && this.setState({ appointment_details_modal: true, appointment_detailed: slot }))
-    //my coach agenda
+
+    if (!this.state.target_id && slot) return (this.setState({appointment_details_modal: true, appointment_detailed: slot}))
+
     if (!slot) this.setState({new_resa_modal: true, can_edit_new_resa: true, form: {...this.state.form, id: slot_id}})
-    else this.setState({new_resa_modal: true, can_edit_new_resa: false, form: {...slot, id: slot_id}})
+
+    else this.setState({appointment_details_modal: true, appointment_detailed: slot})
   }
   getSelectedYear(idx) {
     const today = new Date()
@@ -95,29 +96,38 @@ class Agenda extends React.Component {
     return this.state.year + (is_next_year ? 1 : (is_prev_year ? -1 : 0))
   }
   getSlotClickableClass(slot) {
-    const coachOwnAgenda = !this.state.target_id && this.state.user.role == "coach"
+    const coachOwnAgenda = !this.state.target_id && this.state.user?.role == "coach"
     const coachOpenSlot = !slot || slot.isMulti
     const is_clickable = coachOwnAgenda || this.state.target_id && coachOpenSlot
     return (is_clickable ? " clickable" : "")
   }
   resNewSlot() {
-    let ids = this.state.user.role == "coach" ? [] : [this.state.user.id]
-    http.post("/new-resa", {
+    let ids = !this.state.target_id && this.state.user?.role == "coach" ? this.state.form.coached_ids : [this.state.user.id]
+    http.post("/api/new-resa", {
       id: this.state.form.id,
-      //@TODO: coach doit pouvoir prendre lui meme rdv pour qqun
-      coached_user: this.state.user.id,
       resa: {...this.state.form, coached_ids: ids},
-      user_id: this.state.target_user.id
+      user_id: this.state.target_id || this.state.user.id
     }).then(res => {
       if (res.status != 200) return this.showFlashMessage("error", "Une erreur inconnue est survenue.")
       let schedule = {...this.state.schedule, [this.state.form.id]: this.state.form.id}
       let reservations = {...this.state.reservations, [this.state.form.id]: {...this.state.form, coached_ids: ids}}
       this.showFlashMessage("success", "Votre rendez-vous a bien été enregistré.")
-      this.setState({schedule: schedule, reservations: reservations, new_resa_modal: false, form: this.defaultForm()})  
+      this.setState({schedule: schedule, reservations: reservations, new_resa_modal: false, form: this.defaultForm(), search_user_name: ""})  
     })
     .catch(err => {
       this.showFlashMessage("error", err.response && err?.response?.data  || "Une erreur inattendue est survenue.")
     })
+  }
+  getMatchingUsers(input) {
+    if (input.length >= 1) {
+      http.get(`/users/search?user_name=${encodeURIComponent(input)}&coach_id=${this.state.target_id || this.state.user.id}`).then(res => {
+        if (res.data.length > 0) this.setState({matching_users: res.data, show_users: true})
+      })
+      .catch(err => {
+        this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+      })
+    } else this.setState({show_users: false})
+    this.setState({search_user_name: input})
   }
   getAppointmentTitle(slot) {
     if (!slot) return ""
@@ -144,22 +154,23 @@ class Agenda extends React.Component {
   }
   render() {
     let scheduleForm = [
-      <TextInput value={this.state.form.sessionTitle} onChange={(e) => {this.setState({form: {...this.state.form, sessionTitle: e}}) }}
+      <TextInput bold_label={true} value={this.state.form.sessionTitle} onChange={(e) => {this.setState({form: {...this.state.form, sessionTitle: e}}) }}
         label="Nom de la séance" disabled={!this.state.can_edit_new_resa && !this.state.can_edit_new_resa_name} extraClass=" white-bg" Placeholder="Session fitness pour débutants"/>,
-      <SelectInput value={this.state.durations.find(d => d.value == this.state.form.duration).label} disabled={!this.state.can_edit_new_resa} 
+      <SelectInput bold_label={true} value={this.state.durations.find(d => d.value == this.state.form.duration).label} disabled={!this.state.can_edit_new_resa} 
         options={this.state.durations.map(duration => {return {label: duration.label, value: duration.value}} )}
         onClick={(e) => { this.setState({form: {...this.state.form, duration: e}}) }} label="Durée" />,
-      <RadioButton value={this.state.form.isVideo} onClick={(e) => {this.setState({form: {...this.state.form, isVideo: e}}) }}
+      <RadioButton bold_label={true} value={this.state.form.isVideo} onClick={(e) => {this.setState({form: {...this.state.form, isVideo: e}}) }}
         label="Visio-conférence ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa} />,
-      <TextInput value={this.state.form.address} onChange={(e) => {this.setState({form: {...this.state.form, address: e}}) }}
+      <TextInput bold_label={true} value={this.state.form.address} onChange={(e) => {this.setState({form: {...this.state.form, address: e}}) }}
         label={ this.state.form.isVideo ? undefined : `Addresse de la séance`} disabled={!this.state.can_edit_new_resa && !this.state.can_edit_new_resa_name}
         extraClass={`white-bg ${this.state.form.isVideo ? "hidden" : ""}`} Placeholder="20 avenue Jean Moulin, Paris"/>,
-      <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
+      <RadioButton bold_label={true} value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
         label="Séance de groupe ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa || this.state.target_id} />,
-      <div className={`select-input-autocomplete-container ${this.state.user.role == "coach" ? "" : "hidden"}`}>
-        <TextInput extraClass="text-3 autocomplete-text-input" value={this.state.search_user_name} label="Ajoutez un coaché" placeholder="Nom du coaché" 
+      <div className={`select-input-autocomplete-container ${!this.state.target_id && this.state.user?.role == "coach" ? "" : "hidden"}`}>
+        <TextInput extraClass="text-3 autocomplete-text-input white-bg" value={this.state.search_user_name} 
+        bold_label={true} label="Ajoutez un coaché" placeholder="Nom du coaché" 
           onChange={(e) => { this.getMatchingUsers(e) }} />
-        <div className={`select-autocomplete-wrapper ${this.state.show_users ? "" : "hidden"}`}>
+        <div className={`select-autocomplete-wrapper labeled ${this.state.show_users ? "" : "hidden"}`}>
           {
             this.state.matching_users.map((matching_user) => 
               <div
@@ -167,9 +178,9 @@ class Agenda extends React.Component {
                 className="select-autocomplete-option text-3"
                 onClick={() => 
                   this.setState({
-                    search_coach_name: `${matching_user.firstname} ${matching_user.lastname}`,
+                    search_user_name: `${matching_user.firstname} ${matching_user.lastname}`,
                     form: {...this.state.form, coached_ids: [matching_user.id]},
-                    show_coaches: false
+                    show_users: false
                   })
                 }
               >

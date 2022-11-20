@@ -40,8 +40,7 @@ class TempWelcomePage extends React.Component {
     })
   }
   render() {
-    return (
-      <div className="login-wrapper">
+    return <div className="login-wrapper">
         <Navbar user={this.state.user}/>
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <h1 className="page-title welcome-page-title text-1">Vous êtes bien inscrit sur CoachLab !</h1>
@@ -56,9 +55,8 @@ class TempWelcomePage extends React.Component {
           <Button extraClass="text-3" onClick={() => { this.sendInviteMail()}} text="Suivant"/>
         </div>
       </div>
-    )
   }
 }
 
-const domContainer = document.querySelector('.temp-welcome-page-wrapper');
-ReactDOM.render(<TempWelcomePage/>, domContainer);
+const domContainer = document.querySelector('.temp-welcome-page-wrapper')
+ReactDOM.render(<TempWelcomePage/>, domContainer)

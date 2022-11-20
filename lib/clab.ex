@@ -146,7 +146,7 @@ defmodule ClabRouter do
       reservation = Reservation.get_reservation(resa_id)
       coach = User.get_user_by_id(reservation["coach_id"])
       res = Stripe.create_payment_link(coach[:price_id], id, resa_id)
-      send_resp(conn, 200, res["url"] |> Poison.encode!)
+      send_resp(conn, 200, res |> Poison.encode!)
     else
       send_resp(conn, 401, "Token invalide")
     end
@@ -282,7 +282,7 @@ defmodule ClabRouter do
     user_name = conn.query_params["user_name"] |> URI.decode()
     users =
       User.get_coached_users(coach_id)
-      |> Enum.filter(& String.contains?("#{&1[:firstname]} #{&1[:lastname]}", user_name))
+      |> Enum.filter(& Utils.contains_string("#{&1[:firstname]} #{&1[:lastname]}", user_name))
       |> Poison.encode!
     send_resp(conn, 200, users)
   end
@@ -398,8 +398,7 @@ defmodule ClabRouter do
     end
   end
 
-  #@TODO: envoie de mail si le RDV n'est pas pris par un coaché, pastille sur agenda coach si c'est pas payé,
-  post "/new-resa" do
+  post "/api/new-resa" do
     id = check_token_user(conn)
     if !is_nil(id) do
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
@@ -409,7 +408,9 @@ defmodule ClabRouter do
         "coach_avatar" => coach[:avatar],
         "coach_name" => "#{coach.firstname} #{coach.lastname}",
       })
-      {status_code, ret_text} = Agenda.reserve_agendas(payload.id, payload.coached_ids, payload)
+      {status_code, ret_text} = Agenda.reserve_agendas(payload["id"], payload["coached_ids"], payload)
+      IO.inspect(payload, label: "coached_ids")
+      Enum.each(List.wrap(payload["coached_ids"]), & Reservation.send_payment_link(payload["id"], &1))
       send_resp(conn, status_code, ret_text)
     else
       send_resp(conn, 401, "Token invalide")
@@ -420,8 +421,7 @@ defmodule ClabRouter do
     id = check_token_user(conn)
     if !is_nil(id) do
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
-      #@TODO: modify coached_ids and send mail to new ids
-      payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle, "address" => body.address}
+      payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle, "address" => body.address, "coached_ids" => body.coached_ids}
       if Reservation.update_reservation(body.id, payload, id) == :error do
         send_resp(conn, 403, "Vous n'avez pas l'autorisation de modifier cette reservation.")
       else
