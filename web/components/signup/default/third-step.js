@@ -20,8 +20,6 @@ class DefaultThirdStep extends React.Component {
     const coach_id = urlParams.get("coach")
     if (coach_id) {
       http.get(`/api/user/${coach_id}`).then(res => {
-        console.log(res.status)
-        console.log(res.data)
         if (res.status == 200) this.setState({
           form: {...this.state.form, coaches: [res.data.id]},
           search_coach_name: `${res.data.firstname} ${res.data.lastname} `
@@ -36,8 +34,6 @@ class DefaultThirdStep extends React.Component {
   getMatchingCoaches(input) {
     if (input.length >= 3) {
       http.get(`/coach/search?coach_name=${encodeURIComponent(input)}`).then(res => {
-        console.log(res.status)
-        console.log(res.data)
         if (res.data.length > 0) this.setState({coaches: res.data, show_coaches: true})
       })
       .catch(err => {

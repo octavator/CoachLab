@@ -1,0 +1,17 @@
+<html>
+<body>
+
+    Bonjour <%= "#{user.firstname}," %><br/><br/>
+
+    Vous avez une séance <%= resa["isMulti"] ? "de groupe" : "individuelle" %> avec <%= "#{coach.firstname} #{coach.lastname}" %> en attente de paiement ! <br/>
+    Connectez-vous puis suivez ce lien pour régler la séance: 
+    
+    <%= link to: "#{payment_link}" do %>
+        <%= payment_link %>
+    <% end %>
+
+    <br/> <br/>
+        
+    Merci pour votre confiance et à bientôt sur CoachLab !
+
+</body>

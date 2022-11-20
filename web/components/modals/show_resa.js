@@ -8,7 +8,10 @@ class ShowResaModal extends React.Component {
       sessionTitle: this.props.appointment_detailed?.sessionTitle || "",
       address: this.props.appointment_detailed?.address || "",
       appointment_detailed: {},
-      coached_ids: this.props.appointment_detailed?.coached_ids || []
+      coached_ids: this.props.appointment_detailed?.coached_ids || [],
+      search_user_name: "",
+      show_users: false,
+      matching_users: []
     }
   }
   componentDidUpdate(prevProps) {
@@ -35,6 +38,18 @@ class ShowResaModal extends React.Component {
       this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
+  getMatchingUsers(input) {
+    if (input.length >= 1) {
+      http.get(`/user/search?user_name=${encodeURIComponent(input)}`).then(res => {
+        if (res.data.length > 0) this.setState({matching_users: res.data.filter((u) => this.state.coached_ids?.includes(u.id)), show_users: true})
+      })
+      .catch(err => {
+        this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+      })
+    }
+    this.setState({search_user_name: input})
+  }
+
   updateResa() {
     http.post("/api/update-resa", {
       id: this.props.appointment_detailed.id,
@@ -44,7 +59,12 @@ class ShowResaModal extends React.Component {
     })
     .then(res => {
       if (res.status != 200) return this.props.showFlashMessage("error", "Une erreur inconnue est survenue.")
-      this.props.updateResa({...this.props.appointment_detailed, sessionTitle: this.state.sessionTitle, address: this.state.address})
+      this.props.updateResa({
+        ...this.props.appointment_detailed,
+        sessionTitle: this.state.sessionTitle,
+        address: this.state.address,
+        coached_ids: this.state.coached_ids
+      })
       this.props.showFlashMessage("success", "Votre rendez-vous a bien été modifié.")
     })
     .catch(err => {
@@ -96,6 +116,29 @@ class ShowResaModal extends React.Component {
         <div className="bold mt-1">Lien de paiement de la session:</div>
         <div className="clab-link" onClick={() => window.open(`${this.props.payment_link}`, "_blank")}>
           Cliquez ici pour payer
+        </div>
+      </div>,
+      <div className={`select-input-autocomplete-container ${this.state.user.role == "coach" ? "" : "hidden"}`}>
+        <TextInput extraClass="text-3 autocomplete-text-input" value={this.state.search_user_name} placeholder="Nom du coaché" 
+          onChange={(e) => { this.getMatchingUsers(e) }} />
+        <div className={`select-autocomplete-wrapper ${this.state.show_users ? "" : "hidden"}`}>
+          {
+            this.state.matching_users.map((matching_user) => 
+              <div
+                key={matching_user.id}
+                className="select-autocomplete-option text-3"
+                onClick={() => 
+                  this.setState({
+                    search_user_name: `${matching_user.firstname} ${matching_user.lastname}`,
+                    coached_ids: [...this.state.coached_ids, matching_user.id],
+                    show_users: false
+                  })
+                } 
+              >
+                {`${matching_user.firstname} ${matching_user.lastname}`}
+              </div>
+            )
+          }        
         </div>
       </div>,
       <div className="input-group">

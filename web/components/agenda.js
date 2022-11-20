@@ -23,6 +23,9 @@ class Agenda extends React.Component {
       showFlash: false,
       flashType: '',
       flashMessage: '',
+      matching_users: [],
+      show_users: false,
+      search_user_name: "",
       coached_users: {},
       reservations: {},
       appointment_detailed: {},
@@ -136,6 +139,7 @@ class Agenda extends React.Component {
       sessionTitle: "",
       address: "",
       id: "",
+      coached_ids: []
     }
   }
   render() {
@@ -152,6 +156,30 @@ class Agenda extends React.Component {
         extraClass={`white-bg ${this.state.form.isVideo ? "hidden" : ""}`} Placeholder="20 avenue Jean Moulin, Paris"/>,
       <RadioButton value={this.state.form.isMulti} onClick={(e) => {this.setState({form: {...this.state.form, isMulti: e}}) }}
         label="Séance de groupe ?" yesLabel="Oui" noLabel="Non" disabled={!this.state.can_edit_new_resa || this.state.target_id} />,
+      <div className={`select-input-autocomplete-container ${this.state.user.role == "coach" ? "" : "hidden"}`}>
+        <TextInput extraClass="text-3 autocomplete-text-input" value={this.state.search_user_name} label="Ajoutez un coaché" placeholder="Nom du coaché" 
+          onChange={(e) => { this.getMatchingUsers(e) }} />
+        <div className={`select-autocomplete-wrapper ${this.state.show_users ? "" : "hidden"}`}>
+          {
+            this.state.matching_users.map((matching_user) => 
+              <div
+                key={matching_user.id}
+                className="select-autocomplete-option text-3"
+                onClick={() => 
+                  this.setState({
+                    search_coach_name: `${matching_user.firstname} ${matching_user.lastname}`,
+                    form: {...this.state.form, coached_ids: [matching_user.id]},
+                    show_coaches: false
+                  })
+                }
+              >
+                {`${matching_user.firstname} ${matching_user.lastname}`}
+              </div>
+            )
+          }        
+        </div>
+      </div>,
+
       <div className="input-group">
         <Button extraClass="cl-button mt-2" onClick={() => { this.resNewSlot() }} text="Valider" />
       </div>

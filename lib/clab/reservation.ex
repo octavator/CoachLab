@@ -59,6 +59,7 @@ defmodule Reservation do
       true ->
         resa = update_in(resa, ["coached_ids"], &List.wrap(&1) ++ [coached_id])
         res = :ets.insert(@table, {id, resa})
+        Agenda.update_agenda(coached_id, %{resa["id"] => resa["id"]})
         {:reply, res, state}  
     end
   end
@@ -129,5 +130,12 @@ defmodule Reservation do
     day = Enum.at(String.split(datetime_str, "/"), 0)
     date = "#{year}-#{month}-#{day}"
     Timex.parse!("#{date}T#{List.last(String.split(datetime_str, "T"))}Z", "{ISO:Extended:Z}")
+  end
+
+  def send_payment_link(res_id, user_id) do
+    resa = get_reservation(res_id)
+    coach = User.get_user_by_id(resa["coach_id"])
+    user = User.get_user_by_id(user_id)
+    Clab.Mailer.send_payment_link(user, coach, resa)
   end
 end

@@ -66,6 +66,19 @@ defmodule Clab.Mailer do
         content)
     end)
   end
+
+  def send_payment_link(user, coach, resa) do
+    payment_link = Stripe.create_product_price(coach)
+    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/resa-payment-link.html.eex",
+     user: user, coach: coach, resa: resa, payment_link: payment_link)
+    Task.start(fn ->
+        Clab.Mailer.send_mail(
+        user.email,
+        "Paiement de votre session avec #{coach.firstname} #{coach.lastname}",
+        content
+        )
+     end)
+  end
 end
 
 """

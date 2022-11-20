@@ -126,7 +126,7 @@ defmodule ClabRouter do
     if !is_nil(id) do
       user = User.get_user_by_id(id)
       reservation = Reservation.get_reservation(resa_id)
-      reservation = if user.id == reservation.coach_id do
+      reservation = if user.id == reservation["coach_id"] do
         reservation
       else
         coached_ids = Enum.filter(List.wrap(reservation["coached_ids"]), & &1 == id)
@@ -277,6 +277,16 @@ defmodule ClabRouter do
     send_resp(conn, 200, users)
   end
 
+  get "/users/search" do
+    coach_id = conn.query_params["coach_id"] |> URI.decode()
+    user_name = conn.query_params["user_name"] |> URI.decode()
+    users =
+      User.get_coached_users(coach_id)
+      |> Enum.filter(& String.contains?("#{&1[:firstname]} #{&1[:lastname]}", user_name))
+      |> Poison.encode!
+    send_resp(conn, 200, users)
+  end
+
   post "/sign-up" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
     {conn, status_code, ret_text} = case User.create_user(body) do
@@ -409,7 +419,6 @@ defmodule ClabRouter do
   post "/api/update-resa" do
     id = check_token_user(conn)
     if !is_nil(id) do
-      #user = User.get_user_by_id(id)
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       #@TODO: modify coached_ids and send mail to new ids
       payload = %{"id" => body.id, "sessionTitle" => body.sessionTitle, "address" => body.address}
@@ -431,9 +440,9 @@ defmodule ClabRouter do
       User.get_user_by_id(id)[:role] != "default" ->
         send_resp(conn, 403, "Un coach ne peut pas s'inscrire à une séance.")
       true ->
-        #@TODO: send payment mail
         res_id = conn.query_params["id"] |> URI.decode()
         Reservation.add_coached_id(res_id, id)
+        Reservation.send_payment_link(res_id, id)
         send_resp(conn, 200, "RDV mis à jour.")  
     end
   end

@@ -9,7 +9,7 @@ defmodule Stripe do
     "line_items[0][price]=#{price_id}&line_items[0][quantity]=1&after_completion[type]" 
      <> "=redirect&after_completion[redirect][url]=#{redirect_url}",
     [{"Authorization", "Bearer #{@token}"}, {"Content-Type", "application/x-www-form-urlencoded"}])
-    Poison.decode!(res.body)
+    Poison.decode!(res.body)["url"]
   end
 
   def create_product_price(coach) do
@@ -19,8 +19,7 @@ defmodule Stripe do
     [{"Authorization", "Bearer #{@token}"}, {"Content-Type", "application/x-www-form-urlencoded"}])
     body = Poison.decode!(res.body)
     User.edit_user(coach.id, %{price_id: body["id"]})
-    IO.inspect(body, label: "Created product price")
-    body
+    body["id"]
   end
   
   def create_product(coach) do
@@ -37,11 +36,6 @@ defmodule Stripe do
   def create_product_for_coaches() do
     :ets.tab2list(:users)
     |> Enum.each(fn {_id, value} -> if value.role == "coach", do: create_product(value) end)
-  end
-
-  def create_product_prices_for_coaches() do
-    :ets.tab2list(:users)
-    |> Enum.each(fn {_id, value} -> if value.role == "coach", do: create_product_price(value) end)
   end
 end
 
