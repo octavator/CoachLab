@@ -22,7 +22,8 @@ class ForgottenPassword extends React.Component {
     const urlParams = new URLSearchParams(document.location.search)
     const token = urlParams.get("token")
     http.post(`/api/change_password`, {password: this.state.password, token: token}).then(res => {
-      window.location.href = "/connexion"
+      if (res.status == 200) window.location.href = "/connexion"
+      else this.showFlashMessage("error", "Une erreur inattendue est survenue") 
     })
     .catch(err => {
       this.showFlashMessage("error", "Une erreur inattendue est survenue")
@@ -41,7 +42,7 @@ class ForgottenPassword extends React.Component {
             onChange={(e) => { this.setState({password_check: e}) }}  placeholder="********"
              name="password_check" bold_label={true} label="Confirmez le mot de passe" />
           <Button extraClass="text-3 white-bg cl-form-button" onClick={() => { this.sendForm()}} text="Valider" />
-    </div>
+        </div>
       </div>
     )
   }

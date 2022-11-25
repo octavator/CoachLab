@@ -25,7 +25,8 @@ defmodule Clab.Application do
       Agenda,
       Reservation,
       DataSaver,
-      ImageMover
+      ImageMover,
+      AutoMailer
     ]
 
     opts = [

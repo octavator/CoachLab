@@ -69,7 +69,7 @@ defmodule Clab.Mailer do
 
   def send_payment_link(user, coach, resa) do
     resa_id = resa["id"]
-    price_id = Stripe.create_product_price(coach)
+    price_id = Stripe.create_product_price(coach, resa["price"] || coach[:session_price])
     payment_link = Stripe.create_payment_link(price_id, user.id, resa_id)
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/resa-payment-link.html.eex",
      user: user, coach: coach, resa: resa, payment_link: payment_link)
@@ -80,6 +80,23 @@ defmodule Clab.Mailer do
         content
         )
      end)
+  end
+
+  def send_invoice(user_id, resa) do
+    coach_id = resa["coach_id"]
+    coach = User.get_user_by_id(coach_id)
+    user = User.get_user_by_id(user_id)
+    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/invoice.html.eex",
+     user: user, coach: coach, resa: resa, base_url: Application.get_env(:clab, :url))
+    # attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
+    Task.start(fn ->
+      Clab.Mailer.send_mail(
+        [user.email],
+        "[CoachLab] Confirmation de votre séance avec #{coach.firstname} #{coach.lastname}",
+        content
+      )
+        # attachments)
+    end)
   end
 end
 

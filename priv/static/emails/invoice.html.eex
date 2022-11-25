@@ -1,0 +1,17 @@
+<html>
+<body>
+
+    Bonjour <%= "#{user.firstname} #{user.lastname}," %><br/><br/>
+
+    Votre paiement pour votre séance <%= resa["isMulti"] && "de groupe" || "individuelle" %> avec <b> <%= "#{coach.firstname} #{coach.lastname}" %> </b> 
+    a bien été validé ! <br/>
+
+    Retrouvez-le le <%= date_str %> à <%= time_str %>  <%= if resa["isVideo"], do: "sur CoachLab !", else: "à l'adresse suivante: <br/>" <> resa["address"] %>
+    <br/> <br/>
+
+    Vous pouvez visualiser et télécharger votre facture en suivant ce lien: 
+    <a href="<%= base_url %>/facture?resa_id=<%= resa["id"] %>"><%= base_url %>/facture?resa_id=<%= resa["id"] %></a>
+
+    Merci pour votre confiance et à bientôt sur CoachLab !
+
+</body>

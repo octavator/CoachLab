@@ -12,10 +12,10 @@ defmodule Stripe do
     Poison.decode!(res.body)["url"]
   end
 
-  def create_product_price(coach) do
+  def create_product_price(coach, price) do
     {:ok, res} = StripeApi.post("prices", 
     {:form, [{"currency","eur"}, {"product","session_#{coach.id}"},
-    {"unit_amount", String.to_integer(coach[:session_price] || "50") * 100}]},
+    {"unit_amount", String.to_integer(price || "50") * 100}]},
     [{"Authorization", "Bearer #{@token}"}, {"Content-Type", "application/x-www-form-urlencoded"}])
     body = Poison.decode!(res.body)
     User.edit_user(coach.id, %{price_id: body["id"]})

@@ -68,6 +68,7 @@ defmodule Reservation do
 
   def handle_call({:confirm_payment, {id, coached_id}}, _from, state) do
     [{_key, resa}] = :ets.lookup(@table, id)
+    if !Enum.member?(resa["paid"], coached_id), do: Clab.Mailer.send_invoice(coached_id, resa)
     resa = update_in(resa, ["paid"], &Enum.uniq(List.wrap(&1) ++ [coached_id]))
     :ets.insert(@table, {id, resa})
     {:reply, resa, state}

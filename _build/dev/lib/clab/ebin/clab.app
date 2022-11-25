@@ -3,7 +3,7 @@
                              cowboy,plug_cowboy,poison,mailibex,gen_smtp,
                              joken,httpoison,hackney,timex]},
               {description,"clab"},
-              {modules,['Elixir.Agenda','Elixir.Clab',
+              {modules,['Elixir.Agenda','Elixir.AutoMailer','Elixir.Clab',
                         'Elixir.Clab.Application','Elixir.Clab.AuthPlug',
                         'Elixir.Clab.Mailer','Elixir.ClabRouter',
                         'Elixir.DataSaver','Elixir.ImageMover','Elixir.Jwt',

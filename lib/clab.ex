@@ -389,7 +389,9 @@ defmodule ClabRouter do
         edit_ret == :error -> {400, "Erreur durant le changement de vos informations."}
         existing_user  -> {400, "Cette adresse mail est déjà utilisée."}
         true ->
-          if (body[:session_price] && body[:session_price] != user[:session_price]), do: Stripe.create_product_price(Map.put(user, :session_price, body.session_price))
+          if (body[:session_price] && body[:session_price] != user[:session_price]) do
+            Stripe.create_product_price(Map.put(user, :session_price, body.session_price), body.session_price)
+          end
           {200, "Vos informations ont été mis à jour."}
       end
       send_resp(conn, status_code, ret_text)
@@ -480,12 +482,17 @@ defmodule ClabRouter do
     send_resp(conn, 200, data)
   end
 
+  get "/facture" do
+    data = Utils.get_html_template("invoice")
+    send_resp(conn, 200, data)
+  end
+
   get "/api/send_password_reset" do
     mail = conn.query_params["mail"] |> URI.decode()
     ## Checks user exists
     _u = User.get_user(mail)
     hash = User.create_reset_hash(mail)
-    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/forgotten-password.html.eex", hash: hash)
+    content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/forgotten-password.html.eex", hash: hash, base_url: Application.get_env(:clab, :url))
     Task.start(fn -> Clab.Mailer.send_mail([mail], "Ré-initialisez votre mot de passe CoachLab", content) end)
     send_resp(conn, 200, "OK")
   end

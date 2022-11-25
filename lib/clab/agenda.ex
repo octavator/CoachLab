@@ -29,7 +29,8 @@ defmodule Agenda do
       try do
         updated_coach_agenda = Enum.all?(coached_ids, & Agenda.update_agenda(&1, %{resa_id => resa_id}))
         if updated_coach_agenda do
-          Reservation.create_reservation(resa_id, payload)
+          coach = User.get_user_by_id(payload["coach_id"])
+          Reservation.create_reservation(resa_id, Map.put(payload, "price", coach[:session_price] || "50"))
           Agenda.update_agenda(payload["coach_id"], %{resa_id => resa_id})
           {200, "Votre rendez-vous a bien été enregistré."}
         else

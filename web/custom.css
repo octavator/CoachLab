@@ -212,6 +212,9 @@ a {
     cursor: pointer;
     width: 1vw;
     height: 1vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 1px solid grey;
     background-color: white;
     border-radius: 100px;
@@ -221,7 +224,7 @@ a {
     height: 85%;
     width: 85%;
     border-radius: 100px;
-    border: 1px solid white;
+    border: 0px solid white;
     background-color: #318ce7;
 }
 
@@ -827,6 +830,9 @@ a {
 /* NAVBAR */
 .user-dropdown {
     cursor: pointer;
+    position: relative;
+    margin-right: 5px;
+    text-align: center;
 }
 
 .navbar-wrapper {
@@ -877,11 +883,11 @@ a {
 
 .menu-dropdown-list {
     position: absolute;
-    margin: 15px;
     z-index: 3;
     border: 1px solid black;
     right: 0;
-    top: 40px;
+    top: 2vh;
+    border-radius: 20px;
     background-color: white;
 }
 
@@ -890,12 +896,20 @@ a {
 }
 
 .menu-dropdown-list-item {
-    padding: 13px 15px;
+    padding: 20px 20px;
+    border-bottom: 1px solid grey;
     cursor: pointer;
     color: #26619C;
 }
 .menu-dropdown-list-item:hover {
    background-color: aliceblue;
+}
+.menu-dropdown-list-item:first-of-type {
+    border-radius: 20px 20px 0 0;
+}
+.menu-dropdown-list-item:last-of-type {
+    border-bottom: none;
+    border-radius: 0 0 20px 20px;
 }
 
 .sign-up-section {
@@ -1041,9 +1055,6 @@ a {
     font-weight: bold;
     text-align: center;
     margin-bottom: 20px;
-}
-
-.landing-gradient-text {
 }
 
 .landing-info-card-text {
@@ -1694,5 +1705,20 @@ a {
     } 
     .landing-desktop-pictures-container {
         width: 60%;
+    }
+}
+
+@media print {
+    .invoice-wrapper {
+        background-color: white;
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 15px;
+        font-size: 14px;
+        line-height: 18px;
     }
 }
