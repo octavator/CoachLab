@@ -13,7 +13,8 @@ defmodule ClabRouter do
 
   @secret "73JIOiOJSKLAZHOJfspaioz9902"
 
-  plug Plug.SSL
+  #@TODO
+  # plug Plug.SSL
   plug Plug.Static, from: :clab, at: "/priv/static"
   plug :match
   plug Plug.Parsers,
@@ -41,7 +42,7 @@ defmodule ClabRouter do
     cond do
       !is_nil(conn.cookies["CLABPOWAAA"]) ->
         conn.cookies["CLABPOWAAA"]
-      cookie && cookie == build_token(get_user_from_token(cookie)) -> 
+      cookie && cookie == build_token(get_user_from_token(cookie)) ->
         get_user_from_token(cookie)
       true -> nil
     end
@@ -320,7 +321,7 @@ defmodule ClabRouter do
               {conn, 200, "Votre compte a été bien été créé."}
           end
         rescue
-          e -> 
+          e ->
             Logger.error("[ERROR] Bad signup for user: #{user.email}, #{inspect(e)}")
             User.delete_user(user.id)
             {conn, 400, "Une erreur est survenue lors de la création de votre compte."}
@@ -340,7 +341,7 @@ defmodule ClabRouter do
       user = User.get_user_by_id(id)
       res_id = conn.query_params["roomId"] |> URI.decode() |> String.replace(":00 ", ":00+")
       dt = Reservation.get_date_from_id(res_id)
-      time_diff = Timex.diff(Timex.now("Europe/Paris"), dt, :minutes) 
+      time_diff = Timex.diff(Timex.now("Europe/Paris"), dt, :minutes)
       resa = Reservation.get_reservation(res_id)
       cond do
         time_diff > 90 ->
@@ -445,7 +446,7 @@ defmodule ClabRouter do
         res_id = conn.query_params["id"] |> URI.decode()
         Reservation.add_coached_id(res_id, id)
         Reservation.send_payment_link(res_id, id)
-        send_resp(conn, 200, "RDV mis à jour.")  
+        send_resp(conn, 200, "RDV mis à jour.")
     end
   end
 

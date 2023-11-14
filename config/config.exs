@@ -2,7 +2,7 @@ import Config
 
 config :clab,
   env: :dev,
-  url: "http://localhost:4001",
+  url: "http://localhost:80",
   test_key: "test value",
   region: "email-smtp.eu-west-1.amazonaws.com",
   access_key: "AKIA6L3JFYZIQWKZOPXX",

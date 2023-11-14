@@ -5,19 +5,20 @@ defmodule Clab.Application do
 
   def start(_type, _args) do
     cowboy_children = case Application.fetch_env!(:clab, :env) do
-      env when env in [:prod, :preprod] ->
-        [{
-          Plug.Cowboy, scheme: :https, plug: ClabRouter, options: [
-            port: 443,
-            otp_app: :clab,
-            keyfile: "./privkey.pem",
-            certfile: "./certificate.pem"
-          ]
-        },
-        {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 80]}
-        ]
+      # env when env in [:prod, :preprod] ->
+      #   [{
+      #     Plug.Cowboy, scheme: :https, plug: ClabRouter, options: [
+      #       port: 443,
+      #       otp_app: :clab,
+      #       keyfile: "./privkey.pem",
+      #       certfile: "./certificate.pem"
+      #     ]
+      #   },
+      #   {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 8080]}
+      #   ]
+
       _ ->
-        [{Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 4001]}]
+        [{Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 80]}]
     end
 
     children = cowboy_children ++ [

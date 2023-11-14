@@ -26,11 +26,11 @@ defmodule DataSaver do
   def backup(tables) do
     Enum.each(tables, fn table ->
       date = DateTime.utc_now()
-      date_string = 
+      date_string =
        date
        |> DateTime.to_string
        |> String.split(".")
-       |> List.first
+       |> List.first()
        |> String.replace(" ", "_")
        |> String.replace(":", "")
 
@@ -41,10 +41,11 @@ defmodule DataSaver do
   end
 
   def clean_backups() do
-    files = File.ls!(@backup_path)
-    Enum.each(files, fn file ->
-      today = DateTime.to_date(DateTime.utc_now) 
-      date_string = 
+    @backup_path
+    |> File.ls!()
+    |> Enum.each(fn file ->
+      today = DateTime.to_date(DateTime.utc_now)
+      date_string =
         file
         |> String.split("_")
         |> Enum.at(1)
@@ -55,7 +56,7 @@ defmodule DataSaver do
 
       if Date.compare(target_date, today) == :lt do
         Logger.info("[ETS] Cleaning outdated archive #{file}")
-        IO.inspect(File.rm('#{@backup_path}#{file}'))
+        File.rm('#{@backup_path}#{file}')
       end
     end)
   end

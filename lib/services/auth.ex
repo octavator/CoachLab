@@ -2,7 +2,7 @@ defmodule Clab.AuthPlug do
   import Plug.Conn
   use Plug.Builder
 
-  @secret "73JIOiOJSKLAZHOJfspaioz9902"
+  @secret "ex6NgPSw1MAcMolW0R1czwDC"
 
   def init(options), do: options
 
@@ -10,7 +10,7 @@ defmodule Clab.AuthPlug do
     id = check_token_user(conn)
     user = User.get_user_by_id(id)
     case user do
-      nil -> 
+      nil ->
         send_resp(conn, 401, "Token invalide") |> halt()
       _ ->
         conn |> assign(:user, user)
@@ -28,18 +28,25 @@ defmodule Clab.AuthPlug do
     cond do
       !is_nil(conn.cookies["CLABPOWAAA"]) ->
         conn.cookies["CLABPOWAAA"]
-      cookie && cookie == build_token(get_user_from_token(cookie)) -> 
+
+      cookie && cookie == build_token(get_user_from_token(cookie)) ->
         get_user_from_token(cookie)
-      true -> nil
+
+      true ->
+        nil
     end
   end
 
   def get_user_from_token(cookie) do
     case cookie do
-      nil -> nil
+      nil ->
+        nil
+
       cookie ->
-        token = cookie |> Base.decode64!(padding: false)
-        String.split(token, "|") |> hd
+        cookie
+        |> Base.decode64!(padding: false)
+        |> String.split("|")
+        |> List.first()
     end
   end
 end

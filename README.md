@@ -1,11 +1,8 @@
 # Clab
 
-**TODO: Add description**
-
-
 ## Server
 
-Server runs on port 4001 in http in local dev and in https on port 443 in deployed environment (preprod and production)
+Server runs on port 8080 in http in local dev and in https on port 443 in deployed environment (preprod and production)
 Environment is defined in config file
 
 ## Installation
