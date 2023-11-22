@@ -1,4 +1,4 @@
 const http = axios.create({
     baseURL: window.location.origin,
-    timeout: 3000,
-  });
+    timeout: 5000,
+  })

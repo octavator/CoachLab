@@ -15,23 +15,28 @@ class ShowResaModal extends React.Component {
     }
   }
   componentDidUpdate(prevProps) {
-    if (prevProps.appointment_detailed !== this.props.appointment_detailed) {
-      this.setState({
-        address: this.props.appointment_detailed?.address,
-        sessionTitle: this.props.appointment_detailed?.sessionTitle,
-        coached_ids: this.props.appointment_detailed?.coached_ids
-      })
-    }
+    if (prevProps.appointment_detailed === this.props.appointment_detailed) return
+    this.setState({
+      address: this.props.appointment_detailed?.address,
+      sessionTitle: this.props.appointment_detailed?.sessionTitle,
+      coached_ids: this.props.appointment_detailed?.coached_ids
+    })
   }
   buildVideoId() {
-    return (!this.props.appointment_detailed.id ? undefined
-     : `/video?roomId=${encodeURIComponent(this.props.appointment_detailed.id)}`)
+    return (
+      !this.props.appointment_detailed.id
+      ? undefined
+      : `/video?roomId=${encodeURIComponent(this.props.appointment_detailed.id)}`
+    )
   }
   subscribeResa() {
     http.get(`/api/subscribe-resa?id=${this.props.appointment_detailed.id}`)
     .then(res => {
       if (res.status != 200) return this.props.showFlashMessage("error", "Une erreur inconnue est survenue.")
-      this.props.updateResa({...this.props.appointment_detailed, coached_ids: [...this.props.appointment_detailed.coached_ids, this.props.user.id]})
+      this.props.updateResa({
+        ...this.props.appointment_detailed,
+        coached_ids: [...this.props.appointment_detailed.coached_ids, this.props.user.id]
+      })
       this.props.showFlashMessage("success", "Vous êtes bien inscrit à la séance. N'oubliez pas de la régler au moins 48h avant.")
     })
     .catch(err => {
@@ -39,19 +44,25 @@ class ShowResaModal extends React.Component {
     })
   }
   getMatchingUsers(input) {
-    if (input.length >= 1) {
-      http.get(`/users/search?user_name=${encodeURIComponent(input)}&coach_id=${this.props.appointment_detailed.coach_id}`).then(res => {
-        if (res.data.length > 0) this.setState({matching_users: res.data.filter((u) => !this.state.coached_ids?.includes(u.id)), show_users: true})
-      })
-      .catch(err => {
-        this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
-      })
-    } else this.setState({show_users: false})
+    if (input.length == 0) return this.setState({show_users: false, search_user_name: input})
+
+    http.get(`/users/search?user_name=${encodeURIComponent(input)}&coach_id=${this.props.appointment_detailed.coach_id}`)
+    .then(res => {
+      if (res?.data?.length > 0) this.setState({matching_users: res.data.filter((u) => !this.state.coached_ids?.includes(u.id)), show_users: true})
+    })
+    .catch(err => {
+      this.props.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+    })
     this.setState({search_user_name: input})
   }
   displayCoachedInvite() {
     if (this.props.user?.role != "coach") return false
-    return this.props.appointment_detailed?.isMulti || this.props.appointment_detailed?.coached_ids == 0
+    if (this.props.appointment_detailed?.isMulti) return true
+    return this.props.appointment_detailed?.coached_ids?.length == 0 || true
+  }
+  displayPaymentLink() {
+    if (this.props.appointment_detailed.coach_id == this.props.user.id) return false
+    return !this.props.appointment_detailed.paid?.includes(this.props.user.id)
   }
   updateResa() {
     http.post("/api/update-resa", {
@@ -78,12 +89,12 @@ class ShowResaModal extends React.Component {
     let fields = [
       <div key="sessionTitle">
         <TextInput value={this.state.sessionTitle} onChange={(e) => {this.setState({sessionTitle: e}) }}
-          label="Nom de la séance:" bold_label="true" disabled={this.props.appointment_detailed.coach_id != this.props.user.id} extraClass=" white-bg" Placeholder="Thème de la session"
-        />,
+          label="Nom de la séance:" bold_label="true" extraClass=" white-bg" Placeholder="Thème de la session"
+          disabled={this.props.appointment_detailed.coach_id != this.props.user.id} />
       </div>,
       <div key="duration">
         <div className="bold mt-1 mb-1">Durée:</div>
-        <div>{this.props.appointment_detailed.duration + " min"}</div>
+        <div>{`${this.props.appointment_detailed.duration} min`}</div>
       </div>,
       <div key="isVideo">
         <div className="bold mb-1 mt-1">Visio-conférence:</div>
@@ -98,32 +109,31 @@ class ShowResaModal extends React.Component {
         <div>{this.props.appointment_detailed.isMulti ? "Oui": "Non"}</div>
       </div>,
       <div key="visioLink"
-      className={`details-visioLink-section ${this.props.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
+       className={`details-visioLink-section ${this.props.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
         <div className="bold mb-1 mt-1">Lien de la visio-conférence:</div>
-        <div className="clab-link" onClick={() => window.open(`${this.buildVideoId()}`, "_blank")}>
+        <div className="clab-link" onClick={() => window.open(this.buildVideoId(), "_blank")}>
           Cliquez ici pour rejoindre
         </div>
       </div>,
       <div key="address"
-      className={`details-address-section ${this.props.appointment_detailed.isVideo ? "hidden" : ""}`}>
-        <div className="bold mb-1 mt-1"></div>
-        <TextInput value={this.state.address} onChange={(e) => {this.setState({address: e}) }}
+       className={`details-address-section ${this.props.appointment_detailed.isVideo ? "hidden" : ""}`}>
+        <div className="mb-1 mt-1" />
+        <TextInput value={this.state.address} onChange={(e) => this.setState({address: e}) }
           label="Adresse de la séance:" bold_label="true" disabled={this.props.appointment_detailed.coach_id != this.props.user.id}
           extraClass={`white-bg ${this.props.appointment_detailed.isVideo ? "hidden" : ""}`} Placeholder="Thème de la session"
-        />,
-      </div>,      
-    
+        />
+      </div>,
       <div key="payment"
-      className={`details-payment-section ${this.props.appointment_detailed.paid?.includes(this.props.user.id) || 
-       this.props.appointment_detailed.coach_id == this.props.user.id ? " hidden" : ""}`}>
+       className={`details-payment-section ${this.displayPaymentLink() ? "" : "hidden"}`}>
         <div className="bold mb-1 mt-1">Lien de paiement de la session:</div>
         <div className="clab-link" onClick={() => window.open(`${this.props.payment_link}`, "_blank")}>
           Cliquez ici pour payer
         </div>
       </div>,
       <div className={`select-input-autocomplete-container ${this.displayCoachedInvite() ? "" : "hidden"}`}>
-        <TextInput bold_label={true} label="Invitez un coaché" extraClass="text-3 autocomplete-text-input white-bg" value={this.state.search_user_name} placeholder="Nom du coaché" 
-          onChange={(e) => { this.getMatchingUsers(e) }} />
+        <TextInput bold_label={true} label="Invitez un coaché" placeholder="Nom du coaché"
+          extraClass="text-3 autocomplete-text-input white-bg" value={this.state.search_user_name}  
+          onChange={(e) => this.getMatchingUsers(e) } />
         <div className={`select-autocomplete-wrapper labeled ${this.state.show_users ? "" : "hidden"}`}>
           {
             this.state.matching_users.map((matching_user) => 
@@ -145,9 +155,9 @@ class ShowResaModal extends React.Component {
         </div>
       </div>,
       <div className="input-group">
-        <Button extraClass="cl-button mt-2" 
+        <Button extraClass="cl-button mt-2" text="Valider"
          onClick={() => { 
-          this.props.user.id == this.props.appointment_detailed.coach_id ? this.updateResa() : this.subscribeResa();
+          this.props.user.id == this.props.appointment_detailed.coach_id ? this.updateResa() : this.subscribeResa()
           this.setState({
             sessionTitle: this.props.appointment_detailed?.sessionTitle || "",
             address: this.props.appointment_detailed?.address || "",
@@ -157,16 +167,13 @@ class ShowResaModal extends React.Component {
             show_users: false,
             matching_users: []      
           })
-        }} 
-         text="Valider" 
+         }}
         />
       </div>
-    
     ]
-    return (
-      <Modal toggle={this.props.toggle} closeFunc={() => this.props.closeFunc()}
-        fields={fields} title="Votre RDV" id="appointment-details" />
-    )
+
+    return <Modal toggle={this.props.toggle} closeFunc={this.props.closeFunc}
+      fields={fields} title="Votre RDV" id="appointment-details" />
   }
 }
 

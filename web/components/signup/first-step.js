@@ -9,10 +9,12 @@ class FirstStep extends React.Component {
     return (
       <div className="first-step-wrapper">
         <div className="first-step-btns-wrapper" >
-          <div className="first-step-coach-btn role-step-btn" onClick={() => { this.props.update_form({role: "coach"}); this.props.change_step(2) }} >
+          <div className="first-step-coach-btn role-step-btn"
+           onClick={() => { this.props.update_form({role: "coach"}); this.props.change_step(2) }} >
             <div className="role-step-btn-text text-1">Vous êtes coach ?</div>
           </div>
-          <div className="first-step-default-btn role-step-btn" onClick={() => { this.props.update_form({role: "default"}); this.props.change_step(2) }}>
+          <div className="first-step-default-btn role-step-btn"
+           onClick={() => { this.props.update_form({role: "default"}); this.props.change_step(2) }}>
             <div className="role-step-btn-text text-1">Vous souhaitez vous faire coacher ?</div>
           </div>
         </div>

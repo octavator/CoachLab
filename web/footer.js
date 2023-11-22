@@ -7,7 +7,7 @@ class Footer extends React.Component {
     return (
       <div className="footer-wrapper">
         <div className="navbar-logo-section">
-          <div className="logo-wrapper" onClick={(e) => {window.scroll({top: 0, left: 0, behavior: 'smooth'})}}>
+          <div className="logo-wrapper" onClick={() => window.scroll({top: 0, left: 0, behavior: 'smooth'})}>
             <img src="priv/static/images/logo_blanc.svg"/>
           </div>
         </div>

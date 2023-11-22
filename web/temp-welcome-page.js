@@ -15,7 +15,8 @@ class TempWelcomePage extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/api/me").then(res => {
+    http.get("/api/me")
+    .then(res => {
       this.setState({user: res.data})
     })
     .catch(err => {
@@ -24,20 +25,20 @@ class TempWelcomePage extends React.Component {
   }
   sendInviteMail() {
     if (this.state.inviteMail == "") return
-    http.post("/signup-invite", {email: this.state.inviteMail}).then(res => {
-      if (res.status == 200) {
-        this.showFlashMessage("success", "L'invitation a été envoyée avec succès")
-        this.setState({inviteMail: ""})  
-      } else this.showFlashMessage("error", "Une erreur est survenue lors de l'envoi.")
+    http.post("/signup-invite", {email: this.state.inviteMail})
+    .then(res => {
+      if (res.status != 200) return this.showFlashMessage("error", "Une erreur est survenue lors de l'envoi.")
+      this.showFlashMessage("success", "L'invitation a été envoyée avec succès")
+      this.setState({inviteMail: ""})
     })
     .catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
-    this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
-      setTimeout(() => { this.setState({showFlash: false})}, 5000)
-    })
+    this.setState({showFlash: true, flashMessage: message, flashType: type}, () =>
+      setTimeout(() => this.setState({showFlash: false}), 5000)
+    )
   }
   render() {
     return <div className="login-wrapper">
@@ -51,8 +52,8 @@ class TempWelcomePage extends React.Component {
         </div>
         <div className={`invite-mail-block ${this.state.user.role == "coach" ? `` : " hidden"}`} >
           <TextInput type="email" extraClass="text-3 white-bg" required={true} value={this.state.inviteMail} 
-            onChange={(e) => { this.setState({inviteMail: e}) }} name="invite_mail" placeholder="Invitez votre coaché" />
-          <Button extraClass="text-3" onClick={() => { this.sendInviteMail()}} text="Suivant"/>
+            onChange={(e) => this.setState({inviteMail: e}) } name="invite_mail" placeholder="Invitez votre coaché" />
+          <Button extraClass="text-3" onClick={this.sendInviteMail} text="Suivant"/>
         </div>
       </div>
   }

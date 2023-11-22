@@ -8,8 +8,11 @@ class EditResaModal extends React.Component {
     }
   }
   buildVideoId() {
-    return (!this.state.appointment_detailed.id ? undefined
-     : `/video?roomId=${encodeURIComponent(this.state.appointment_detailed.id)}`)
+    return (
+      !this.state.appointment_detailed?.id 
+      ? undefined
+      : `/video?roomId=${encodeURIComponent(this.state.appointment_detailed.id)}`
+    )
   }
   render() {
     let fields = [
@@ -34,7 +37,7 @@ class EditResaModal extends React.Component {
         <div>{this.state.appointment_detailed.isMulti ? "Oui": "Non"}</div>
       </div>,
       <div key="visioLink"
-      className={`details-visioLink-section ${this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
+       className={`details-visioLink-section ${this.state.appointment_detailed.isVideo && this.buildVideoId() ? "" : " hidden"}`}>
         <div className="bold mt-1">Lien de la visio-conférence:</div>
         <div className="clab-link" onClick={() => window.open(`${this.buildVideoId()}`, "_blank")}>
           Cliquez ici pour rejoindre
@@ -49,7 +52,7 @@ class EditResaModal extends React.Component {
       </div>
     ]
     return (
-      <Modal toggle={this.props.toggle} closeFunc={() => this.props.closeFunc()}
+      <Modal toggle={this.props.toggle} closeFunc={this.props.closeFunc}
         fields={fields} title="Votre RDV" id="appointment-details" />
     )
   }

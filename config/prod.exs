@@ -3,7 +3,8 @@ import Config
 config :clab,
   env: :prod,
   test_key: "production value",
-  url: "https://coachlab.fr",
+  # @TODO: change url for Azure's
+  url: "https://clab.azurewebsites.net",
   stripe: %{
     url: "https://api.stripe.com/v1/",
     #@TODO: prod keys

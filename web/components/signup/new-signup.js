@@ -12,8 +12,8 @@ class SignUp extends React.Component {
       const urlParams = new URLSearchParams(document.location.search)
       const role = urlParams.get("role")
       const coach_id = urlParams.get("coach")
-      let form = role && coach_id  && {role: role, coaches: [coach_id]} || {coaches: []}
-      let step = role && 2 || 1
+      let form = role && coach_id ? {role: role, coaches: [coach_id]} : {coaches: []}
+      let step = role ? 2 : 1
       this.state = {
         form: form,
         steps: [1, 2, 3],
@@ -24,25 +24,23 @@ class SignUp extends React.Component {
       }
     }
     sendForm() {
-      console.log(this.state.form)
-      http.post("/sign-up", this.state.form).then(res => {
-        if (res.status == 200) window.location.href = "/bienvenue"
-        else this.showFlashMessage("error", "Une erreur inattendue est survenue.") 
+      http.post("/sign-up", this.state.form)
+      .then(res => {
+        if (res.status == 200) return window.location.href = "/bienvenue"
+        this.showFlashMessage("error", "Une erreur inattendue est survenue.") 
       })
-      .catch(err => {
+      .catch(err =>
         this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
-      })
+      )
     }
     setStateForm(new_form, is_complete = false) {
-      if (!is_complete) this.setState({form: {...this.state.form, ...new_form}})
-      else {
-        this.setState({form: {...this.state.form, ...new_form}}, () => {this.sendForm()})
-      }
+      if (!is_complete) return this.setState({form: {...this.state.form, ...new_form}})
+      this.setState({form: {...this.state.form, ...new_form}}, this.sendForm)
     }
     showFlashMessage(type, message) {
-      this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
-        setTimeout(() => { this.setState({showFlash: false})}, 5000)
-      })
+      this.setState({showFlash: true, flashMessage: message, flashType: type}, () =>
+        setTimeout(() => this.setState({showFlash: false}), 5000)
+      )
     }
     render() {
       return (
@@ -51,22 +49,33 @@ class SignUp extends React.Component {
           <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
           {
             this.state.step == 1 ? 
-              <FirstStep showFlashMessage={this.showFlashMessage} update_form={(data) => { this.setStateForm(data) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
-            :(
+              <FirstStep showFlashMessage={this.showFlashMessage}
+               update_form={(data) => this.setStateForm(data) }
+               change_step={(new_step) => this.setState({step: new_step}) } />
+            : (
               this.state.form.role == "coach" ?
                 (this.state.step == 2 ? 
-                  <CoachSecondStep user_form={this.state.form} showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} update_form={(data, is_complete) => { this.setStateForm(data, is_complete) }} change_step={(new_step) => { this.setState({step: new_step}) }} />
-                : <CoachThirdStep user_form={this.state.form} showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} send_form={() => this.sendForm()} update_form={(data, is_complete) => { this.setStateForm(data, is_complete) }} change_step={(new_step) => { this.setState({step: new_step}) }} />)
+                  <CoachSecondStep user_form={this.state.form}
+                   showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)}
+                   update_form={(data, is_complete) => this.setStateForm(data, is_complete) }
+                   change_step={(new_step) => this.setState({step: new_step}) } />
+                : <CoachThirdStep user_form={this.state.form}
+                   showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)}
+                   send_form={this.sendForm}
+                   update_form={(data, is_complete) => this.setStateForm(data, is_complete) }
+                   change_step={(new_step) => this.setState({step: new_step}) } />
+                )
               : (this.state.step == 2 ? 
                   <DefaultSecondStep user_form={this.state.form}
                    showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} 
-                   update_form={(data, is_complete = false) => { this.setStateForm(data, is_complete) }} 
-                   change_step={(new_step) => { this.setState({step: new_step}) }} 
+                   update_form={(data, is_complete = false) => this.setStateForm(data, is_complete) } 
+                   change_step={(new_step) => this.setState({step: new_step}) } 
                   />
-                : <DefaultThirdStep user_form={this.state.form} showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} 
-                    send_form={() => this.sendForm()} 
-                    update_form={(data, is_complete) => { this.setStateForm(data, is_complete) }}
-                    change_step={(new_step) => { this.setState({step: new_step}) }}
+                : <DefaultThirdStep user_form={this.state.form}
+                   showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} 
+                   send_form={this.sendForm} 
+                   update_form={(data, is_complete) => this.setStateForm(data, is_complete) }
+                   change_step={(new_step) => this.setState({step: new_step}) }
                   />
               )
             )

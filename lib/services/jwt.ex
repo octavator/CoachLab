@@ -9,15 +9,28 @@ defmodule Jwt do
   end
 
   def create_twilio_token(user) do
-    grants = %{"identity" => user.id, "voice" => %{}, "video" => %{}}
-    {:ok, token, _conf} = Jwt.generate_and_sign(
-      %{"grants" => grants, "ttl" => 4800},
-      Joken.Signer.create("HS256", Application.get_env(:clab, :twilio)[:secret], %{
-        "typ" => "JWT",
-        "alg" => "HS256",
-        "cty" => "twilio-fpa;v=1"
-      })
-    )
+    grants = %{
+      "identity" => user.id,
+      "voice" => %{},
+      "video" => %{}
+    }
+    opts = %{
+      "grants" => grants,
+      "ttl" => 4800
+    }
+    {:ok, token, _conf} =
+      Jwt.generate_and_sign(
+        opts,
+        Joken.Signer.create(
+          "HS256",
+          Application.get_env(:clab, :twilio)[:secret],
+          %{
+            "typ" => "JWT",
+            "alg" => "HS256",
+            "cty" => "twilio-fpa;v=1"
+          }
+        )
+      )
     token
   end
 end

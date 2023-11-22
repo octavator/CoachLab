@@ -21,7 +21,7 @@ defmodule ImageMover do
 
     @mover_path
     |> File.ls!()
-    |> Enum.each( &ImageMover.copy_user_avatar/1)
+    |> Enum.each(& ImageMover.copy_user_avatar/1)
 
     Process.send_after(__MODULE__, :move_avatars, 1000 * 60 * 60 * @mover_interval)
     {:noreply, state}
@@ -29,8 +29,12 @@ defmodule ImageMover do
 
   def copy_user_avatar(user_id) do
     old_filepath = "#{@mover_path}/#{user_id}/"
-    avatar_file = File.ls!(old_filepath) |> Enum.find(& String.contains?(&1, "avatar"))
-    if File.exists?(old_filepath <> avatar_file) do
+    avatar_file =
+      old_filepath
+      |> File.ls!()
+      |> Enum.find(& String.contains?(&1, "avatar"))
+
+    if avatar_file do
       file_ext = Utils.get_file_extension(avatar_file)
       new_filepath = "#{:code.priv_dir(:clab)}/static/images/#{user_id}/"
       new_filename = "avatar.#{file_ext}"

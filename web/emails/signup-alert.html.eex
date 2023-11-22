@@ -13,7 +13,7 @@
             Recherche Coach : <%= "#{user[:coach_desc]}" %><br/>
         <% end %>
         <%= if !is_nil(coach) do %>
-            Coach assigné :  <%= "#{coach[:firstname]} #{coach[:lastname]}" %><br/>
+            Coach selectionné :  <%= "#{coach[:firstname]} #{coach[:lastname]}" %><br/>
         <% end %>
     <% end %>
 </body>

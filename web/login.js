@@ -19,22 +19,23 @@ class Login extends React.Component {
   componentDidMount() {
     http.get("/api/me").then(res => {
       if (res.status == 200) return window.location.href = "/bienvenue"
-    }).catch(_e => console.log("not auth"))
+    })
   }
   sendForm() {
     http.post("/sign-in", this.state.form)
     .then(res => {
-      if (res.status == 200) window.location.href = "/bienvenue"
-      else this.showFlashMessage("error", "Une erreur est survenue. Vérifiez vos identifiants.")
+      if (res.status == 200) return window.location.href = "/bienvenue"
+      this.showFlashMessage("error", "Une erreur est survenue. Vérifiez vos identifiants.")
     })
     .catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
-    this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
-      setTimeout(() => { this.setState({showFlash: false})}, 5000)
-    })
+    this.setState(
+      {showFlash: true, flashMessage: message, flashType: type}, () =>
+      setTimeout(() => this.setState({showFlash: false}), 5000)
+    )
   }
   render() {
     return (
@@ -43,12 +44,15 @@ class Login extends React.Component {
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <h1 className="page-title">Connectez-vous</h1>
         <div className="login-content-wrapper infos-form">
-          <TextInput onKeyDown={(event) => {if (event.key === 'Enter') this.sendForm() }} extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true} label="Adresse mail"
-            onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }
-            } name="email" type="email" placeholder="Adresse mail" />
-          <TextInput onKeyDown={(event) =>  { if (event.key === 'Enter') this.sendForm() }} extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.password} bold_label={true} label="Mot de passe"
-            onChange={(e) => { this.setState({form: {...this.state.form, password: e}}) }} name="password" type="password" placeholder="Mot de passe" />
-          <Button extraClass="text-3 mt-1 white-bg" onClick={() => { this.sendForm()}} text="Suivant" />
+          <TextInput onKeyDown={(e) => e.key === 'Enter' && this.sendForm() }
+            extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true} label="Adresse mail"
+            onChange={(e) => this.setState({form: {...this.state.form, email: e}}) }
+            name="email" type="email" placeholder="Adresse mail" />
+          <TextInput onKeyDown={(e) => e.key === 'Enter' && this.sendForm() } extraClass="white-bg cl-form-input text-3"
+            required={true} value={this.state.form.password} bold_label={true} label="Mot de passe"
+            onChange={(e) => this.setState({form: {...this.state.form, password: e}}) }
+            name="password" type="password" placeholder="Mot de passe" />
+          <Button extraClass="text-3 mt-1 white-bg" onClick={() => this.sendForm()} text="Suivant" />
           <a className="sign-up-section text-2-5" href="/inscription">
             <b>Pas encore de compte ? Cliquez-ici pour créer le votre</b>
           </a>

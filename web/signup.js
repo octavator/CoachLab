@@ -18,18 +18,19 @@ class SignUp extends React.Component {
     }
   }
   sendForm() {
-    http.post("/sign-up", this.state.form).then(res => {
-      if (res.status == 200) window.location.href = "/connexion";
-      else this.showFlashMessage("error", "Une erreur inattendue est survenue.") 
+    http.post("/sign-up", this.state.form)
+    .then(res => {
+      if (res.status == 200) return window.location.href = "/connexion"
+      this.showFlashMessage("error", "Une erreur inattendue est survenue.") 
     })
     .catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
   showFlashMessage(type, message) {
-    this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
-      setTimeout(() => { this.setState({showFlash: false})}, 5000)
-    })
+    this.setState({showFlash: true, flashMessage: message, flashType: type}, () =>
+      setTimeout(() => this.setState({showFlash: false}), 5000)
+    )
   }
   render() {
     return (
@@ -40,17 +41,21 @@ class SignUp extends React.Component {
         <div className="login-content-wrapper infos-form">
           <div className="input-group">
             <label className="input-label">Adresse mail</label>
-            <input onChange={(e) => { this.setState({form: {...this.state.form, email: e.target.value}}) }} value={this.state.form.email} type="email"></input>
+            <input onChange={(e) => this.setState({form: {...this.state.form, email: e.target.value}}) }
+              value={this.state.form.email} type="email" />
           </div>
           <div className="input-group">
             <label className="input-label">Mot de passe</label>
-            <input onChange={(e) => { this.setState({form: {...this.state.form, password: e.target.value}}) }} value={this.state.form.password} type="password"></input>
+            <input onChange={(e) => this.setState({form: {...this.state.form, password: e.target.value}}) }
+              value={this.state.form.password} type="password" />
           </div>
-          <TextInput value={this.state.form.firstname} onChange={(e) => { this.setState({form: {...this.state.form, firstname: e.target.value}}) }} label="Prénom" />
-          <TextInput value={this.state.form.lastname} onChange={(e) => { this.setState({form: {...this.state.form, lastname: e.target.value}}) }} label="Nom" />
+          <TextInput value={this.state.form.firstname}
+            onChange={(e) => this.setState({form: {...this.state.form, firstname: e.target.value}}) } label="Prénom" />
+          <TextInput value={this.state.form.lastname}
+            onChange={(e) => this.setState({form: {...this.state.form, lastname: e.target.value}}) } label="Nom" />
           <div className="input-group">
             <div className="button-group">
-              <button onClick={() => { this.sendForm() }} className="cl-button">
+              <button onClick={this.sendForm} className="cl-button">
                 Valider
               </button>
             </div>

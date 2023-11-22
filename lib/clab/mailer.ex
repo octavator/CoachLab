@@ -1,59 +1,78 @@
 defmodule Clab.Mailer do
+  @sender_name "CoachLab"
+  @sender_mail "theodecagny@hotmail.fr"
+
+  defp smtp_config(key), do: Application.get_env(:clab, :mailer)[key]
+
   def send_mail(recipients, subject, content) do
-    mail = MimeMail.Flat.to_mail(from: %MimeMail.Address{name: "Coachlab",address: "coachlab@coachlab.fr"},
-      #  cc: Application.get_env(:clab, :mailer)[:maintainer_emails],
-      cc: ["theophile.decagny@gmail.com"],
-     html: content,
-     subject: subject)
-     |> MimeMail.to_string
-    :gen_smtp_client.send_blocking({"coachlab@coachlab.fr", recipients, mail},
-     [{:relay, Application.get_env(:clab, :region)},
-      {:username, Application.get_env(:clab, :access_key)},
-      {:password, Application.get_env(:clab, :secret)},
-      {:port, 587},
+    mail =
+      MimeMail.Flat.to_mail(
+        from: %MimeMail.Address{name: @sender_name, address: @sender_mail},
+        cc: smtp_config(:maintainer_emails),
+        html: content,
+        subject: subject
+      )
+      |> MimeMail.to_string
+
+    :gen_smtp_client.send_blocking({@sender_mail, recipients, mail},
+     [{:relay, smtp_config(:region)},
+      {:username, smtp_config(:access_key)},
+      {:password, smtp_config(:secret)},
+      {:port, smtp_config(:port)},
       {:tls, :always}
      ]
     )
   end
   def send_mail_with_attachments(recipients, subject, content, attachments) do
-    #  cc: Application.get_env(:clab, :mailer)[:maintainer_emails],
-    opts = [
-      html: content,
-      subject: subject,
-      cc: ["theophile.decagny@gmail.com"],
-      from: %MimeMail.Address{name: "Coachlab",address: "contact@coachlab.fr"}
-    ]
-    opts = opts ++ Enum.flat_map(attachments, fn attachment ->
-      [attach: attachment]
-    end)
-    mail = MimeMail.Flat.to_mail(opts)
-     |> MimeMail.to_string
-    :gen_smtp_client.send_blocking({"coachlab@coachlab.fr", recipients, mail},
-     [{:relay, Application.get_env(:clab, :region)},
-      {:username, Application.get_env(:clab, :access_key)},
-      {:password, Application.get_env(:clab, :secret)},
-      {:port, 587},
+    mail =
+      [
+        from: %MimeMail.Address{name: @sender_name, address: @sender_mail},
+        cc: smtp_config(:maintainer_emails),
+        html: content,
+        subject: subject
+      ]
+      |> Kernel.++(Enum.flat_map(attachments, & [attach: &1]))
+      |> MimeMail.Flat.to_mail()
+      |> MimeMail.to_string
+
+    :gen_smtp_client.send_blocking({@sender_mail, recipients, mail},
+     [{:relay, smtp_config(:region)},
+      {:username, smtp_config(:access_key)},
+      {:password, smtp_config(:secret)},
+      {:port, smtp_config(:port)},
       {:tls, :always}
      ]
     )
   end
 
-  # Clab.Mailer.send_invitation_mail("theophile.decagny@gmail.com", %{firstname: "coucou" , lastname: " toi", id: "mabite"})
+  # Clab.Mailer.send_invitation_mail("theophile.decagny@gmail.com", %{firstname: "coucou", lastname: " toi", id: "123"})
   def send_invitation_mail(invited_mail, coach) do
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-invitation.html.eex", coach: coach)
-    Clab.Mailer.send_mail([invited_mail], "Votre coach vous a invité à le rejoindre sur CoachLab", content)
+    Task.start(fn ->
+      Clab.Mailer.send_mail([invited_mail], "Votre coach vous a invité à le rejoindre sur CoachLab !", content)
+    end)
   end
 
   def send_signup_alert(user) do
-    coach_id = List.wrap(user[:coaches]) |> List.first()
-    coach = User.get_user_by_id(coach_id)
+    coach =
+      user[:coaches]
+      |> List.wrap()
+      |> List.first()
+      |> User.get_user_by_id()
+    file_dir = "data/images/#{user.id}"
+    attachments =
+      file_dir
+      |> File.ls!()
+      |> Enum.map(fn filename -> {filename, File.read!("#{file_dir}/#{filename}")} end)
+
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-alert.html.eex", user: user, coach: coach)
-    attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
     Task.start(fn ->
       Clab.Mailer.send_mail_with_attachments(
-        Application.get_env(:clab, :mailer)[:signup_emails],
+        smtp_config(:signup_emails),
         "[#{Utils.get_role_label(user.role)}] Nouvelle inscription sur CoachLab !",
-        content, attachments)
+        content,
+        attachments
+      )
     end)
   end
 
@@ -63,32 +82,36 @@ defmodule Clab.Mailer do
       Clab.Mailer.send_mail(
         [user.email],
         "Confirmation de votre inscription sur CoachLab",
-        content)
+        content
+      )
     end)
   end
 
   def send_payment_link(user, coach, resa) do
-    resa_id = resa["id"]
     price_id = Stripe.create_product_price(coach, resa["price"] || coach[:session_price])
-    payment_link = Stripe.create_payment_link(price_id, user.id, resa_id)
+    payment_link = Stripe.create_payment_link(price_id, user.id, resa["id"])
+    resa_date =
+      resa["id"]
+      |> String.split(" ")
+      |> List.first()
+
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/resa-payment-link.html.eex",
      user: user, coach: coach, resa: resa, payment_link: payment_link)
     Task.start(fn ->
-        Clab.Mailer.send_mail(
+      Clab.Mailer.send_mail(
         [user.email],
-        "Paiement de votre session avec #{coach.firstname} #{coach.lastname} le #{List.first(String.split(resa_id, " "))}",
+        "Paiement de votre session avec #{coach.firstname} #{coach.lastname} le #{resa_date}",
         content
-        )
-     end)
+      )
+    end)
   end
 
   def send_invoice(user_id, resa) do
-    coach_id = resa["coach_id"]
-    coach = User.get_user_by_id(coach_id)
+    coach = User.get_user_by_id(resa["coach_id"])
     user = User.get_user_by_id(user_id)
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/invoice.html.eex",
      user: user, coach: coach, resa: resa, base_url: Application.get_env(:clab, :url))
-    # attachments = File.ls!("data/images/#{user.id}") |> Enum.map(& {&1, File.read!("data/images/#{user.id}/#{&1}")})
+    # Legally we should send PDF, and save PDF for several years...
     Task.start(fn ->
       Clab.Mailer.send_mail(
         [user.email],

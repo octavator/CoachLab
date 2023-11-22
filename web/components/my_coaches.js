@@ -21,16 +21,18 @@ class MyCoaches extends React.Component {
       new_coach_id: ""
     }
   }
-  componentDidMount() {
-    http.get("/api/me").then(userData => {
-      http.get("/api/linked_users").then(myCoaches => {
-        this.setState({user: userData.data, coaches: myCoaches.data})
-      })
-      .catch(err => {
-        this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
-      })
+  getCoaches() {
+    http.get("/api/linked_users").then(myCoaches => {
+      this.setState({user: userData.data, coaches: myCoaches.data})
     })
     .catch(err => {
+      this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+    })
+  }
+  componentDidMount() {
+    http.get("/api/me").then(userData => {
+      this.getCoaches()
+    }).catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }
@@ -47,11 +49,12 @@ class MyCoaches extends React.Component {
   addChosenCoach() {
     if (this.state.new_coach_id == "") return
     http.post("/new_coach", {coach_id: this.state.new_coach_id}).then(res => {
-      res.statuts == 200 ? this.showFlashMessage("success", "Votre coach a bien été rajouté. Rafraichissez la page.")
-      : this.showFlashMessage("error", "Une erreur est survenue lors de l'ajout de votre coach.")
+      if (res.status != 200) return this.showFlashMessage("error", "Une erreur est survenue lors de l'ajout de votre coach.")
+      this.getCoaches()
+      this.showFlashMessage("success", "Votre coach a bien été rajouté.") 
     })
   }
-  getMatchingCoaches(input) {
+  searchMatchingCoaches(input) {
     if (input.length >= 3) {
       http.get(`/coach/search?coach_name=${encodeURIComponent(input)}`).then(res => {
         res.status == 200 ? this.setState({search_coaches: res.data, show_coaches: res.data.length > 0})
@@ -93,7 +96,7 @@ class MyCoaches extends React.Component {
             <div className="flex input-group inline">
               <div className="select-input-autocomplete-container mr-2">
                 <TextInput extraClass="text-3 autocomplete-text-input white-bg" value={this.state.search_coach_name}
-                 placeholder="Nom du coach" onChange={(e) => this.getMatchingCoaches(e) } />
+                 placeholder="Nom du coach" onChange={(e) => this.searchMatchingCoaches(e) } />
                 <div className={`select-autocomplete-wrapper ${this.state.show_coaches ? "" : "hidden"}`}>
                   {
                     this.state.search_coaches.map(coach =>

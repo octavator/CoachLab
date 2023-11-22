@@ -18,20 +18,17 @@ class DefaultThirdStep extends React.Component {
   componentDidMount() {
     const urlParams = new URLSearchParams(document.location.search)
     const coach_id = urlParams.get("coach")
-    if (coach_id) {
-      http.get(`/api/user/${coach_id}`).then(res => {
-        if (res.status == 200) this.setState({
-          form: {...this.state.form, coaches: [res.data.id]},
-          search_coach_name: `${res.data.firstname} ${res.data.lastname} `
-        })
-        else this.setState({form: {...this.state.form, coaches: []}})
-      })
-      .catch(err => {
-        console.log(err.response)
-      })        
-    }
+    if (!coach_id) return
+    http.get(`/api/user/${coach_id}`).then(res => {
+      if (res.status != 200) this.setState({form: {...this.state.form, coaches: []}})
+
+      this.setState({
+        form: {...this.state.form, coaches: [res.data.id]},
+        search_coach_name: `${res.data.firstname} ${res.data.lastname} `
+      })      
+    })
   }
-  getMatchingCoaches(input) {
+  searchMatchingCoaches(input) {
     if (input.length >= 3) {
       http.get(`/coach/search?coach_name=${encodeURIComponent(input)}`).then(res => {
         if (res.data.length > 0) this.setState({coaches: res.data, show_coaches: true})
@@ -44,10 +41,8 @@ class DefaultThirdStep extends React.Component {
     this.setState({search_coach_name: input})
   }
   uploadFile(e) {
-    console.log(e)
     const formData = new FormData()
-    // const filename = `avatar_${this.props.user_form.lastname}_${e.name}`.replace(" ", "-")
-    const filename = `avatar_${this.props.user_form.lastname}`.replace(" ", "-").replace("/","")
+    const filename = `avatar_${this.props.user_form.lastname}_${e.name}`.replace(" ", "-").replace("/","")
     formData.append("myFile", e, filename)
     fetch("/inscription/file", {
       body: formData,
@@ -83,7 +78,7 @@ class DefaultThirdStep extends React.Component {
               </div>
               <div className="select-input-autocomplete-container">
                 <TextInput extraClass="text-3 autocomplete-text-input" value={this.state.search_coach_name} placeholder="Nom du coach" 
-                 onChange={(e) => { this.getMatchingCoaches(e) }} />
+                 onChange={(e) => { this.searchMatchingCoaches(e) }} />
                   <div className={`select-autocomplete-wrapper ${this.state.show_coaches ? "" : "hidden"}`}>
                     {
                       this.state.coaches.map((coach) => 

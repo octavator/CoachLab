@@ -302,7 +302,7 @@ class Button extends React.Component {
         <button
          className={`cl-button ${this.props.extraClass ? this.props.extraClass : "text-3"}`}
          disabled={this.props.disabled || false}
-         onClick={() => { this.props.onClick()}}>
+         onClick={() => this.props.onClick()}>
           {this.props.text}
         </button>
       </div>              

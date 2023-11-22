@@ -31,19 +31,17 @@ class ClabVideo extends React.Component {
     http.get("/api/me/agenda").then(agendaData => {
       //@TODO: Gérer room type en créant la room plutot que ad hoc connect
       // let roomType = resa.isMulti ? "group": "go"
-      if (Video.isSupported) {
-        //@TODO: Base encode room Ids ?
-        http.get(`/video-token?roomId=${this.state.roomId}`).then(token => {
-          // http.get(`/video-create-room?roomId=${this.state.roomId}`).then(token => {
-          // })
-          Video.createLocalVideoTrack().then(track => document.getElementById('local-media').appendChild(track.attach()))
+      if (!Video.isSupported) return this.showFlashMessage("error", "Votre navigateur actuel n'est pas compatible avec notre module vidéo.")
+      //@TODO: Base encode room Ids ?
+      http.get(`/video-token?roomId=${this.state.roomId}`).then(token => {
+        // http.get(`/video-create-room?roomId=${this.state.roomId}`).then(token => {
+        // })
+        Video.createLocalVideoTrack().then(track => document.getElementById('local-media').appendChild(track.attach()))
 
-          this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data})
-        }).catch(err => {
-          this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
-        })
-
-      } else this.showFlashMessage("error", "Votre navigateur actuel n'est pas compatible avec notre module vidéo.")
+        this.setState({schedule: agendaData.data.agenda, user: agendaData.data.user, token: token.data})
+      }).catch(err => {
+        this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
+      })
     }).catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })

@@ -1,3 +1,4 @@
+#@TODO: if we could make this work :pray:
 defmodule Clab.AuthPlug do
   import Plug.Conn
   use Plug.Builder
@@ -6,14 +7,15 @@ defmodule Clab.AuthPlug do
 
   def init(options), do: options
 
-   def call(conn, _opts) do
-    id = check_token_user(conn)
-    user = User.get_user_by_id(id)
-    case user do
+  def call(conn, _opts) do
+    conn
+    |> check_token_user()
+    |> User.get_user_by_id()
+    |> case do
       nil ->
         send_resp(conn, 401, "Token invalide") |> halt()
-      _ ->
-        conn |> assign(:user, user)
+      user ->
+        assign(conn, :user, user)
     end
   end
 

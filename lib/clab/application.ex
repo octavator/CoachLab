@@ -35,6 +35,8 @@ defmodule Clab.Application do
       max_seconds: 5,
       strategy: :one_for_one
     ]
+
+    File.mkdir_p("data/tmp_files")
     Supervisor.start_link(children, opts)
   end
 end

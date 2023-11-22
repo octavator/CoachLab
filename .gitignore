@@ -3,3 +3,6 @@ _build/
 deps/
 data/
 *.pem
+phx_clab/
+.vscode
+.elixir_ls
