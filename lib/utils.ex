@@ -92,4 +92,14 @@ defmodule Utils do
     footer = EEx.eval_file("#{:code.priv_dir(:clab)}/static/templates/footer.html")
     header <> data <> footer
   end
+
+  def safe_decode(json) do
+    try do
+      Poison.decode!(json, keys: :atoms!)
+    rescue
+      ArgumentError ->
+        # Fallback vers des clés string
+        Poison.decode!(json)
+    end
+  end
 end

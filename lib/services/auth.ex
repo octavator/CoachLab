@@ -14,6 +14,7 @@ defmodule Clab.AuthPlug do
     |> case do
       nil ->
         send_resp(conn, 401, "Token invalide") |> halt()
+
       user ->
         assign(conn, :user, user)
     end

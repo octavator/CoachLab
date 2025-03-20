@@ -1,54 +1,58 @@
 # Test CC : https://stripe.com/docs/testing
 defmodule Stripe do
   @conf Application.compile_env(:clab, :stripe, %{})
-  @token if @conf[:test_mode], do: @conf[:test_secret], else: @conf[:live_secret]
   @default_price "50"
 
+  def get_token() do
+    if @conf[:test_mode] do
+      @conf[:test_secret]
+    else
+      @conf[:live_secret]
+    end
+  end
+
+  def get_headers() do
+    token = get_token()
+    [{"Authorization", "Bearer #{token}"}, {"Content-Type", "application/x-www-form-urlencoded"}]
+  end
+
   def create_payment_link(price_id, user_id, resa_id) do
-    redirect_url = "#{Application.fetch_env!(:clab, :url)}/payment_success?id=#{resa_id |> URI.encode_www_form}&user_id=#{user_id |> URI.encode_www_form}" |> URI.encode_www_form
+    resa_id = URI.encode_www_form(resa_id)
+    user_id = URI.encode_www_form(user_id)
+    redirect_url =
+      Application.fetch_env!(:clab, :url)
+      |> Kernel.<>("/payment_success?id=#{resa_id}&user_id=#{user_id}")
+      |> URI.encode_www_form
+
     {:ok, res} =
       StripeApi.post("payment_links",
         "line_items[0][price]=#{price_id}&line_items[0][quantity]=1&after_completion[type]"
          <> "=redirect&after_completion[redirect][url]=#{redirect_url}",
-        [{"Authorization", "Bearer #{@token}"}, {"Content-Type", "application/x-www-form-urlencoded"}]
+        get_headers()
       )
     res.body
     |> Poison.decode!()
     |> Access.get("url")
   end
 
-  def create_product_price(coach, price) do
+  def create_product_price(coach, resa, price) do
     {:ok, res} =
       StripeApi.post("prices",
-        {:form, [{"currency","eur"}, {"product","session_#{coach.id}"},
+        {:form, [{"currency","eur"}, {"product","session_#{coach.id}_#{resa.id}"},
          {"unit_amount", String.to_integer(price || @default_price) * 100}]},
-        [{"Authorization", "Bearer #{@token}"}, {"Content-Type", "application/x-www-form-urlencoded"}])
+        get_headers()
+      )
 
     price_id =
       res.body
       |> Poison.decode!()
       |> Access.get("id")
-    User.edit_user(coach.id, %{price_id: price_id})
     price_id
-  end
-
-  def create_product(coach) do
-    StripeApi.post("products",
-      {:form, [{"id", "session_#{coach.id}"},
-       {"name", "Coaching avec #{coach.firstname} #{coach.lastname}"}]},
-      [{"Authorization", "Bearer #{@token}"}, {"Content-Type", "application/x-www-form-urlencoded"}]
-    )
   end
 
   def process_url(url) do
     @conf[:url] <> url
   end
-
-  def create_product_for_coaches() do
-    :users
-    |> :ets.tab2list()
-    |> Enum.each(fn {_id, value} -> if value.role == "coach", do: create_product(value) end)
-  end
 end
 
-  # %{"line_items" => [%{"quantity" => 1, "price" => coach[:price_id]}]}, {"after_completion", %{"type" => "redirect", "redirect" => %{"url" => "https://www.coachlab.fr/oui"}}}]},
+  # %{"line_items" => [%{"quantity" => 1, "price" => resa[:price_id]}]}, {"after_completion", %{"type" => "redirect", "redirect" => %{"url" => "https://www.coachlab.fr/oui"}}}]},

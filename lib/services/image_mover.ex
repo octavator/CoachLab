@@ -17,7 +17,7 @@ defmodule ImageMover do
 
   def handle_info(:move_avatars, state) do
     Logger.info("[ImageMover] Avatar Mover now in progress")
-    :ok = File.mkdir_p(@mover_path)
+    File.mkdir_p(@mover_path)
 
     @mover_path
     |> File.ls!()
@@ -38,8 +38,9 @@ defmodule ImageMover do
       file_ext = Utils.get_file_extension(avatar_file)
       new_filepath = "#{:code.priv_dir(:clab)}/static/images/#{user_id}/"
       new_filename = "avatar.#{file_ext}"
+
       Logger.info("[ImageMover] Copying #{old_filepath <> avatar_file} to #{new_filepath <> new_filename}")
-      :ok = File.mkdir_p!(new_filepath)
+      File.mkdir_p(new_filepath)
       File.copy(old_filepath <> avatar_file, new_filepath <> new_filename)
     end
   end

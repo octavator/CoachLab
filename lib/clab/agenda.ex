@@ -23,13 +23,15 @@ defmodule Agenda do
   end
 
   def reserve_agendas(resa_id, coached_ids, payload) do
+    #@TODO: revoir ca, bizarre de tout cancel si on arrive pas à créer une résa chez un des coachés
+    # + peut être simplifié/plus lisible
     try do
       coached_ids
-      |> Enum.all?(& Agenda.update_agenda(&1, %{resa_id => resa_id}))
+      |> Enum.all?(& Agenda.update_agenda(&1, %{:"#{resa_id}" => resa_id}))
       |> if do
-        coach = User.get_user_by_id(payload["coach_id"])
-        Reservation.create_reservation(resa_id, Map.put(payload, "price", coach[:session_price] || "50"))
-        Agenda.update_agenda(payload["coach_id"], %{resa_id => resa_id})
+        coach = User.get_user_by_id(payload[:coach_id])
+        Reservation.create_reservation(resa_id, Map.put(payload, :price, coach[:session_price] || "50"))
+        Agenda.update_agenda(payload[:coach_id], %{resa_id => resa_id})
         :ok
       else
         Enum.each(coached_ids, & Reservation.cancel_resa(resa_id, &1))

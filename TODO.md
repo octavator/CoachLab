@@ -6,6 +6,8 @@
 
 - Repasser sur tous les @TODO
 
+- MIDDLEWARE AUTHENTIFICATION sur les api pour alléger
+
 - Passer sur une BDD plutôt que les tables ets
 
 - Prix de la session de coaching à créer par couple resa/user
@@ -21,9 +23,13 @@
 
 - Gérer les factures de manière légale (donner un PDF aux clients plutôt qu'un lien, + sauvegarder le fichier pendant plusieurs années)
 
+- Permettre aux coachs de définir une liste de prestations, durée + prix
+
 - Activer noice cancellation de TWILIO AI: https://www.twilio.com/blog/introducing-noise-cancellation-for-twilio-video
 
 - Quid de la fonctionnalité d'invitation des coachs pour les coachés ? n'a plus l'air implémenté => USELESS ?? Low Crit
+
+- delayed Sup
 
 # Augmentation avec l'IA
 

@@ -5,7 +5,7 @@ defmodule Twilio do
 
   def create_room(resa) do
     #@TODO: should we do p2p ? small-group ?
-    room_type = resa["isMulti"] && "group" || "go"
+    room_type = resa[:isMulti] && "group" || "go"
     should_record = false
     audio_only = false
     empty_room_ttl = 5 # minutes
@@ -15,7 +15,7 @@ defmodule Twilio do
     {:ok, res} =
       TwilioApi.post("Rooms",
         {:form, [
-         {"UniqueName", resa["id"]}, {"RecordParticipantsOnConnect", "#{should_record}"},
+         {"UniqueName", resa[:id]}, {"RecordParticipantsOnConnect", "#{should_record}"},
          {"AudioOnly", "#{audio_only}"}, {"MediaRegion", "de1"}, #deutschland 1
          {"MaxParticipantDuration", "6400"}, {"Type", "#{room_type}"},
          {"EmptyRoomTimeout", "#{empty_room_ttl}"}, {"UnusedRoomTimeout", "#{pristine_room_ttl}"}

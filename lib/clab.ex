@@ -22,10 +22,10 @@ defmodule ClabRouter do
     parsers: [
       :json,
       :urlencoded,
-      # 6MB max upload
-      {:multipart, length: 6_000_000}
+      {:multipart, length: Application.compile_env(:clab, :max_upload_file_size, 3_000_000)}
     ],
-    json_decoder: Poison
+    json_decoder: {Poison, :decode!, [[keys: :atoms!]]}
+    # json_decoder: {Poison, :decode!, [[keys: :atoms]]}
   )
 
   plug(:dispatch)
@@ -67,6 +67,8 @@ defmodule ClabRouter do
         |> List.first()
     end
   end
+
+  #@TODO: use smthg like MyAPI.UserPlug.call(conn, [])
 
   get "/" do
     data = Utils.get_html_template("landing")
@@ -150,27 +152,27 @@ defmodule ClabRouter do
       reservation = Reservation.get_reservation(resa_id)
 
       reservation =
-        if user.id == reservation["coach_id"] do
+        if user.id == reservation[:coach_id] do
           reservation
         else
           coached_ids =
-            reservation["coached_ids"]
+            reservation[:coached_ids]
             |> List.wrap()
             |> Enum.filter(&(&1 == id))
 
           reservation
           |> Map.take([
-            "isMulti",
-            "isVideo",
-            "id",
-            "coach_id",
-            "coach_name",
-            "duration",
-            "sessionTitle",
-            "paid",
-            "address"
+            :isMulti,
+            :isVideo,
+            :id,
+            :coach_id,
+            :coach_name,
+            :duration,
+            :sessionTitle,
+            :paid,
+            :address
           ])
-          |> Map.put("coached_ids", coached_ids)
+          |> Map.put(:coached_ids, coached_ids)
         end
         |> Poison.encode!()
 
@@ -189,8 +191,6 @@ defmodule ClabRouter do
       payment_link =
         resa_id
         |> Reservation.get_reservation()
-        |> Access.get("coach_id")
-        |> User.get_user_by_id()
         |> Access.get(:price_id)
         |> Stripe.create_payment_link(id, resa_id)
         |> Poison.encode!()
@@ -418,12 +418,12 @@ defmodule ClabRouter do
             "La séance n'est pas encore accessible. Vous pourrez y accéder 15 minutes avant."
           )
 
-        resa["coach_id"] == user.id ->
+        resa[:coach_id] == user.id ->
           Twilio.create_room(resa)
           token = Jwt.create_twilio_token(user)
           send_resp(conn, 200, token)
 
-        Enum.member?(List.wrap(resa["paid"]), user.id) ->
+        Enum.member?(List.wrap(resa[:paid]), user.id) ->
           token = Jwt.create_twilio_token(user)
           send_resp(conn, 200, token)
 
@@ -463,28 +463,20 @@ defmodule ClabRouter do
 
     if !is_nil(id) do
       user = User.get_user_by_id(id)
-      email_already_used? = body.email != user.email && !is_nil(User.get_user(body.email))
 
-      {status_code, ret_text} =
-        cond do
-          email_already_used? ->
-            {400, "Cette adresse mail est déjà utilisée."}
+      if body[:session_price] && body[:session_price] != user[:session_price] do
+        Map.put(user, :session_price, body.session_price)
+      end
 
-          User.edit_user(user.id, body) == :error ->
-            {400, "Erreur durant le changement de vos informations."}
+      cond do
+        User.edit_user(user.id, body) == :error ->
+          send_resp(conn, 400, "Erreur durant le changement de vos informations.")
 
-          true ->
-            if body[:session_price] && body[:session_price] != user[:session_price] do
-              user
-              |> Map.put(:session_price, body.session_price)
-              |> Stripe.create_product_price(body.session_price)
-            end
+        true ->
+          send_resp(conn, 200, "Vos informations ont été mis à jour.")
+      end
 
-            {200, "Vos informations ont été mis à jour."}
-        end
-
-      send_resp(conn, status_code, ret_text)
-    else
+      else
       send_resp(conn, 401, "Token invalide")
     end
   end
@@ -498,18 +490,18 @@ defmodule ClabRouter do
 
       payload =
         Map.merge(body.resa, %{
-          "coach_id" => coach.id,
-          "coach_avatar" => coach[:avatar],
-          "coach_name" => "#{coach.firstname} #{coach.lastname}"
+          coach_id: coach.id,
+          coach_avatar: coach[:avatar],
+          coach_name: "#{coach.firstname} #{coach.lastname}"
         })
 
       {status_code, ret_text} =
-        Agenda.reserve_agendas(payload["id"], payload["coached_ids"], payload)
+        Agenda.reserve_agendas(payload[:id], payload[:coached_ids], payload)
         |> case do
           :ok ->
-            payload["coached_ids"]
+            payload[:coached_ids]
             |> List.wrap()
-            |> Enum.each(&Reservation.send_payment_link(payload["id"], &1))
+            |> Enum.each(&Reservation.send_payment_link(payload[:id], &1))
 
             {200, "Votre rendez-vous a bien été enregistré."}
 
@@ -532,11 +524,12 @@ defmodule ClabRouter do
     if !is_nil(id) do
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
 
+      #@TODO: besoin d'une fonction format resa ?
       payload = %{
-        "id" => body.id,
-        "sessionTitle" => body.sessionTitle,
-        "address" => body.address,
-        "coached_ids" => body.coached_ids
+        id: body.id,
+        sessionTitle: body.sessionTitle,
+        address: body.address,
+        coached_ids: body.coached_ids
       }
 
       if Reservation.update_reservation(body.id, payload, id) == :error do
@@ -550,24 +543,14 @@ defmodule ClabRouter do
   end
 
   post "/signup-invite" do
+    #@TODO: MIDDLEWARE AUTHENTIFICATION
     id = check_token_user(conn)
 
     if !is_nil(id) do
       body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
       coach = User.get_user_by_id(id)
 
-      content =
-        EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/signup-invitation.html.eex",
-          coach: coach
-        )
-
-      Task.start(fn ->
-        Clab.Mailer.send_mail(
-          [body.email],
-          "Votre coach vous a invité à le rejoindre sur CoachLab",
-          content
-        )
-      end)
+      Clab.Mailer.send_invitation_mails([body.email], coach)
 
       send_resp(conn, 200, "Ok")
     else

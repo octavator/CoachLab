@@ -26,9 +26,9 @@ defmodule Reservation do
   def handle_call({:update_reservation, {id, data, user_id}}, _from, state) do
     [{_key, old_data}] = :ets.lookup(@table, id)
     res =
-      if (user_id == old_data["coach_id"]) do
+      if (user_id == old_data[:coach_id]) do
         :ets.insert(@table, {id, Map.merge(old_data, data)})
-        new_coached_ids = List.wrap(data["coached_ids"]) -- List.wrap(old_data["coached_ids"])
+        new_coached_ids = List.wrap(data[:coached_ids]) -- List.wrap(old_data[:coached_ids])
         Enum.each(new_coached_ids, & Task.start( fn -> Reservation.send_payment_link(id, &1) end))
       else
         :error
@@ -38,18 +38,18 @@ defmodule Reservation do
 
   def handle_call({:confirm_payment, {id, coached_id}}, _from, state) do
     [{_key, resa}] = :ets.lookup(@table, id)
-    if !Enum.member?(resa["paid"], coached_id), do: Clab.Mailer.send_invoice(coached_id, resa)
-    resa = Map.update(resa, "paid", [coached_id], &Enum.uniq(&1 ++ [coached_id]))
+    if !Enum.member?(resa[:paid], coached_id), do: Clab.Mailer.send_invoice(coached_id, resa)
+    resa = Map.update(resa, :paid, [coached_id], &Enum.uniq(&1 ++ [coached_id]))
     :ets.insert(@table, {id, resa})
     {:reply, resa, state}
   end
 
   def handle_call({:cancel_resa, {id, coached_id}}, _from, state) do
     [{_key, resa}] = :ets.lookup(@table, id)
-    resa = Map.update(resa, "coached_ids", [], & Enum.reject(&1, fn id -> id == coached_id end))
+    resa = Map.update(resa, :coached_ids, [], & Enum.reject(&1, fn id -> id == coached_id end))
     resa =
-      if Enum.empty?(resa["coached_ids"]) do
-        Agenda.update_agenda(resa["coach_id"], %{resa["id"] => nil})
+      if Enum.empty?(resa[:coached_ids]) do
+        Agenda.update_agenda(resa[:coach_id], %{resa[:id] => nil})
         nil
       else
         resa
@@ -130,12 +130,12 @@ defmodule Reservation do
 
   def send_payment_link(resa_id, user_id) do
     resa = Reservation.get_reservation(resa_id)
-    coach = User.get_user_by_id(resa["coach_id"])
+    coach = User.get_user_by_id(resa[:coach_id])
     user = User.get_user_by_id(user_id)
     Clab.Mailer.send_payment_link(user, coach, resa)
   end
 
   def get_price(resa, coach) do
-    resa["price"] || coach[:session_price]
+    resa[:price] || coach[:session_price]
   end
 end
