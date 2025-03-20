@@ -44,9 +44,9 @@ class Landing extends React.Component {
       <div className="landing-wrapper">
         <div className="landing-first-page-wrapper">
           <div className="landing-first-page-buttons">
-            <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => window.location.href = "/connexion" }>
+            {/* <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => window.location.href = "/connexion" }>
               Je me connecte
-            </div>
+            </div> */}
             <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => window.location.href = "/inscription" }>
               Je m'inscris
             </div>
@@ -56,9 +56,9 @@ class Landing extends React.Component {
           </div>
           <h2 className="landing-page-title">Le centre de coaching digital</h2>
           <div className="landing-first-page-buttons">
-            <div className="cl-button bg-white text-3 landing-page-mobile-signup-button mr-1" onClick={() => window.location.href = "/connexion" }>
+            {/* <div className="cl-button bg-white text-3 landing-page-mobile-signup-button mr-1" onClick={() => window.location.href = "/connexion" }>
               Je me connecte
-            </div>
+            </div> */}
             <div className="cl-button bg-white text-3 landing-page-mobile-signup-button mr-1" onClick={() => window.location.href = "/inscription" }>
               Je m'inscris
             </div>
@@ -77,9 +77,9 @@ class Landing extends React.Component {
             <img className="landing-inline-logo" src="priv/static/images/logo.svg"/>
           </div>
           <div className="flex">
-            <div className="cl-button text-3 landing-intermediary-connection-button" onClick={() => window.location.href = "/connexion" }>
+            {/* <div className="cl-button text-3 landing-intermediary-connection-button" onClick={() => window.location.href = "/connexion" }>
               Je me connecte
-            </div>
+            </div> */}
             <div className="cl-button text-3 landing-intermediary-connection-button" onClick={() => window.location.href = "/inscription" }>
               Je m'inscris
             </div>

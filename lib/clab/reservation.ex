@@ -3,7 +3,7 @@ defmodule Reservation do
   require Logger
 
   @table :reservations
-  @path 'data/reservations.ets'
+  @path ~c"data/reservations.ets"
 
   def start_link(args \\ []) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
@@ -133,5 +133,9 @@ defmodule Reservation do
     coach = User.get_user_by_id(resa["coach_id"])
     user = User.get_user_by_id(user_id)
     Clab.Mailer.send_payment_link(user, coach, resa)
+  end
+
+  def get_price(resa, coach) do
+    resa["price"] || coach[:session_price]
   end
 end

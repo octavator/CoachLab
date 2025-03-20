@@ -1,7 +1,7 @@
 defmodule Twilio do
   require Logger
 
-  @conf Application.get_env(:clab, :twilio)
+  @conf Application.compile_env(:clab, :twilio, %{})
 
   def create_room(resa) do
     #@TODO: should we do p2p ? small-group ?

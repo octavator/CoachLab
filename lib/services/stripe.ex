@@ -1,11 +1,11 @@
 # Test CC : https://stripe.com/docs/testing
 defmodule Stripe do
-  @conf Application.get_env(:clab, :stripe)
+  @conf Application.compile_env(:clab, :stripe, %{})
   @token if @conf[:test_mode], do: @conf[:test_secret], else: @conf[:live_secret]
   @default_price "50"
 
   def create_payment_link(price_id, user_id, resa_id) do
-    redirect_url = "#{Application.get_env(:clab, :url)}/payment_success?id=#{resa_id |> URI.encode_www_form}&user_id=#{user_id |> URI.encode_www_form}" |> URI.encode_www_form
+    redirect_url = "#{Application.fetch_env!(:clab, :url)}/payment_success?id=#{resa_id |> URI.encode_www_form}&user_id=#{user_id |> URI.encode_www_form}" |> URI.encode_www_form
     {:ok, res} =
       StripeApi.post("payment_links",
         "line_items[0][price]=#{price_id}&line_items[0][quantity]=1&after_completion[type]"

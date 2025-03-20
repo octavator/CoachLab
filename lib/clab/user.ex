@@ -3,7 +3,7 @@ defmodule User do
   require Logger
 
   @table :users
-  @path 'data/users.ets'
+  @path ~c"data/users.ets"
   @password_secret "Pa4z=7lfce2bHh$3W2ma2zlpe6ez!0r"
 
   def start_link(args \\ []) do
@@ -99,7 +99,7 @@ defmodule User do
       {:reply, linked_users, state}
     rescue
       e ->
-        Logger.warn("Error getting linked users: #{inspect(e)}")
+        Logger.warning("Error getting linked users: #{inspect(e)}")
         {:reply, nil, state}
     end
   end

@@ -1,7 +1,7 @@
 defmodule DataSaver do
   require Logger
   use GenServer
-  @backup_path 'data/backup/'
+  @backup_path "data/backup/"
   @backup_interval 1 #hours
   @backup_days 30 #after that we delete backups
   @tables [:users, :agendas, :reservations]
@@ -36,7 +36,7 @@ defmodule DataSaver do
         |> String.replace(" ", "_")
         |> String.replace(":", "")
 
-      filepath = '#{@backup_path}#{to_charlist(table)}_#{to_charlist(date_string)}.ets'
+      filepath = ~c"#{@backup_path}#{to_charlist(table)}_#{to_charlist(date_string)}.ets"
       Logger.info("[ETS] Saving #{table} table in #{filepath}")
       :ets.tab2file(table, filepath)
     end)
@@ -58,7 +58,7 @@ defmodule DataSaver do
 
       if Date.compare(today, target_date) == :gt do
         Logger.info("[ETS] Cleaning outdated archive #{file}")
-        File.rm('#{@backup_path}#{file}')
+        File.rm(~c"#{@backup_path}#{file}")
       end
     end)
   end

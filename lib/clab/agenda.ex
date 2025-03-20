@@ -3,7 +3,7 @@ defmodule Agenda do
   require Logger
 
   @table :agendas
-  @path 'data/agendas.ets'
+    @path ~c"data/agendas.ets"
 
   def start_link(args \\ []) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)

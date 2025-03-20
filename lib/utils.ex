@@ -5,19 +5,27 @@ defmodule Utils do
   def test_file_type(filepath, filename) do
     ext = Utils.get_file_extension(filename)
     mimetype = Utils.get_file_mimetype(filepath)
+
     is_valid_type =
       case mimetype do
         "image/" <> mime_type_ext ->
-          Enum.member?(@allowed_exts, ext) && (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
+          Enum.member?(@allowed_exts, ext) &&
+            (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
 
         "application/" <> mime_type_ext ->
-          Enum.member?(@allowed_exts, ext) && (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
+          Enum.member?(@allowed_exts, ext) &&
+            (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
 
         _ ->
           false
       end
 
-    if !is_valid_type, do: Logger.error("[SECURITY ERROR]: extension #{ext} is invalid or doesn't match with real mime_type_ext #{mimetype}")
+    if !is_valid_type,
+      do:
+        Logger.error(
+          "[SECURITY ERROR]: extension #{ext} is invalid or doesn't match with real mime_type_ext #{mimetype}"
+        )
+
     is_valid_type
   end
 
@@ -63,7 +71,8 @@ defmodule Utils do
   end
 
   def get_file_mimetype(filepath) do
-    {res , 0} = System.cmd("file", [filepath, "--mime-type", "-i"])
+    {res, 0} = System.cmd("file", [filepath, "--mime-type", "-i"])
+
     res
     |> String.split(" ")
     |> Enum.at(1)

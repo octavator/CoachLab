@@ -2,8 +2,6 @@
 
 - Découper clab.ex en différent routers
 
-- Quid de la fonctionnalité d'invitation des coachs pour les coachés ? n'a plus l'air implémenté
-
 - Compléter l'edition des infos persos (avatar, spés, etc.)
 
 - Repasser sur tous les @TODO
@@ -24,3 +22,13 @@
 - Gérer les factures de manière légale (donner un PDF aux clients plutôt qu'un lien, + sauvegarder le fichier pendant plusieurs années)
 
 - Activer noice cancellation de TWILIO AI: https://www.twilio.com/blog/introducing-noise-cancellation-for-twilio-video
+
+- Quid de la fonctionnalité d'invitation des coachs pour les coachés ? n'a plus l'air implémenté => USELESS ?? Low Crit
+
+# Augmentation avec l'IA
+
+- Au moment où on envoie un mail d'inscription aujd, on pourrait aussi si le user est un coaché et qu'il a renseigné une recherche pour un coach, on peut appeler un agent IA pour matcher ses critères avec un ou plusieurs coachs de notre BDD 
+
+- Améliorations de l'audio/vidéo en post-processing (si pas trop couteux en temps ou en computing ?)
+
+- 

@@ -1,7 +1,7 @@
 defmodule ImageMover do
   require Logger
   use GenServer
-  @mover_path 'data/images/'
+  @mover_path ~c"data/images/"
   @mover_interval 24 #hours
 
   # Initial run 10sec after app start, next will be in 24h

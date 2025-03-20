@@ -88,4 +88,4 @@
     disabled: "Firstname" - is field disabled // optionnal (false)
     text: "Suivant" - button content // optionnal ("")
   }
-*/class Button extends React.Component{constructor(props){super(props);this.state={}}render(){return/*#__PURE__*/React.createElement("div",{className:"button-wrapper"},/*#__PURE__*/React.createElement("button",{className:`cl-button ${this.props.extraClass?this.props.extraClass:"text-3"}`,disabled:this.props.disabled||false,onClick:()=>{this.props.onClick()}},this.props.text))}}export{TextInput,FileInput,TextArea,Button,SelectInput,RadioButton,NumberInput};
+*/class Button extends React.Component{constructor(props){super(props);this.state={}}render(){return/*#__PURE__*/React.createElement("div",{className:"button-wrapper"},/*#__PURE__*/React.createElement("button",{className:`cl-button ${this.props.extraClass?this.props.extraClass:"text-3"}`,disabled:this.props.disabled||false,onClick:()=>this.props.onClick()},this.props.text))}}export{TextInput,FileInput,TextArea,Button,SelectInput,RadioButton,NumberInput};
