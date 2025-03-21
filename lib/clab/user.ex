@@ -1,5 +1,6 @@
 defmodule User do
   use GenServer
+  import Plug.Conn
   require Logger
 
   @table :users
@@ -141,6 +142,37 @@ defmodule User do
     |> :ets.tab2list()
     |> Enum.find(fn {_key, user} -> user.email == email end)
     |> is_nil()
+  end
+
+  def confirm_signup(conn, user) do
+    try do
+      Logger.debug("New user: #{inspect(user)}")
+      user.role
+      |> case do
+        "coach" ->
+          [:avatar, :certification, :idcard, :rib]
+
+        _ ->
+          [:avatar]
+      end
+      |> Enum.all?(&Utils.move_user_files(user, &1))
+      |> if do
+        Clab.Mailer.send_confirmation_mail(user)
+        Clab.Mailer.send_signup_alert(user)
+        ImageMover.copy_user_avatar(user.id)
+        token = Clab.AuthPlug.build_token(user.id)
+        conn = put_resp_cookie(conn, "cltoken", token, same_site: "Strict")
+        {conn, 200, "Votre compte a été bien été créé."}
+      else
+        User.delete_user(user.id)
+        {conn, 400, "Une erreur est survenue lors de la sauvegarde d'un de vos fichiers."}
+      end
+    rescue
+      e ->
+        Logger.error("[ERROR] Bad signup for user: #{user.email}, #{inspect(e)}")
+        User.delete_user(user.id)
+        {conn, 500, "Une erreur est survenue lors de la création de votre compte."}
+    end
   end
 
   def create_user(data) do

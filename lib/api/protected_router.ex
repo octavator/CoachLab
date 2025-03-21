@@ -6,11 +6,8 @@ defmodule Clab.ProtectedRouter do
 
   plug :match
   plug :dispatch
-  def init(options), do: options
 
-  def call(conn, _opts) do
-    conn
-  end
+  #@TODO: possible de split ce router en plusieurs sous routers plus spécialisés
 
   get "/api/me" do
     user_data =
@@ -292,7 +289,7 @@ defmodule Clab.ProtectedRouter do
 
     Clab.Mailer.send_invitation_mails([body.email], coach)
 
-    send_resp(conn, 200, "Ok")
+    send_resp(conn, 200, "OK")
   end
 
   get "/api/user/:user_id" do
@@ -308,7 +305,7 @@ defmodule Clab.ProtectedRouter do
   post "/api/change_password" do
     body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
     User.change_password(body.password, body.token)
-    send_resp(conn, 200, "Ok")
+    send_resp(conn, 200, "OK")
   end
 
   match _ do

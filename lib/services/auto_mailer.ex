@@ -1,7 +1,8 @@
 defmodule AutoMailer do
   use GenServer
-  require Logger
   use Timex
+
+  require Logger
 
   @ticking_interval 1000 * 60 * 60 # 60 minutes
 
@@ -16,7 +17,7 @@ defmodule AutoMailer do
 
   def handle_info(:tick, state) do
     Logger.info("Auto Mailer ticking")
-    if (rem(Timex.now().minute, 15) == 0) do
+    if (rem(Timex.now().minute, 60) == 0) do
       Logger.info("Auto Mailer in progress")
       send_payment_reminders()
     end
