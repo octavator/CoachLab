@@ -1,15 +1,15 @@
 defmodule Plug.MixProject do
   use Mix.Project
 
-  @version "1.13.4"
+  @version "1.17.0"
   @description "Compose web applications with functions"
-  @xref_exclude [Plug.Cowboy, :telemetry]
+  @xref_exclude [Plug.Cowboy, :ssl]
 
   def project do
     [
       app: :plug,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.10",
       deps: deps(),
       package: package(),
       description: @description,
@@ -26,26 +26,36 @@ defmodule Plug.MixProject do
         groups_for_extras: groups_for_extras(),
         source_ref: "v#{@version}",
         source_url: "https://github.com/elixir-plug/plug"
-      ]
+      ],
+      test_ignore_filters: [&String.starts_with?(&1, "test/fixtures/")]
     ]
   end
 
   # Configuration for the OTP application
   def application do
     [
-      extra_applications: [:logger, :eex],
+      extra_applications: extra_applications(Mix.env()),
       mod: {Plug.Application, []},
       env: [validate_header_keys_during_test: true]
     ]
   end
 
+  defp extra_applications(:test), do: [:logger, :eex, :ssl]
+  defp extra_applications(_), do: [:logger, :eex]
+
   def deps do
     [
       {:mime, "~> 1.0 or ~> 2.0"},
-      {:plug_crypto, "~> 1.1.1 or ~> 1.2"},
+      {:plug_crypto, plug_crypto_version()},
       {:telemetry, "~> 0.4.3 or ~> 1.0"},
       {:ex_doc, "~> 0.21", only: :docs}
     ]
+  end
+
+  if System.get_env("PLUG_CRYPTO_2_0", "true") == "true" do
+    defp plug_crypto_version, do: "~> 1.1.1 or ~> 1.2 or ~> 2.0"
+  else
+    defp plug_crypto_version, do: "~> 1.1.1 or ~> 1.2"
   end
 
   defp package do

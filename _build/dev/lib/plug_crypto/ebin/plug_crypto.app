@@ -7,5 +7,5 @@
               {applications,[kernel,stdlib,elixir,crypto]},
               {description,"Crypto-related functionality for the web"},
               {registered,[]},
-              {vsn,"1.2.2"},
+              {vsn,"2.1.0"},
               {mod,{'Elixir.Plug.Crypto.Application',[]}}]}.

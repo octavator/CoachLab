@@ -5,7 +5,7 @@ defmodule Clab.MixProject do
     [
       app: :clab,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
       deps: deps()
     ]
@@ -35,12 +35,14 @@ end
 defmodule Mix.Tasks.Webcopy do
   use Mix.Task
   def run(_) do
-    files = File.ls!("web/")
-    Enum.each(files, fn file ->
-      res = IO.inspect File.copy("web/" <> file, "priv/static/" <> file)
+    "web/"
+    |> File.ls!()
+    |> Enum.each(fn file ->
+      res = File.copy("web/" <> file, "priv/static/" <> file)
       if res == {:error, :eisdir} do
-        dir_files = File.ls!("web/#{file}")
-        Enum.each(dir_files, fn dir_file ->
+        "web/#{file}"
+        |> File.ls!()
+        |> Enum.each(fn dir_file ->
           File.mkdir_p!("priv/static/#{file}")
           File.copy("web/#{file}/" <> dir_file, "priv/static/#{file}/" <> dir_file)
           IO.puts "Copied #{dir_file} to priv/static/#{file}"

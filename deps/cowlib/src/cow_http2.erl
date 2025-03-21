@@ -1,4 +1,4 @@
-%% Copyright (c) 2015-2018, Loïc Hoguin <essen@ninenines.eu>
+%% Copyright (c) Loïc Hoguin <essen@ninenines.eu>
 %%
 %% Permission to use, copy, modify, and/or distribute this software for any
 %% purpose with or without fee is hereby granted, provided that the above
@@ -39,15 +39,23 @@
 -type streamid() :: pos_integer().
 -export_type([streamid/0]).
 
--type fin() :: fin | nofin.
--export_type([fin/0]).
-
 -type head_fin() :: head_fin | head_nofin.
 -export_type([head_fin/0]).
 
+%% @todo The PRIORITY mechanism in HTTP/2 is de facto deprecated.
 -type exclusive() :: exclusive | shared.
 -type weight() :: 1..256.
--type settings() :: map().
+
+-type settings() :: #{
+	enable_connect_protocol => boolean(),
+	enable_push => boolean(),
+	header_table_size => 16384..16#7fffffff,
+	initial_window_size => 0..16#7fffffff,
+	max_concurrent_streams => 0..16#ffffffff,
+	max_frame_size => 16384..16777215,
+	max_header_list_size => 16384..16#ffffffff
+}.
+-export_type([settings/0]).
 
 -type error() :: no_error
 	| protocol_error
@@ -66,9 +74,10 @@
 	| unknown_error.
 -export_type([error/0]).
 
--type frame() :: {data, streamid(), fin(), binary()}
-	| {headers, streamid(), fin(), head_fin(), binary()}
-	| {headers, streamid(), fin(), head_fin(), exclusive(), streamid(), weight(), binary()}
+-type frame() :: {data, streamid(), cow_http:fin(), binary()}
+	| {headers, streamid(), cow_http:fin(), head_fin(), binary()}
+	| {headers, streamid(), cow_http:fin(), head_fin(),
+		exclusive(), streamid(), weight(), binary()}
 	| {priority, streamid(), exclusive(), streamid(), weight()}
 	| {rst_stream, streamid(), error()}
 	| {settings, settings()}
@@ -192,8 +201,8 @@ parse(<< 5:24, 2:8, _:9, StreamID:31, _:1, StreamID:31, _:8, Rest/bits >>) ->
 		'PRIORITY frames cannot make a stream depend on itself. (RFC7540 5.3.1)', Rest};
 parse(<< 5:24, 2:8, _:9, StreamID:31, E:1, DepStreamID:31, Weight:8, Rest/bits >>) ->
 	{ok, {priority, StreamID, parse_exclusive(E), DepStreamID, Weight + 1}, Rest};
-%% @todo figure out how to best deal with frame size errors; if we have everything fine
-%% if not we might want to inform the caller how much he should expect so that it can
+%% @todo Figure out how to best deal with non-fatal frame size errors; if we have everything
+%% then OK if not we might want to inform the caller how much he should expect so that it can
 %% decide if it should just close the connection
 parse(<< BadLen:24, 2:8, _:9, StreamID:31, _:BadLen/binary, Rest/bits >>) ->
 	{stream_error, StreamID, frame_size_error, 'PRIORITY frames MUST be 5 bytes wide. (RFC7540 6.3)', Rest};
@@ -204,8 +213,7 @@ parse(<< 4:24, 3:8, _:9, 0:31, _/bits >>) ->
 	{connection_error, protocol_error, 'RST_STREAM frames MUST be associated with a stream. (RFC7540 6.4)'};
 parse(<< 4:24, 3:8, _:9, StreamID:31, ErrorCode:32, Rest/bits >>) ->
 	{ok, {rst_stream, StreamID, parse_error_code(ErrorCode)}, Rest};
-%% @todo same as priority
-parse(<< _:24, 3:8, _:9, _:31, _/bits >>) ->
+parse(<< BadLen:24, 3:8, _:9, _:31, _/bits >>) when BadLen =/= 4 ->
 	{connection_error, frame_size_error, 'RST_STREAM frames MUST be 4 bytes wide. (RFC7540 6.4)'};
 %%
 %% SETTINGS frames.

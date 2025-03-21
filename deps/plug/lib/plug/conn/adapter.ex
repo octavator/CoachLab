@@ -49,6 +49,9 @@ defmodule Plug.Conn.Adapter do
   as the body can no longer be manipulated. However, the
   test implementation returns the actual body so it can
   be used during testing.
+
+  Webservers must send a `{:plug_conn, :already_sent}`
+  message to the process that called `Plug.Conn.Adapter.conn/5`.
   """
   @callback send_resp(
               payload,
@@ -69,6 +72,9 @@ defmodule Plug.Conn.Adapter do
   as the body can no longer be manipulated. However, the
   test implementation returns the actual body so it can
   be used during testing.
+
+  Webservers must send a `{:plug_conn, :already_sent}`
+  message to the process that called `Plug.Conn.Adapter.conn/5`.
   """
   @callback send_file(
               payload,
@@ -84,9 +90,14 @@ defmodule Plug.Conn.Adapter do
   a chunked response to the client.
 
   Webservers are advised to return `nil` as the sent_body,
-  as the body can no longer be manipulated. However, the
-  test implementation returns the actual body so it can
-  be used during testing.
+  since this function does not actually produce a body.
+  However, the test implementation returns an empty binary
+  as the body in order to be consistent with the built-up
+  body returned by subsequent calls to the test implementation's
+  `chunk/2` function
+
+  Webservers must send a `{:plug_conn, :already_sent}`
+  message to the process that called `Plug.Conn.Adapter.conn/5`.
   """
   @callback send_chunked(payload, status :: Conn.status(), headers :: Conn.headers()) ::
               {:ok, sent_body :: binary | nil, payload}
@@ -97,13 +108,14 @@ defmodule Plug.Conn.Adapter do
   If the request has method `"HEAD"`, the adapter should
   not send the response to the client.
 
-  Webservers are advised to return `:ok` and not modify
-  any further state for each chunk. However, the test
-  implementation returns the actual body and payload so
-  it can be used during testing.
+  Webservers are advised to return `nil` as the sent_body,
+  since the complete sent body depends on the sum of all
+  calls to this function. However, the test implementation
+  tracks the overall body and payload so it can be used
+  during testing.
   """
   @callback chunk(payload, body :: Conn.body()) ::
-              :ok | {:ok, sent_body :: binary, payload} | {:error, term}
+              :ok | {:ok, sent_body :: binary | nil, payload} | {:error, term}
 
   @doc """
   Reads the request body.
@@ -121,6 +133,8 @@ defmodule Plug.Conn.Adapter do
 
   If the adapter does not support server push then `{:error, :not_supported}`
   should be returned.
+
+  This callback no longer needs to be implemented, as browsers no longer support server push.
   """
   @callback push(payload, path :: String.t(), headers :: Keyword.t()) :: :ok | {:error, term}
 
@@ -131,7 +145,21 @@ defmodule Plug.Conn.Adapter do
   should be returned.
   """
   @callback inform(payload, status :: Conn.status(), headers :: Keyword.t()) ::
-              :ok | {:error, term}
+              :ok | {:ok, payload()} | {:error, term()}
+
+  @doc """
+  Attempt to upgrade the connection with the client.
+
+  If the adapter does not support the indicated upgrade, then `{:error, :not_supported}` should be
+  be returned.
+
+  If the adapter supports the indicated upgrade but is unable to proceed with it (due to
+  a negotiation error, invalid opts being passed to this function, or some other reason), then an
+  arbitrary error may be returned. Note that an adapter does not need to process the actual
+  upgrade within this function; it is a wholly supported failure mode for an adapter to attempt
+  the upgrade process later in the connection lifecycle and fail at that point.
+  """
+  @callback upgrade(payload, protocol :: atom, opts :: term) :: {:ok, payload} | {:error, term}
 
   @doc """
   Returns peer information such as the address, port and ssl cert.
@@ -142,4 +170,6 @@ defmodule Plug.Conn.Adapter do
   Returns the HTTP protocol and its version.
   """
   @callback get_http_protocol(payload) :: http_protocol
+
+  @optional_callbacks push: 3
 end

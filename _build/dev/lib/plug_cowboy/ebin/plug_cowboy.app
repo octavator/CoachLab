@@ -8,5 +8,5 @@
                              cowboy_telemetry]},
               {description,"A Plug adapter for Cowboy"},
               {registered,[]},
-              {vsn,"2.5.2"},
+              {vsn,"2.7.3"},
               {mod,{'Elixir.Plug.Cowboy',[]}}]}.

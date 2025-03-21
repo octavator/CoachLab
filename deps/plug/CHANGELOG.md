@@ -1,5 +1,132 @@
 # Changelog
 
+## v1.17.0 (2025-03-14)
+
+### Enhancements
+
+  * [Plug.Debugger] Add dark mode and other UI improvements
+  * [Plug.Debugger] Link `Module.function/arity` to hexdocs in exception messages
+  * [Plug.Debugger] Support `__RELATIVEFILE__` to `PLUG_EDITOR` replacements
+  * [Plug.SSL] Add SSL validation support for `certs_keys`
+
+### Deprecations
+
+  * [Plug.Conn.Adapter] Make `push` an optional callback as it is no longer supported by browsers
+  * [Plug.Conn] Deprecate `req_cookies`, `cookies`, and `resp_cookies` fields in favor of functions
+  * [Plug.Conn] Deprecate `owner` field. Tracking responses is now part of adapters
+  * [Plug.Test] Deprecate `use Plug.Test` in favor of imports
+
+## v1.16.2 (2025-03-14)
+
+### Bug fixes
+
+  * Avoid XSS injection in the debug error page
+
+## v1.16.1 (2024-06-20)
+
+### Enhancements
+
+  * Optimize cookie parsing by 10x (10x faster, 10x less memory) on Erlang/OTP 26+
+
+## v1.16.0 (2024-05-18)
+
+### Enhancements
+
+  * Support x-forwarded-for in Plug.RewriteOn
+  * Support MFArgs in Plug.RewriteOn
+  * Add immutable directive to versioned requests in `Plug.Static`
+  * Support disabling MIME type handling in `Plug.Static`
+
+### Bug fixes
+
+  * Fix bug with discarded connection state in `Plug.Debugger`
+  * Parse media types with underscores in them
+  * Do not crash on `max_age` set to nil (for consistency)
+
+## v1.15.3 (2024-01-16)
+
+### Enhancements
+
+  * Allow setting the port on the connection in tests
+  * Allow returning `{:ok, payload}` on inform
+  * Allow custom exceptions in `validate_utf8` option
+  * Allow skipping sent body on chunked replies
+
+## v1.15.2 (2023-11-14)
+
+### Enhancements
+
+  * Add `:assign_as` option to `Plug.RequestId`
+  * Improve performance of `Plug.RequestId`
+  * Avoid clashes between Plug nodes
+  * Add specs to `Plug.BasicAuth`
+  * Fix a bug with non-string `_method` body parameters in `Plug.MethodOverride`
+
+## v1.15.1 (2023-10-06)
+
+### Enhancements
+
+  * Relax requirement on `plug_crypto`
+
+## v1.15.0 (2023-10-01)
+
+### Enhancements
+
+  * Add `Plug.Conn.get_session/3` for default value
+  * Allow `Plug.SSL.configure/1` to accept all :ssl options
+  * Optimize query decoding by 15% to 45% - this removes the previously deprecated `:limit` MFA and `:include_unnamed_parts_at` from MULTIPART. This may be backwards incompatible for applications that were relying on ambiguous arguments, such as `user[][key]=1&user[][key]=2`, which has unspecified parsing behaviour
+
+## v1.14.2 (2023-03-23)
+
+### Bug fixes
+
+  * Properly deprecate `Plug.Adapters.Cowboy` before removal
+
+## v1.14.1 (2023-03-17)
+
+### Enhancements
+
+  * Add `nest_all_json` option to JSON parser
+  * Make action on Plug.Debugger page look like a button
+  * Better formatting of exceptions on the error page
+  * Provide stronger response header validation
+
+## v1.14.0 (2022-10-31)
+
+Require Elixir v1.10+.
+
+### Enhancements
+
+  * Add `Plug.Conn.prepend_req_headers/2` and `Plug.Conn.merge_req_headers/2`
+  * Support adapter upgrades with `Plug.Conn.upgrade_adapter/3`
+  * Add "Copy to Markdown" button in exception page
+  * Support exclusive use of tlsv1.3
+
+### Bug fixes
+
+  * Make sure last parameter works within maps
+
+### Deprecations
+
+  * Deprecate server pushes as they are no longer supported by browsers
+
+## v1.13.6 (2022-04-14)
+
+### Bug fixes
+
+  * Fix compile-time dependencies in Plug.Builder
+
+## v1.13.5 (2022-04-11)
+
+### Enhancements
+
+  * Support `:via` in `Plug.Router.forward/2`
+
+### Bug fixes
+
+  * Fix compile-time deps in Plug.Builder
+  * Do not require routes to be compile-time binaries in `Plug.Router.forward/2`
+
 ## v1.13.4 (2022-03-10)
 
 ### Bug fixes
@@ -159,7 +286,7 @@
   * [Plug.Parsers] Add option to skip utf8 validation
   * [Plug.Parsers] Make multipart support MFA for `:length` limit
   * [Plug.Static] Accept MFA for `:header` option
-  
+
 ### Notes
   * When implementing the `Plug.Exception` protocol, if the new `actions` function is not implemented, a warning will printed during compilation.
 

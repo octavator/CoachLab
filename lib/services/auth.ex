@@ -1,7 +1,6 @@
 #@TODO: if we could make this work :pray:
 defmodule Clab.AuthPlug do
   import Plug.Conn
-  use Plug.Builder
 
   @secret "ex6NgPSw1MAcMolW0R1czwDC"
 
@@ -40,16 +39,11 @@ defmodule Clab.AuthPlug do
     end
   end
 
+  def get_user_from_token(nil), do: nil
   def get_user_from_token(cookie) do
-    case cookie do
-      nil ->
-        nil
-
-      cookie ->
-        cookie
-        |> Base.decode64!(padding: false)
-        |> String.split("|")
-        |> List.first()
-    end
+    cookie
+    |> Base.decode64!(padding: false)
+    |> String.split("|")
+    |> List.first()
   end
 end

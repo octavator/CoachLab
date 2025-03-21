@@ -3,7 +3,7 @@
 
     Bonjour <%= "#{user.firstname}," %><br/><br/>
 
-    Vous avez une séance <%= resa[:isMulti] && "de groupe" || "individuelle" %> avec <%= "#{coach.firstname} #{coach.lastname}" %> en attente de paiement ! <br/>
+    Vous avez une séance avec <%= "#{coach.firstname} #{coach.lastname}" %> en attente de paiement ! <br/>
     Connectez-vous puis suivez ce lien pour régler la séance: <%= payment_link %>
 
     <br/> <br/>

@@ -26,19 +26,22 @@ defmodule Agenda do
     #@TODO: revoir ca, bizarre de tout cancel si on arrive pas à créer une résa chez un des coachés
     # + peut être simplifié/plus lisible
     try do
-      coached_ids
-      |> Enum.all?(& Agenda.update_agenda(&1, %{:"#{resa_id}" => resa_id}))
-      |> if do
-        coach = User.get_user_by_id(payload[:coach_id])
-        Reservation.create_reservation(resa_id, Map.put(payload, :price, coach[:session_price] || "50"))
-        Agenda.update_agenda(payload[:coach_id], %{resa_id => resa_id})
-        :ok
-      else
-        Enum.each(coached_ids, & Reservation.cancel_resa(resa_id, &1))
-        :error
-      end
+      coach = User.get_user_by_id(payload[:coach_id])
+      price =
+        if payload[:price] do
+          payload[:price]
+        else
+          coach[:session_price] || "50"
+        end
+
+      Enum.each([coach.id | coached_ids], fn coached_id ->
+        Agenda.update_agenda(coached_id, %{:"#{resa_id}" => resa_id})
+      end)
+      Reservation.create_reservation(resa_id, Map.put(payload, :price, price))
+      :ok
     rescue
       e ->
+        Enum.each(coached_ids, & Reservation.cancel_resa(resa_id, &1))
         Logger.error("[RESERVATION] Error during creation of reservation  #{resa_id}: #{inspect(e)}")
         :unknown_error
     end

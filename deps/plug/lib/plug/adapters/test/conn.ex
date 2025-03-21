@@ -4,7 +4,7 @@ defmodule Plug.Adapters.Test.Conn do
 
   ## Test helpers
 
-  def conn(conn, method, uri, body_or_params) do
+  def conn(%Plug.Conn{} = conn, method, uri, body_or_params) do
     maybe_flush()
     uri = URI.parse(uri)
 
@@ -36,14 +36,16 @@ defmodule Plug.Adapters.Test.Conn do
         })
     }
 
-    %Plug.Conn{
+    conn_port = if conn.port != 0, do: conn.port, else: 80
+
+    %{
       conn
       | adapter: {__MODULE__, state},
         host: uri.host || conn.host || "www.example.com",
         method: method,
         owner: owner,
         path_info: split_path(uri.path),
-        port: uri.port || 80,
+        port: uri.port || conn_port,
         remote_ip: conn.remote_ip || {127, 0, 0, 1},
         req_headers: req_headers,
         request_path: uri.path,
@@ -117,6 +119,16 @@ defmodule Plug.Adapters.Test.Conn do
   def inform(%{owner: owner, ref: ref}, status, headers) do
     send(owner, {ref, :inform, {status, headers}})
     :ok
+  end
+
+  def upgrade(%{owner: owner, ref: ref}, :not_supported = protocol, opts) do
+    send(owner, {ref, :upgrade, {protocol, opts}})
+    {:error, :not_supported}
+  end
+
+  def upgrade(%{owner: owner, ref: ref} = state, protocol, opts) do
+    send(owner, {ref, :upgrade, {protocol, opts}})
+    {:ok, state}
   end
 
   def push(%{owner: owner, ref: ref}, path, headers) do

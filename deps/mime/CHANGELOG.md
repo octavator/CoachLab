@@ -1,5 +1,23 @@
 # Changelog
 
+## v2.0.6
+
+  * Add mimes for ZSTD, APNG, JP2000
+  * Add `known_types/0` to list all known types
+
+## v2.0.5
+
+  * Allow conflicting extension to be overridden
+
+## v2.0.4
+
+  * Only returns extensions from known suffixes
+  * Allow mime types to be fully overridden
+
+## v2.0.3
+
+  * Support Markdown, JPEG XL, and PSD formats
+
 ## v2.0.2
 
   * Support Associated Signature Containers (ASiC) files

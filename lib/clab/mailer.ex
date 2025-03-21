@@ -7,12 +7,12 @@ defmodule Clab.Mailer do
 
   def send_mail(recipients, subject, content, attachments \\ []) do
     mail =
-      MimeMail.Flat.to_mail(
+      [
         from: %MimeMail.Address{name: @sender_name, address: @sender_mail},
         cc: smtp_config(:maintainer_emails),
         html: content,
         subject: subject
-      )
+      ]
       |> Kernel.++(Enum.flat_map(attachments, fn attachment -> [attach: attachment] end))
       |> MimeMail.Flat.to_mail()
       |> MimeMail.to_string
@@ -26,47 +26,6 @@ defmodule Clab.Mailer do
      ]
     )
   end
-
-  # def send_mail(recipients, subject, content) do
-  #   mail =
-  #     MimeMail.Flat.to_mail(
-  #       from: %MimeMail.Address{name: @sender_name, address: @sender_mail},
-  #       cc: smtp_config(:maintainer_emails),
-  #       html: content,
-  #       subject: subject
-  #     )
-  #     |> MimeMail.to_string
-
-  #   :gen_smtp_client.send_blocking({@sender_mail, recipients, mail},
-  #    [{:relay, smtp_config(:region)},
-  #     {:username, smtp_config(:access_key)},
-  #     {:password, smtp_config(:secret)},
-  #     {:port, smtp_config(:port)},
-  #     {:tls, :always}
-  #    ]
-  #   )
-  # end
-  # def send_mail(recipients, subject, content, attachments) do
-  #   mail =
-  #     [
-  #       from: %MimeMail.Address{name: @sender_name, address: @sender_mail},
-  #       cc: smtp_config(:maintainer_emails),
-  #       html: content,
-  #       subject: subject
-  #     ]
-  #     |> Kernel.++(Enum.flat_map(attachments, fn attachment -> [attach: attachment] end))
-  #     |> MimeMail.Flat.to_mail()
-  #     |> MimeMail.to_string
-
-  #   :gen_smtp_client.send_blocking({@sender_mail, recipients, mail},
-  #    [{:relay, smtp_config(:region)},
-  #     {:username, smtp_config(:access_key)},
-  #     {:password, smtp_config(:secret)},
-  #     {:port, smtp_config(:port)},
-  #     {:tls, :always}
-  #    ]
-  #   )
-  # end
 
   # Clab.Mailer.send_invitation_mails(["theophile.decagny@gmail.com"], %{firstname: "coucou", lastname: " toi", id: "123"})
   def send_invitation_mails(invited_mails, coach) do
@@ -138,6 +97,20 @@ defmodule Clab.Mailer do
         "Paiement de votre session avec #{coach.firstname} #{coach.lastname} le #{resa_date}",
         content
       )
+    end)
+  end
+
+  def send_reset_password_mail(mail) do
+    Task.start(fn ->
+      hash = User.create_reset_hash(mail)
+
+      content =
+        EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/forgotten-password.html.eex",
+          hash: hash,
+          base_url: Application.fetch_env!(:clab, :url)
+        )
+
+      Clab.Mailer.send_mail([mail], "Ré-initialisez votre mot de passe CoachLab", content)
     end)
   end
 

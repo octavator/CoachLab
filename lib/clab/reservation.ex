@@ -1,6 +1,7 @@
 defmodule Reservation do
   use GenServer
   require Logger
+  use Timex
 
   @table :reservations
   @path ~c"data/reservations.ets"
@@ -28,8 +29,15 @@ defmodule Reservation do
     res =
       if (user_id == old_data[:coach_id]) do
         :ets.insert(@table, {id, Map.merge(old_data, data)})
-        new_coached_ids = List.wrap(data[:coached_ids]) -- List.wrap(old_data[:coached_ids])
-        Enum.each(new_coached_ids, & Task.start( fn -> Reservation.send_payment_link(id, &1) end))
+
+        data[:coached_ids]
+        |> List.wrap()
+        |> Kernel.--(List.wrap(old_data[:coached_ids]))
+        |> Enum.each(fn coached_id ->
+          Task.start(fn -> Reservation.send_payment_link(id, coached_id) end)
+        end)
+
+        :ok
       else
         :error
       end
@@ -38,7 +46,10 @@ defmodule Reservation do
 
   def handle_call({:confirm_payment, {id, coached_id}}, _from, state) do
     [{_key, resa}] = :ets.lookup(@table, id)
-    if !Enum.member?(resa[:paid], coached_id), do: Clab.Mailer.send_invoice(coached_id, resa)
+
+    if !Enum.member?(resa[:paid], coached_id) do
+      Clab.Mailer.send_invoice(coached_id, resa)
+    end
     resa = Map.update(resa, :paid, [coached_id], &Enum.uniq(&1 ++ [coached_id]))
     :ets.insert(@table, {id, resa})
     {:reply, resa, state}
@@ -49,13 +60,13 @@ defmodule Reservation do
     resa = Map.update(resa, :coached_ids, [], & Enum.reject(&1, fn id -> id == coached_id end))
     resa =
       if Enum.empty?(resa[:coached_ids]) do
-        Agenda.update_agenda(resa[:coach_id], %{resa[:id] => nil})
+        Agenda.update_agenda(resa[:coach_id], %{:"#{resa[:id]}" => nil})
         nil
       else
         resa
       end
 
-    Agenda.update_agenda(coached_id, %{resa.id => nil})
+    Agenda.update_agenda(coached_id, %{:"#{resa.id}" => nil})
     res = :ets.insert(@table, {id, resa})
     {:reply, res, state}
   end

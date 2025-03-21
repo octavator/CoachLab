@@ -27,7 +27,7 @@ defmodule Plug.Parsers.MULTIPART do
       headers
 
     * `:validate_utf8` - specifies whether multipart body parts should be validated
-      as utf8 binaries. Defaults to true
+      as utf8 binaries. It is either a boolean or a custom exception to raise
 
     * `:multipart_to_params` - a MFA that receives the multipart headers and the
       connection and it must return a tuple of `{:ok, params, conn}`
@@ -39,14 +39,14 @@ defmodule Plug.Parsers.MULTIPART do
   is equivalent to:
 
       def multipart_to_params(parts, conn) do
-        params =
-          for {name, _headers, body} <- parts,
+        acc =
+          for {name, _headers, body} <- Enum.reverse(parts),
               name != nil,
-              reduce: %{} do
-            acc -> Plug.Conn.Query.decode_pair({name, body}, acc)
+              reduce: Plug.Conn.Query.decode_init() do
+            acc -> Plug.Conn.Query.decode_each({name, body}, acc)
           end
 
-        {:ok, params, conn}
+        {:ok, Plug.Conn.Query.decode_done(acc), conn}
       end
 
   As you can notice, it discards all multiparts without a name. If you want
@@ -54,12 +54,14 @@ defmodule Plug.Parsers.MULTIPART do
   such as:
 
       def multipart_to_params(parts, conn) do
-        params =
-          for {name, _headers, body} <- parts, reduce: %{} do
-            acc -> Plug.Conn.Query.decode_pair({name || "_parts[]", body}, acc)
+        acc =
+          for {name, _headers, body} <- Enum.reverse(parts),
+              name != nil,
+              reduce: Plug.Conn.Query.decode_init() do
+            acc -> Plug.Conn.Query.decode_each({name || "_parts[]", body}, acc)
           end
 
-        {:ok, params, conn}
+        {:ok, Plug.Conn.Query.decode_done(acc), conn}
       end
 
   ## Dynamic configuration
@@ -76,8 +78,8 @@ defmodule Plug.Parsers.MULTIPART do
         end
 
         def parse(conn, "multipart", subtype, headers, opts) do
-          limit = [limit: System.fetch_env!("UPLOAD_LIMIT")]
-          opts = @multipart.init([limit: limit] ++ opts)
+          length = System.fetch_env!("UPLOAD_LIMIT") |> String.to_integer
+          opts = @multipart.init([length: length] ++ opts)
           @multipart.parse(conn, "multipart", subtype, headers, opts)
         end
 
@@ -103,17 +105,8 @@ defmodule Plug.Parsers.MULTIPART do
     # The header options are handled individually.
     {headers_opts, opts} = Keyword.pop(opts, :headers, [])
 
-    with {_, _, _} <- limit do
-      IO.warn(
-        "passing a {module, function, args} tuple to Plug.Parsers.MULTIPART is deprecated. " <>
-          "Please see Plug.Parsers.MULTIPART module docs for better approaches to configuration"
-      )
-    end
-
-    if opts[:include_unnamed_parts_at] do
-      IO.warn(
-        ":include_unnamed_parts_at for multipart is deprecated. Use :multipart_to_params instead"
-      )
+    unless is_integer(limit) do
+      raise ":length option for Plug.Parsers.MULTIPART must be an integer"
     end
 
     m2p = opts[:multipart_to_params] || {__MODULE__, :multipart_to_params, [opts]}
@@ -141,31 +134,20 @@ defmodule Plug.Parsers.MULTIPART do
   end
 
   @doc false
-  def multipart_to_params(acc, conn, opts) do
-    unnamed_at = opts[:include_unnamed_parts_at]
-
-    params =
-      Enum.reduce(acc, %{}, fn
-        {nil, headers, body}, acc when unnamed_at != nil ->
-          Plug.Conn.Query.decode_pair(
-            {unnamed_at <> "[]", %{headers: headers, body: body}},
-            acc
-          )
-
-        {nil, _headers, _body}, acc ->
-          acc
-
-        {name, _headers, body}, acc ->
-          Plug.Conn.Query.decode_pair({name, body}, acc)
+  def multipart_to_params(acc, conn, _opts) do
+    acc =
+      List.foldr(acc, Plug.Conn.Query.decode_init(), fn
+        {nil, _headers, _body}, acc -> acc
+        {name, _headers, body}, acc -> Plug.Conn.Query.decode_each({name, body}, acc)
       end)
 
-    {:ok, params, conn}
+    {:ok, Plug.Conn.Query.decode_done(acc), conn}
   end
 
   ## Multipart
 
   defp parse_multipart(conn, {m2p, {module, fun, args}, header_opts, opts}) do
-    # TODO: This is deprecated. Remove me on Plug 2.0.
+    # TODO: Remove me once the deprecation is removed
     limit = apply(module, fun, args)
     parse_multipart(conn, {m2p, limit, header_opts, opts})
   end
@@ -202,8 +184,15 @@ defmodule Plug.Parsers.MULTIPART do
         {:ok, limit, body, conn} =
           parse_multipart_body(Plug.Conn.read_part_body(conn, opts), limit, opts, "")
 
-        if Keyword.get(opts, :validate_utf8, true) do
-          Plug.Conn.Utils.validate_utf8!(body, Plug.Parsers.BadEncodingError, "multipart body")
+        case Keyword.get(opts, :validate_utf8, true) do
+          true ->
+            Plug.Conn.Utils.validate_utf8!(body, Plug.Parsers.BadEncodingError, "multipart body")
+
+          false ->
+            :ok
+
+          module ->
+            Plug.Conn.Utils.validate_utf8!(body, module, "multipart body")
         end
 
         {conn, limit, [{name, headers, body} | acc]}

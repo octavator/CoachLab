@@ -7,18 +7,18 @@ defmodule Clab.Application do
     cowboy_children = case Application.fetch_env!(:clab, :env) do
       # env when env in [:prod, :preprod] ->
       #   [{
-      #     Plug.Cowboy, scheme: :https, plug: ClabRouter, options: [
+      #     Plug.Cowboy, scheme: :https, plug: Clab.Router, options: [
       #       port: 443,
       #       otp_app: :clab,
       #       keyfile: "./privkey.pem",
       #       certfile: "./certificate.pem"
       #     ]
       #   },
-      #   {Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 8080]}
+      #   {Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: 8080]}
       #   ]
 
       _ ->
-        [{Plug.Cowboy, scheme: :http, plug: ClabRouter, options: [port: 80]}]
+        [{Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: 80]}]
     end
 
     children = cowboy_children ++ [
@@ -33,7 +33,7 @@ defmodule Clab.Application do
     opts = [
       max_restarts: 30,
       max_seconds: 5,
-      strategy: :one_for_one
+      strategy: :one_for_one,
     ]
 
     File.mkdir_p("data/tmp_files")

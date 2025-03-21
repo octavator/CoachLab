@@ -139,7 +139,7 @@ defmodule Plug.Parsers do
   uploads, you can do:
 
       plug Plug.Parsers,
-           parsers: [:url_encoded, :multipart],
+           parsers: [:urlencoded, :multipart],
            length: 20_000_000
 
   However, the above will increase the maximum length of all request
@@ -148,7 +148,7 @@ defmodule Plug.Parsers do
 
       plug Plug.Parsers,
            parsers: [
-             :url_encoded,
+             :urlencoded,
              {:multipart, length: 20_000_000} # Increase to 20MB max upload
            ]
 
@@ -192,9 +192,10 @@ defmodule Plug.Parsers do
 
       defmodule CacheBodyReader do
         def read_body(conn, opts) do
-          {:ok, body, conn} = Plug.Conn.read_body(conn, opts)
-          conn = update_in(conn.assigns[:raw_body], &[body | (&1 || [])])
-          {:ok, body, conn}
+          with {:ok, body, conn} <- Plug.Conn.read_body(conn, opts) do
+            conn = update_in(conn.assigns[:raw_body], &[body | &1 || []])
+            {:ok, body, conn}
+          end
         end
       end
 
@@ -279,13 +280,7 @@ defmodule Plug.Parsers do
           reference -> Module.concat(Plug.Parsers, String.upcase(reference))
         end
 
-      # TODO: Remove this check in future releases once all parsers implement init/1 accordingly
-      if Code.ensure_compiled(module) == {:module, module} and
-           function_exported?(module, :init, 1) do
-        {module, module.init(opts)}
-      else
-        {module, opts}
-      end
+      {module, module.init(opts)}
     end
   end
 

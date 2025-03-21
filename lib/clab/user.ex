@@ -89,18 +89,17 @@ defmodule User do
     try do
       [{_key, user}] = :ets.lookup(@table, user_id)
       linked_users =
-        case user.role do
-          "coach" ->
-            get_coached_users(user[:id])
-
-          _ ->
-            get_coaching_users(user[:coaches])
+        if user.role == "coach" do
+          get_coached_users(user[:id])
+        else
+          get_coaching_users(user[:coaches])
         end
+
       {:reply, linked_users, state}
     rescue
       e ->
         Logger.warning("Error getting linked users: #{inspect(e)}")
-        {:reply, nil, state}
+        {:reply, [], state}
     end
   end
 
@@ -137,14 +136,16 @@ defmodule User do
     GenServer.call(__MODULE__, {:get_user, email})
   end
 
+  def is_new_email(email) do
+    @table
+    |> :ets.tab2list()
+    |> Enum.find(fn {_key, user} -> user.email == email end)
+    |> is_nil()
+  end
+
   def create_user(data) do
-    is_new_email? =
-      @table
-      |> :ets.tab2list()
-      |> Enum.find(fn {_key, user} -> user.email == data[:email] end)
-      |> is_nil()
     cond do
-      !is_new_email? ->
+      !is_new_email(data[:email]) ->
         :email_already_used
 
       !data[:email] || !data[:password] ->
@@ -177,12 +178,14 @@ defmodule User do
     @table
     |> :ets.tab2list()
     |> Stream.filter(fn {_key, user} ->
-      Enum.member?(List.wrap(user[:coaches]), coach_id)
+      user[:coaches]
+      |> List.wrap()
+      |> Enum.member?(coach_id)
     end)
-    #@TODO: parellelize
-    |> Enum.map(fn {_key, user} ->
+    |> Task.async_stream(fn {_key, user} ->
       User.format_user(user)
     end)
+    |> Enum.map(fn {:ok, res} -> res end)
   end
 
   def get_coaching_users(coaches_id) do
@@ -191,9 +194,10 @@ defmodule User do
     |> Stream.filter(fn {_key, user} ->
       Enum.member?(coaches_id, user[:id])
     end)
-    |> Enum.map(fn {_key, user} ->
+    |> Task.async_stream(fn {_key, user} ->
       User.format_user(user)
     end)
+    |> Enum.map(fn {:ok, user} -> user end)
   end
 
   def change_password(password, token) do
@@ -205,7 +209,9 @@ defmodule User do
   end
 
   def create_reset_hash(user_email) do
-    Base.encode64(@password_secret <> user_email, padding: false)
+    @password_secret
+    |> Kernel.<>(user_email)
+    |> Base.encode64(padding: false)
   end
 
   def delete_user(id) do
@@ -229,7 +235,7 @@ end
 #   email: "theodecagny@hotmail.fr",
 #   firstname: "Theophile",
 #   lastname: "de Cagny",
-#   password: "azeUIRE$6823z9EZZ",
+#   password: "azerty",
 #   role: "coach",
 #   coached_ids: [],
 #   session_price: "50"

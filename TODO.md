@@ -31,7 +31,17 @@
 
 - delayed Sup
 
+- Switch Twilio JS SDK from CDN to NPM package !!
+
+- Twilio pricing a changé, le SDK aussi du coup => TOUTE REU EST PAYANTE PAR PARTICIPANT, mais plus de fonctionnalités OotB
+
+  # @TODO: add expiration to token (1 month ?)
+  # @TODO: auto delete of very old tmp_files
+
+
 # Augmentation avec l'IA
+
+- IA Modération profils (avatars NSFW/hate, description, profils only fans like etc.)
 
 - Au moment où on envoie un mail d'inscription aujd, on pourrait aussi si le user est un coaché et qu'il a renseigné une recherche pour un coach, on peut appeler un agent IA pour matcher ses critères avec un ou plusieurs coachs de notre BDD 
 

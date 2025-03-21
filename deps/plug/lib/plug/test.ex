@@ -5,7 +5,8 @@ defmodule Plug.Test do
   This module can be used in your test cases, like this:
 
       use ExUnit.Case, async: true
-      use Plug.Test
+      import Plug.Test
+      import Plug.Conn
 
   Using this module will:
 
@@ -22,6 +23,9 @@ defmodule Plug.Test do
   """
 
   @doc false
+  @deprecated """
+  Please use `import Plug.Test` and `import Plug.Conn` directly instead.
+  """
   defmacro __using__(_) do
     quote do
       import Plug.Test
@@ -130,6 +134,33 @@ defmodule Plug.Test do
   end
 
   @doc """
+  Returns the upgrade requests that have been sent.
+
+  This function depends on gathering the messages sent by the test adapter when
+  upgrade requests are sent. Calling this function will clear the upgrade request messages from the inbox for the
+  process.
+
+  ## Examples
+
+      conn = conn(:get, "/foo", "bar=10")
+      upgrades = Plug.Test.send_upgrades(conn)
+      assert {:websocket, [opt: :value]} in upgrades
+
+  """
+  def sent_upgrades(%Conn{adapter: {Plug.Adapters.Test.Conn, %{ref: ref}}}) do
+    Enum.reverse(receive_upgrades(ref, []))
+  end
+
+  defp receive_upgrades(ref, upgrades) do
+    receive do
+      {^ref, :upgrade, response} ->
+        receive_upgrades(ref, [response | upgrades])
+    after
+      0 -> upgrades
+    end
+  end
+
+  @doc """
   Returns the assets that have been pushed.
 
   This function depends on gathering the messages sent by the test adapter
@@ -145,6 +176,7 @@ defmodule Plug.Test do
       assert {"/static/application.js", [{"accept", "application/javascript"}]} in pushes
 
   """
+  @deprecated "Most browsers and clients have removed push support"
   def sent_pushes(%Conn{adapter: {Plug.Adapters.Test.Conn, %{ref: ref}}}) do
     Enum.reverse(receive_pushes(ref, []))
   end
@@ -213,7 +245,7 @@ defmodule Plug.Test do
     req_cookies = Plug.Conn.fetch_cookies(old_conn).req_cookies
 
     resp_cookies =
-      Enum.reduce(old_conn.resp_cookies, req_cookies, fn {key, opts}, acc ->
+      Enum.reduce(Plug.Conn.get_resp_cookies(old_conn), req_cookies, fn {key, opts}, acc ->
         if value = Map.get(opts, :value) do
           Map.put(acc, key, value)
         else

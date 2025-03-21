@@ -1,12 +1,15 @@
 {application,clab,
              [{modules,['Elixir.Agenda','Elixir.AutoMailer','Elixir.Clab',
                         'Elixir.Clab.Application','Elixir.Clab.AuthPlug',
-                        'Elixir.Clab.Mailer','Elixir.ClabRouter',
+                        'Elixir.Clab.FallbackRouter','Elixir.Clab.Mailer',
+                        'Elixir.Clab.ProtectedRouter',
+                        'Elixir.Clab.PublicRouter','Elixir.Clab.Router',
                         'Elixir.DataSaver','Elixir.ImageMover','Elixir.Jwt',
                         'Elixir.Reservation','Elixir.Stripe',
                         'Elixir.StripeApi','Elixir.Twilio','Elixir.TwilioApi',
                         'Elixir.User','Elixir.Utils']},
-              {compile_env,[{clab,[stripe],
+              {compile_env,[{clab,[max_upload_file_size],error},
+                            {clab,[stripe],
                                   {ok,#{url =>
                                             <<"https://api.stripe.com/v1/">>,
                                         test_sid =>

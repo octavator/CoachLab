@@ -9,8 +9,21 @@ defmodule MIME do
         "application/vnd.api+json" => ["json-api"]
       }
 
-  After adding the configuration, MIME needs to be recompiled.
-  If you are using mix, it can be done with:
+  Note that defining a new type will completely override all
+  previous extensions. You can use `MIME.extensions/1` to get
+  the existing extension to keep when redefining.
+
+  You can also customize the extensions for suffixes. For example,
+  the mime type "application/custom+gzip" returns the extension
+  `".gz"` because the suffix "gzip" maps to `["gz"]`:
+
+      config :mime, :suffixes, %{
+        "gzip" => ["gz"]
+      }
+
+  After adding the configuration, MIME needs to be recompiled
+  if you are using an Elixir version earlier than v1.15. In such
+  cases, it can be done with:
 
       $ mix deps.clean mime --build
 
@@ -66,6 +79,7 @@ defmodule MIME do
     "application/xhtml+xml" => ["xhtml"],
     "application/xml" => ["xml"],
     "application/zip" => ["zip"],
+    "application/zstd" => ["zst"],
     "audio/3gpp" => ["3gp"],
     "audio/3gpp2" => ["3g2"],
     "audio/aac" => ["aac"],
@@ -79,13 +93,19 @@ defmodule MIME do
     "font/ttf" => ["ttf"],
     "font/woff" => ["woff"],
     "font/woff2" => ["woff2"],
+    "image/apng" => ["apng"],
     "image/avif" => ["avif"],
     "image/bmp" => ["bmp"],
     "image/gif" => ["gif"],
+    "image/heic" => ["heic"],
+    "image/heif" => ["heif"],
+    "image/jp2" => [".jp2"],
     "image/jpeg" => ["jpg", "jpeg"],
+    "image/jxl" => ["jxl"],
     "image/png" => ["png"],
     "image/svg+xml" => ["svg", "svgz"],
     "image/tiff" => ["tiff", "tif"],
+    "image/vnd.adobe.photoshop" => ["psd"],
     "image/vnd.microsoft.icon" => ["ico"],
     "image/webp" => ["webp"],
     "text/calendar" => ["ics"],
@@ -93,6 +113,7 @@ defmodule MIME do
     "text/csv" => ["csv"],
     "text/html" => ["html", "htm"],
     "text/javascript" => ["js", "mjs"],
+    "text/markdown" => ["md", "markdown"],
     "text/plain" => ["txt", "text"],
     "text/xml" => ["xml"],
     "video/3gpp" => ["3gp"],
@@ -112,30 +133,55 @@ defmodule MIME do
 
   to_exts = fn map ->
     for {media, exts} <- map, ext <- exts, reduce: %{} do
-      acc -> Map.update(acc, ext, [media], &[media | &1])
+      acc -> Map.update(acc, ext, media, &[media | List.wrap(&1)])
     end
   end
 
-  exts =
-    Map.merge(to_exts.(types), %{
-      "3g2" => ["video/3gpp2"],
-      "3gp" => ["video/3gpp"],
-      "js" => ["text/javascript"],
-      "xml" => ["text/xml"]
-    })
-
-  for {ext, [_, _ | _] = mimes} <- exts do
-    raise "conflicting MIMEs for extension .#{ext}, please override: #{inspect(mimes)}"
-  end
-
-  all_exts = Map.merge(exts, to_exts.(custom_types))
   all_types = Map.merge(types, custom_types)
+
+  default_exts = %{
+    "3g2" => "video/3gpp2",
+    "3gp" => "video/3gpp",
+    "js" => "text/javascript",
+    "xml" => "text/xml"
+  }
+
+  custom_exts = Application.compile_env(:mime, :extensions, %{})
+  all_exts = Map.merge(to_exts.(all_types), Map.merge(default_exts, custom_exts))
+
+  # https://www.iana.org/assignments/media-type-structured-suffix/media-type-structured-suffix.xhtml
+  default_suffixes = %{
+    "gzip" => ["gz"],
+    "json" => ["json"],
+    "xml" => ["xml"],
+    "zip" => ["zip"],
+    "zstd" => ["zst"]
+  }
+
+  custom_suffixes = Application.compile_env(:mime, :suffixes, %{})
+  suffixes = Map.merge(default_suffixes, custom_suffixes)
 
   @doc """
   Returns the custom types compiled into the MIME module.
   """
   def compiled_custom_types do
     unquote(Macro.escape(custom_types))
+  end
+
+  @doc """
+  Returns a mapping of all known types to their extensions,
+  including custom types compiled into the MIME module.
+  
+  ## Examples
+  
+      known_types()
+      #=> %{"application/json" => ["json"], ...}
+
+  """
+  @doc since: "2.1.0"
+  @spec known_types() :: %{required(String.t()) => [String.t()]}
+  def known_types do
+    unquote(Macro.escape(all_types))
   end
 
   @doc """
@@ -168,7 +214,7 @@ defmodule MIME do
 
   defp suffix(type) do
     case String.split(type, "+") do
-      [_type_subtype_without_suffix, suffix] -> [suffix]
+      [_type_subtype_without_suffix, suffix] -> suffix_to_ext(suffix)
       _ -> nil
     end
   end
@@ -183,8 +229,8 @@ defmodule MIME do
 
   ## Examples
 
-      iex> MIME.type("txt")
-      "text/plain"
+      iex> MIME.type("html")
+      "text/html"
 
       iex> MIME.type("foobarbaz")
       #{inspect(@default_type)}
@@ -200,7 +246,7 @@ defmodule MIME do
 
   ## Examples
 
-      iex> MIME.has_type?("txt")
+      iex> MIME.has_type?("html")
       true
 
       iex> MIME.has_type?("foobarbaz")
@@ -242,8 +288,24 @@ defmodule MIME do
   @spec ext_to_mime(String.t()) :: String.t() | nil
   defp ext_to_mime(type)
 
-  for {ext, [type | _]} <- all_exts do
-    defp ext_to_mime(unquote(ext)), do: unquote(type)
+  for {ext, mimes} <- all_exts do
+    case mimes do
+      [first | _] ->
+        raise """
+        extension .#{ext} currently maps to different mime-types: #{inspect(mimes)}
+
+        You must tell us which mime-type is preferred by defining the :extensions \
+        configuration. For example:
+
+            config :mime, :extensions, %{
+              #{inspect(ext)} => #{inspect(first)}
+            }
+
+        """
+
+      mime ->
+        defp ext_to_mime(unquote(ext)), do: unquote(mime)
+    end
   end
 
   defp ext_to_mime(_ext), do: nil
@@ -256,4 +318,13 @@ defmodule MIME do
   end
 
   defp mime_to_ext(_type), do: nil
+
+  @spec suffix_to_ext(String.t()) :: list(String.t()) | nil
+  defp suffix_to_ext(suffix)
+
+  for {suffix, exts} <- suffixes do
+    defp suffix_to_ext(unquote(suffix)), do: unquote(List.wrap(exts))
+  end
+
+  defp suffix_to_ext(_suffix), do: nil
 end

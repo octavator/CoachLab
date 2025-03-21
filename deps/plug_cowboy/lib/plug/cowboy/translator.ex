@@ -1,6 +1,7 @@
 defmodule Plug.Cowboy.Translator do
   @moduledoc false
 
+  # Cowboy 2.12.0 and below error format
   @doc """
   The `translate/4` function expected by custom Logger translators.
   """
@@ -9,6 +10,17 @@ defmodule Plug.Cowboy.Translator do
         :error,
         :format,
         {~c"Ranch listener" ++ _, [ref, conn_pid, stream_id, stream_pid, reason, stack]}
+      ) do
+    extra = [" (connection ", inspect(conn_pid), ", stream id ", inspect(stream_id), ?)]
+    translate_ranch(min_level, ref, extra, stream_pid, reason, stack)
+  end
+
+  # Cowboy 2.13.0 error format
+  def translate(
+        min_level,
+        :error,
+        :format,
+        {~c"Ranch listener" ++ _, [ref, conn_pid, stream_id, stream_pid, {reason, stack}]}
       ) do
     extra = [" (connection ", inspect(conn_pid), ", stream id ", inspect(stream_id), ?)]
     translate_ranch(min_level, ref, extra, stream_pid, reason, stack)
@@ -29,16 +41,23 @@ defmodule Plug.Cowboy.Translator do
          _stack
        ) do
     if log_exception?(reason) do
-      {:ok,
-       [
-         inspect(pid),
-         " running ",
-         inspect(mod),
-         extra,
-         " terminated\n",
-         conn_info(min_level, conn)
-         | Exception.format(:exit, reason, [])
-       ], conn: conn, crash_reason: reason, domain: [:cowboy]}
+      message = [
+        inspect(pid),
+        " running ",
+        inspect(mod),
+        extra,
+        " terminated\n",
+        conn_info(min_level, conn)
+        | Exception.format(:exit, reason, [])
+      ]
+
+      metadata =
+        [
+          crash_reason: reason,
+          domain: [:cowboy]
+        ] ++ maybe_conn_metadata(conn)
+
+      {:ok, message, metadata}
     else
       :skip
     end
@@ -54,7 +73,7 @@ defmodule Plug.Cowboy.Translator do
        extra,
        " terminated\n"
        | Exception.format_exit({reason, stack})
-     ], crash_reason: reason, domain: [:cowboy]}
+     ], crash_reason: {reason, stack}, domain: [:cowboy]}
   end
 
   defp log_exception?({%{__exception__: true} = exception, _}) do
@@ -82,6 +101,14 @@ defmodule Plug.Cowboy.Translator do
 
   defp request_info(%Plug.Conn{method: method, query_string: query_string} = conn) do
     ["Request: ", method, ?\s, path_to_iodata(conn.request_path, query_string), ?\n]
+  end
+
+  defp maybe_conn_metadata(conn) do
+    if Application.get_env(:plug_cowboy, :conn_in_exception_metadata, true) do
+      [conn: conn]
+    else
+      []
+    end
   end
 
   defp path_to_iodata(path, ""), do: path

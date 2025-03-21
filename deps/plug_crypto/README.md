@@ -11,11 +11,11 @@ You can use plug_crypto in your projects by adding it to your `mix.exs` dependen
 
 ```elixir
 def deps do
-  [{:plug_crypto, "~> 1.0"}]
+  [{:plug_crypto, "~> 2.0"}]
 end
 ```
 
-If you're using [Plug][plug], you can already use the functionality in plug_crypto since Plug depends on it.
+If you're using [Plug](https://github.com/elixir-plug/plug), you can already use the functionality in plug_crypto since Plug depends on it.
 
 ## Contributing
 

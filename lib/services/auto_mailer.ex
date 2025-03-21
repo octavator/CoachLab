@@ -1,8 +1,9 @@
 defmodule AutoMailer do
   use GenServer
   require Logger
+  use Timex
 
-  @ticking_interval 1000 * 60 * 1 # 15 minutes
+  @ticking_interval 1000 * 60 * 60 # 60 minutes
 
   def start_link(args \\ []) do
     GenServer.start_link(__MODULE__, args, name: __MODULE__)
