@@ -2,8 +2,6 @@ defmodule Clab.ProtectedRouter do
   use Plug.Router
   use Timex
 
-  plug Clab.AuthPlug
-
   plug :match
   plug :dispatch
 
@@ -202,7 +200,7 @@ defmodule Clab.ProtectedRouter do
   end
 
   post "/new_coach" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
     user =
       conn.assigns[:user]
       |> Map.update(:coaches, [body.coach_id], &Enum.uniq([body.coach_id | &1]))
@@ -218,7 +216,7 @@ defmodule Clab.ProtectedRouter do
   end
 
   post "/edit-infos" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
     user = conn.assigns[:user]
 
     if body[:session_price] && body[:session_price] != user[:session_price] do
@@ -236,7 +234,7 @@ defmodule Clab.ProtectedRouter do
   end
 
   post "/api/new-resa" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
     coach = User.get_user_by_id(body.user_id)
 
     #@TODO: map.take
@@ -262,7 +260,7 @@ defmodule Clab.ProtectedRouter do
   end
 
   post "/api/update-resa" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
     user = conn.assigns[:user]
     #@TODO: besoin d'une fonction format resa ?
     payload = %{
@@ -284,7 +282,7 @@ defmodule Clab.ProtectedRouter do
   end
 
   post "/signup-invite" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
     coach = conn.assigns[:user]
 
     Clab.Mailer.send_invitation_mails([body.email], coach)
@@ -303,7 +301,7 @@ defmodule Clab.ProtectedRouter do
   end
 
   post "/api/change_password" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
     User.change_password(body.password, body.token)
     send_resp(conn, 200, "OK")
   end

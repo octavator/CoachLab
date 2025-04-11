@@ -24,7 +24,8 @@ class MySessions extends React.Component {
     }
   }
   componentDidMount() {
-    http.get("/api/me/agenda").then(res => {
+    http.get("/api/me/agenda")
+    .then(res => {
       this.setState({user: res.data.user, agenda: res.data.agenda}, () => {
         let ids = Object.values(this.state.agenda)
         ids.forEach(id => {
@@ -32,7 +33,6 @@ class MySessions extends React.Component {
             this.setState({reservations: [...this.state.reservations, res.data]})
           })
         })
-        
       })
     }).catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
@@ -44,10 +44,12 @@ class MySessions extends React.Component {
     })
   }
   showResaModal(resa) {
-    if (resa.paid?.includes(this.state.user.id)) return this.setState({ appointment_details_modal: true, appointment_detailed: resa})
-    http.get(`/api/payment_link/${encodeURIComponent(resa.id)}`).then(res => {
+    if (resa.paid?.includes(this.state.user.id)) return this.setState({ appointment_details_modal: true, appointment_detailed: resa })
+    http.get(`/api/payment_link/${encodeURIComponent(resa.id)}`)
+   .then(res => {
       this.setState({ payment_link: res.data, appointment_details_modal: true, appointment_detailed: resa})
-      }).catch(err => {
+    })
+    .catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
     })
   }

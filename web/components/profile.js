@@ -45,11 +45,11 @@ class Profile extends React.Component {
   }
   sendInviteMail() {
     if (this.state.inviteMail == "") return
-    http.post("/signup-invite", {email: this.state.inviteMail}).then(res => {
-      if (res.status == 200) {
-        this.showFlashMessage("success", "L'invitation a été envoyée avec succès")
-        this.setState({inviteMail: ""})  
-      } else this.showFlashMessage("error", "Une erreur est survenue lors de l'envoi.")
+    http.post("/signup-invite", {email: this.state.inviteMail})
+    .then(res => {
+      if (res.status != 200) return this.showFlashMessage("error", "Une erreur est survenue lors de l'envoi.")
+      this.showFlashMessage("success", "L'invitation a été envoyée avec succès")
+      this.setState({inviteMail: ""})
     })
     .catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
@@ -57,11 +57,11 @@ class Profile extends React.Component {
   }
   showFlashMessage(type, message) {
     this.setState({showFlash: true, flashMessage: message, flashType: type}, () => {
-      setTimeout(() => { this.setState({showFlash: false})}, 5000)
+      setTimeout(() =>
+        this.setState({showFlash: false}), 5000)
     })
   }
   render() {
-    console.log(this.state.form)
     return (
       <div>
         <Navbar user={this.state.user} />
@@ -69,19 +69,48 @@ class Profile extends React.Component {
         <div className="infos-wrapper">
           <h1 className="page-title">Mes informations</h1>
           <div className="infos-content-wrapper infos-form">
-            <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.lastname} bold_label={true} label="Nom"
-              onChange={(e) => { this.setState({form: {...this.state.form, lastname: e}}) }} name="lastname" placeholder="Nom" />
-            <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.firstname} bold_label={true} label="Prenom"
-              onChange={(e) => { this.setState({form: {...this.state.form, firstname: e}}) }} name="firstname" placeholder="Prenom" />
-            <TextInput extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true} label="Adresse mail"
-              onChange={(e) => { this.setState({form: {...this.state.form, email: e}}) }} name="email" placeholder="Adresse mail" />
+            <TextInput label="Nom"
+              extraClass="white-bg cl-form-input text-3"
+              required={true}
+              value={this.state.form.lastname}
+              bold_label={true}
+              onChange={(e) => this.setState({form: {...this.state.form, lastname: e}}) }
+              name="lastname"
+              placeholder="Nom" />
+            
+            <TextInput label="Prenom"
+              extraClass="white-bg cl-form-input text-3"
+              required={true}
+              value={this.state.form.firstname}
+              bold_label={true}
+              onChange={(e) => this.setState({form: {...this.state.form, firstname: e}}) }
+              name="firstname"
+              placeholder="Prenom" />
+            
+            <TextInput label="Adresse mail"
+              extraClass="white-bg cl-form-input text-3"
+              required={true}
+              value={this.state.form.email}
+              bold_label={true}
+              onChange={(e) => this.setState({form: {...this.state.form, email: e}}) }
+              name="email"
+              placeholder="Adresse mail" />
+            
             <div className={this.state.user.role != "coach" ? "hidden" : ""}>
-              <NumberInput extraClass="white-bg cl-form-input text-3" required={false} value={this.state.form.session_price} bold_label={true} label="Prix d'une séance (€)"
-              onChange={(e) => { this.setState({form: {...this.state.form, session_price: e}}) }} name="session_price" max={500} min={10} />
+              <NumberInput label="Prix d'une séance (€)"
+                extraClass="white-bg cl-form-input text-3"
+                required={false}
+                value={this.state.form.session_price}
+                bold_label={true}
+                onChange={(e) => { this.setState({form: {...this.state.form, session_price: e}}) }}
+                name="session_price"
+                max={500}
+                min={10} />
             </div>
+            
             <div className="input-group">
               <div className="button-group mb-2">
-                <button onClick={() => { this.sendForm() }} className="cl-button">
+                <button onClick={this.sendForm} className="cl-button">
                   Valider
                 </button>
               </div>
@@ -90,9 +119,15 @@ class Profile extends React.Component {
             <div className={this.state.user.role == "coach" ? `` : " hidden"}>
               <h2 className="page-title mt-2">Invitez vos coachés !</h2>
               <div className={"invite-mail-block"} >
-                <TextInput type="email" extraClass="text-3 white-bg" required={true} value={this.state.inviteMail} 
-                  onChange={(e) => { this.setState({inviteMail: e}) }} name="invite_mail" placeholder="Email du coaché" />
-                <Button extraClass="text-3" onClick={() => { this.sendInviteMail()}} text="Suivant"/>
+                <TextInput type="email"
+                  extraClass="text-3 white-bg"
+                  required={true}
+                  value={this.state.inviteMail} 
+                  onChange={(e) => this.setState({inviteMail: e}) }
+                  name="invite_mail"
+                  placeholder="Email du coaché" />
+
+                <Button extraClass="text-3" onClick={() => this.sendInviteMail()} text="Suivant"/>
               </div>
             </div>
           </div>

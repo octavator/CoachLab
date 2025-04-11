@@ -6,7 +6,6 @@ defmodule Clab.Router do
       Clab.PublicRouter,
       Clab.AuthPlug,
       Clab.ProtectedRouter,
-      Clab.FallbackRouter
     ])
 
     Enum.reduce_while(routers, conn, fn router, conn ->

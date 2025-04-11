@@ -21,7 +21,11 @@ class ForgottenPassword extends React.Component {
   sendForm() {
     const urlParams = new URLSearchParams(document.location.search)
     const token = urlParams.get("token")
-    http.post(`/api/change_password`, {password: this.state.password, token: token}).then(res => {
+    http.post(`/api/change_password`, {
+      password: this.state.password,
+      token: token
+    })
+    .then(res => {
       if (res.status == 200) window.location.href = "/connexion"
       else this.showFlashMessage("error", "Une erreur inattendue est survenue") 
     })
@@ -35,13 +39,24 @@ class ForgottenPassword extends React.Component {
         <Navbar user={{}} blue_bg={true} />
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <div className="infos-wrapper flex flex-center flex-column">
-          <TextInput type="password" extraClass="text-3 white-bg" required={true} value={this.state.password}
-            onChange={(e) => { this.setState({password: e}) }} placeholder="********"
-             name="password" bold_label={true} label="Nouvreau mot de passe" />
-          <TextInput type="password" extraClass="text-3 white-bg" required={true} value={this.state.password_check} 
-            onChange={(e) => { this.setState({password_check: e}) }}  placeholder="********"
-             name="password_check" bold_label={true} label="Confirmez le mot de passe" />
-          <Button extraClass="text-3 white-bg cl-form-button" onClick={() => { this.sendForm()}} text="Valider" />
+          <TextInput
+            type="password"
+            extraClass="text-3 white-bg"
+            required={true}
+            value={this.state.password}
+            onChange={(e) => { this.setState({password: e}) }}
+            placeholder="********"
+            name="password" bold_label={true} label="Nouvreau mot de passe" />
+          
+          <TextInput
+            type="password"
+            extraClass="text-3 white-bg"
+            required={true}
+            value={this.state.password_check} 
+            onChange={(e) => this.setState({password_check: e}) }
+            placeholder="********"
+            name="password_check" bold_label={true} label="Confirmez le mot de passe" />
+          <Button extraClass="text-3 white-bg cl-form-button" onClick={this.sendForm()} text="Valider" />
         </div>
       </div>
     )

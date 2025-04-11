@@ -17,7 +17,7 @@ defmodule Clab.PublicRouter do
   plug :dispatch
 
   post "/inscription/file" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
     filename = body.myFile.filename
     path = Path.expand(body.myFile.path, __DIR__)
     case Utils.test_file_type(path, filename) do
@@ -32,7 +32,7 @@ defmodule Clab.PublicRouter do
   end
 
   post "/sign-in" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
 
     body.email
     |> User.get_all_user_info()
@@ -56,7 +56,7 @@ defmodule Clab.PublicRouter do
   end
 
   post "/sign-up" do
-    body = conn.body_params |> Map.new(fn {k, v} -> {String.to_atom(k), v} end)
+    body = conn.body_params
 
     {conn, status_code, ret_text} =
       case User.create_user(body) do

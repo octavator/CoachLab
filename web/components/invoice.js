@@ -21,8 +21,10 @@ class Invoice extends React.Component {
     const urlParams = new URLSearchParams(document.location.search)
     const resa_id = urlParams.get("resa_id")
 
-    http.get("/api/me").then(userData => {
-      http.get(`/api/reservation/${encodeURIComponent(resa_id)}`).then(resaData => {
+    http.get("/api/me")
+    .then(userData => {
+      http.get(`/api/reservation/${encodeURIComponent(resa_id)}`)
+      .then(resaData => {
         this.setState({user: userData.data, resa: resaData.data})
       })
       .catch(err => {

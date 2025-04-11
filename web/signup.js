@@ -29,7 +29,8 @@ class SignUp extends React.Component {
   }
   showFlashMessage(type, message) {
     this.setState({showFlash: true, flashMessage: message, flashType: type}, () =>
-      setTimeout(() => this.setState({showFlash: false}), 5000)
+      setTimeout(() =>
+        this.setState({showFlash: false}), 5000)
     )
   }
   render() {
@@ -41,18 +42,23 @@ class SignUp extends React.Component {
         <div className="login-content-wrapper infos-form">
           <div className="input-group">
             <label className="input-label">Adresse mail</label>
-            <input onChange={(e) => this.setState({form: {...this.state.form, email: e.target.value}}) }
+            <input
+              onChange={(e) => this.setState({form: {...this.state.form, email: e.target.value}}) }
               value={this.state.form.email} type="email" />
           </div>
+
           <div className="input-group">
             <label className="input-label">Mot de passe</label>
-            <input onChange={(e) => this.setState({form: {...this.state.form, password: e.target.value}}) }
+            <input
+              onChange={(e) => this.setState({form: {...this.state.form, password: e.target.value}}) }
               value={this.state.form.password} type="password" />
           </div>
-          <TextInput value={this.state.form.firstname}
-            onChange={(e) => this.setState({form: {...this.state.form, firstname: e.target.value}}) } label="Prénom" />
+
+          <TextInput label="Prénom" value={this.state.form.firstname}
+            onChange={(e) => this.setState({form: {...this.state.form, firstname: e.target.value}}) }  />
           <TextInput value={this.state.form.lastname}
             onChange={(e) => this.setState({form: {...this.state.form, lastname: e.target.value}}) } label="Nom" />
+
           <div className="input-group">
             <div className="button-group">
               <button onClick={this.sendForm} className="cl-button">

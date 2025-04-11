@@ -14,7 +14,13 @@ const resIdToDate = function(res_id) {
 }
 
 const formatDate = function(date) {
-  return date.toLocaleString("fr-FR").replace(":", "h").replace(":00", "").replace(" ", "  ")
+  return (
+    date
+    .toLocaleString("fr-FR")
+    .replace(":", "h")
+    .replace(":00", "")
+    .replace(" ", "  ")
+  )
 }
 
 export {scrollTo, resIdToDate, formatDate}

@@ -44,21 +44,33 @@ class Login extends React.Component {
         <Flash showFlash={this.state.showFlash} flashType={this.state.flashType} flashMessage={this.state.flashMessage} />
         <h1 className="page-title">Connectez-vous</h1>
         <div className="login-content-wrapper infos-form">
-          <TextInput onKeyDown={(e) => e.key === 'Enter' && this.sendForm() }
-            extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true} label="Adresse mail"
+
+          <TextInput label="Adresse mail"
+            onKeyDown={(e) => e.key === 'Enter' && this.sendForm() }
+            extraClass="white-bg cl-form-input text-3" required={true} value={this.state.form.email} bold_label={true}
             onChange={(e) => this.setState({form: {...this.state.form, email: e}}) }
             name="email" type="email" placeholder="Adresse mail" />
-          <TextInput onKeyDown={(e) => e.key === 'Enter' && this.sendForm() } extraClass="white-bg cl-form-input text-3"
-            required={true} value={this.state.form.password} bold_label={true} label="Mot de passe"
+
+          <TextInput label="Mot de passe"
+            onKeyDown={(e) => e.key === 'Enter' && this.sendForm() }
+            extraClass="white-bg cl-form-input text-3"
+            required={true}
+            value={this.state.form.password}
+            bold_label={true}
             onChange={(e) => this.setState({form: {...this.state.form, password: e}}) }
             name="password" type="password" placeholder="Mot de passe" />
-          <Button extraClass="text-3 mt-1 white-bg" onClick={() => this.sendForm()} text="Suivant" />
+
+          <Button text="Suivant"
+            extraClass="text-3 mt-1 white-bg" onClick={this.sendForm} />
+
           <a className="sign-up-section text-2-5" href="/inscription">
-            <b>Pas encore de compte ? Cliquez-ici pour créer le votre</b>
+            <b>Je n'ai pas encore de compte</b>
           </a>
+
           <a className="sign-up-section text-3" href="/nouveau-mot-de-passe">
-            <b>Vous avez oublié votre mot de passe ?</b>
+            <b>J'ai oublié mon mot de passe !</b>
           </a>
+
         </div>
       </div>
     )

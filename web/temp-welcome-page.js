@@ -16,8 +16,8 @@ class TempWelcomePage extends React.Component {
   }
   componentDidMount() {
     http.get("/api/me")
-    .then(res => {
-      this.setState({user: res.data})
+    .then(user => {
+      this.setState({user: user.data})
     })
     .catch(err => {
       this.showFlashMessage("error", err?.response?.data || "Une erreur inattendue est survenue.")
@@ -50,9 +50,17 @@ class TempWelcomePage extends React.Component {
           Vous serez prévenu par mail dès que la plateforme ouvrira officiellement ses portes.<br/><br/>
           Merci pour votre intérêt et à très bientôt sur CoachLab !
         </div>
+
         <div className={`invite-mail-block ${this.state.user.role == "coach" ? `` : " hidden"}`} >
-          <TextInput type="email" extraClass="text-3 white-bg" required={true} value={this.state.inviteMail} 
-            onChange={(e) => this.setState({inviteMail: e}) } name="invite_mail" placeholder="Invitez votre coaché" />
+          <TextInput
+            type="email"
+            extraClass="text-3 white-bg"
+            required={true}
+            value={this.state.inviteMail} 
+            onChange={(e) => this.setState({inviteMail: e}) }
+            name="invite_mail"
+            placeholder="Invitez votre coaché" />
+          
           <Button extraClass="text-3" onClick={this.sendInviteMail} text="Suivant"/>
         </div>
       </div>
