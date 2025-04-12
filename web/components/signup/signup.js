@@ -1,10 +1,11 @@
+import http from "../../http.js"
 import FirstStep from "./first-step.js"
 import CoachSecondStep from "./coach/second-step.js"
 import DefaultSecondStep from "./default/second-step.js"
 import CoachThirdStep from "./coach/third-step.js"
 import DefaultThirdStep from "./default/third-step.js"
-import Navbar from "../../navbar.js"
-import Flash from "../../flash.js"
+import Navbar from "../navbar.js"
+import Flash from "../flash.js"
 
 class SignUp extends React.Component {
     constructor(props) {
@@ -35,7 +36,7 @@ class SignUp extends React.Component {
     }
     setStateForm(new_form, is_complete = false) {
       if (!is_complete) return this.setState({form: {...this.state.form, ...new_form}})
-      this.setState({form: {...this.state.form, ...new_form}}, this.sendForm)
+      this.setState({form: {...this.state.form, ...new_form}}, () => this.sendForm())
     }
     showFlashMessage(type, message) {
       this.setState({showFlash: true, flashMessage: message, flashType: type}, () =>
@@ -61,7 +62,6 @@ class SignUp extends React.Component {
                    change_step={(new_step) => this.setState({step: new_step}) } />
                 : <CoachThirdStep user_form={this.state.form}
                    showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)}
-                   send_form={this.sendForm}
                    update_form={(data, is_complete) => this.setStateForm(data, is_complete) }
                    change_step={(new_step) => this.setState({step: new_step}) } />
                 )
@@ -72,8 +72,7 @@ class SignUp extends React.Component {
                    change_step={(new_step) => this.setState({step: new_step}) } 
                   />
                 : <DefaultThirdStep user_form={this.state.form}
-                   showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)} 
-                   send_form={this.sendForm} 
+                   showFlashMessage={(type, msg) => this.showFlashMessage(type, msg)}  
                    update_form={(data, is_complete) => this.setStateForm(data, is_complete) }
                    change_step={(new_step) => this.setState({step: new_step}) }
                   />
@@ -86,4 +85,7 @@ class SignUp extends React.Component {
   }
   
   const domContainer = document.querySelector('.signup-wrapper');
-  ReactDOM.render(<SignUp/>, domContainer);
+  const root = ReactDOM.createRoot(domContainer)
+  root.render(<SignUp />)
+
+  export default SignUp

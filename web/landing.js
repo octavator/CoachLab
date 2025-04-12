@@ -1,3 +1,5 @@
+import http from "./http.js"
+
 class Landing extends React.Component {
   constructor(props) {
     super(props)
@@ -35,7 +37,7 @@ class Landing extends React.Component {
   componentDidMount() {
     http.get("/api/me").then(res => {
       if (res.status == 200) return window.location.href = "/bienvenue"
-    })
+    }).catch(e => { return })
 
     this.handleNavbar()
   }
@@ -147,4 +149,5 @@ class Landing extends React.Component {
 }
 
 const domContainer = document.querySelector('.landing-wrapper');
-ReactDOM.render(<Landing/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<Landing />);

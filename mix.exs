@@ -27,7 +27,8 @@ defmodule Clab.MixProject do
       {:joken, "~> 2.4"},
       {:httpoison, "~> 1.8"},
       {:hackney, "~> 1.17"},
-      {:timex, "~> 3.7"}
+      {:timex, "~> 3.7"},
+      {:mime, "~> 2.0"}
     ]
   end
 end

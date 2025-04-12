@@ -1,7 +1,7 @@
 import { TextInput, FileInput, TextArea, Button } from "../../forms/inputs.js"
 import Stepper from "../stepper.js"
 
-class DefaultThirdStep extends React.Component {
+class CoachThirdStep extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -96,7 +96,7 @@ class DefaultThirdStep extends React.Component {
           </div>
         </form>
         <Button extraClass="cl-button cl-form-button bg-white  text-3"
-         onClick={this.sendForm} text="Suivant" />
+         onClick={() => this.sendForm()} text="Suivant" />
       </div>
       <Stepper step="3" />
     </div>
@@ -104,4 +104,4 @@ class DefaultThirdStep extends React.Component {
   }
 }
 
-export default DefaultThirdStep
+export default CoachThirdStep

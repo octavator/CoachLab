@@ -1,3 +1,4 @@
+import http from "../../../http.js"
 import Stepper from "../stepper.js"
 import {FileInput, TextInput, TextArea, Button} from "../../forms/inputs.js"
 
@@ -29,7 +30,7 @@ class DefaultThirdStep extends React.Component {
     })
   }
   searchMatchingCoaches(input) {
-    if (input.length >= 3) {
+    if (input.length >= 2) {
       http.get(`/coach/search?coach_name=${encodeURIComponent(input)}`).then(res => {
         if (res.data.length > 0) this.setState({coaches: res.data, show_coaches: true})
       })

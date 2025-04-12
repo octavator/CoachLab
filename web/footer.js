@@ -12,8 +12,8 @@ class Footer extends React.Component {
           </div>
         </div>
         <div className="footer-text">
-          <a href="https://www.linkedin.com/company/coachlab-fr/" target="_blank" class="inline-flex">
-            <img src="priv/static/images/linkedin.svg" class="footer-linkedin"/>
+          <a href="https://www.linkedin.com/company/coachlab-fr/" target="_blank" className="inline-flex">
+            <img src="priv/static/images/linkedin.svg" className="footer-linkedin"/>
           </a>
         </div>
         <div className="footer-text text-3" >
@@ -25,6 +25,8 @@ class Footer extends React.Component {
   }
 }
 
-export default Footer
 const domContainer = document.querySelector('.footer');
-ReactDOM.render(<Footer/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<Footer />);
+
+// export default Footer

@@ -11,15 +11,14 @@ defmodule Clab.PublicRouter do
       :urlencoded,
       {:multipart, length: Application.compile_env(:clab, :max_upload_file_size, 3_000_000)}
     ],
-    json_decoder: {Poison, :decode!, [[keys: :atoms!]]}
-    # json_decoder: {Poison, :decode!, [[keys: :atoms]]}
+    json_decoder: {Poison, :decode!, [[keys: :atoms]]} # can do [[keys: :atoms]] to prevent crashes
 
   plug :dispatch
 
   post "/inscription/file" do
     body = conn.body_params
-    filename = body.myFile.filename
-    path = Path.expand(body.myFile.path, __DIR__)
+    filename = body["myFile"].filename
+    path = Path.expand(body["myFile"].path, __DIR__)
     case Utils.test_file_type(path, filename) do
       true ->
         Logger.debug("[SIGNUP FILE] Uploading file to data/tmp_files/#{filename}")
@@ -112,7 +111,7 @@ defmodule Clab.PublicRouter do
   end
 
   get "/inscription" do
-    data = Utils.get_html_template("new-signup")
+    data = Utils.get_html_template("signup")
     send_resp(conn, 200, data)
   end
 

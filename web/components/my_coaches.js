@@ -1,3 +1,4 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import Flash from './flash.js'
 import {TextInput, Button} from './forms/inputs.js'
@@ -58,7 +59,7 @@ class MyCoaches extends React.Component {
     })
   }
   searchMatchingCoaches(input) {
-    if (input.length < 3) {
+    if (input.length < 2) {
       this.setState({search_coach_name: input})
       this.setState({show_coaches: false})
       return
@@ -130,7 +131,7 @@ class MyCoaches extends React.Component {
                 </div>
               </div>
 
-              <Button onClick={this.addChosenCoach} text="Ajouter"
+              <Button onClick={() => this.addChosenCoach()} text="Ajouter"
                 extraClass="cl-button white-bg text-3"/>
             </div>
           </div>
@@ -141,4 +142,5 @@ class MyCoaches extends React.Component {
 }
 
 const domContainer = document.querySelector('.page-wrapper');
-ReactDOM.render(<MyCoaches/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<MyCoaches />)

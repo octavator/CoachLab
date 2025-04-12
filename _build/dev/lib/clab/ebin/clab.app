@@ -7,7 +7,8 @@
                         'Elixir.Reservation','Elixir.Stripe',
                         'Elixir.StripeApi','Elixir.Twilio','Elixir.TwilioApi',
                         'Elixir.User','Elixir.Utils']},
-              {compile_env,[{clab,[max_upload_file_size],error},
+              {compile_env,[{clab,[env],{ok,dev}},
+                            {clab,[max_upload_file_size],error},
                             {clab,[stripe],
                                   {ok,#{url =>
                                             <<"https://api.stripe.com/v1/">>,
@@ -32,7 +33,7 @@
               {optional_applications,[]},
               {applications,[kernel,stdlib,elixir,logger,crypto,eex,plug,
                              cowboy,plug_cowboy,poison,mailibex,gen_smtp,
-                             joken,httpoison,hackney,timex]},
+                             joken,httpoison,hackney,timex,mime]},
               {description,"clab"},
               {registered,[]},
               {vsn,"0.1.0"},

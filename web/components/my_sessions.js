@@ -1,3 +1,4 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import ShowResaModal from './modals/show_resa.js'
 import Flash from './flash.js'
@@ -112,4 +113,5 @@ class MySessions extends React.Component {
 }
 
 const domContainer = document.querySelector('.page-wrapper');
-ReactDOM.render(<MySessions/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<MySessions />)

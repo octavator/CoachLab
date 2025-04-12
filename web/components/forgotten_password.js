@@ -1,6 +1,8 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import Flash from './flash.js'
 import {TextInput, Button} from "./forms/inputs.js"
+
 
 class ForgottenPassword extends React.Component {
   constructor(props) {
@@ -56,7 +58,7 @@ class ForgottenPassword extends React.Component {
             onChange={(e) => this.setState({password_check: e}) }
             placeholder="********"
             name="password_check" bold_label={true} label="Confirmez le mot de passe" />
-          <Button extraClass="text-3 white-bg cl-form-button" onClick={this.sendForm()} text="Valider" />
+          <Button extraClass="text-3 white-bg cl-form-button" onClick={() => this.sendForm()} text="Valider" />
         </div>
       </div>
     )
@@ -64,4 +66,5 @@ class ForgottenPassword extends React.Component {
 }
 
 const domContainer = document.querySelector('.forgotten-password');
-ReactDOM.render(<ForgottenPassword/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<ForgottenPassword />)

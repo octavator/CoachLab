@@ -1,3 +1,4 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import Flash from './flash.js'
 
@@ -68,4 +69,5 @@ class UserInfos extends React.Component {
 }
 
 const domContainer = document.querySelector('.user-infos');
-ReactDOM.render(<UserInfos/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<UserInfos />)

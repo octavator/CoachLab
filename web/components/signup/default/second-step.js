@@ -46,7 +46,7 @@ class DefaultSecondStep extends React.Component {
                onChange={(e) => this.setState({form: {...this.state.form, password: e}}) } name="password" placeholder="Mot de passe" />
               <TextInput type="password" extraClass="text-3 cl-form-input" required={true} value={this.state.form.password_check} 
                onChange={(e) => this.setState({form: {...this.state.form, password_check: e}}) }  name="password_check" placeholder="Confirmez le mot de passe" />
-              <Button extraClass="text-3 cl-form-button bg-white" onClick={this.sendForm} text="Suivant" />
+              <Button extraClass="text-3 cl-form-button bg-white" onClick={() => this.sendForm()} text="Suivant" />
             </div>
           </form>
         </div>

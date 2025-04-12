@@ -27,5 +27,12 @@ config :clab,
     test_mode: true,
     live_secret: "sk_azerty"
   }
+config :mime, :types, %{
+  "application/pdf" => ["pdf"],
+  "image/png" => ["png"],
+  "image/jpeg" => ["jpg", "jpeg"],
+  "image/svg+xml" => ["svg"],
+  "image/gif" => ["gif"]
+}
 
 import_config "#{config_env()}.exs"

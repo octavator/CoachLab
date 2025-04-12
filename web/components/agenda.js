@@ -1,3 +1,4 @@
+import http from "../http.js"
 import Modal from './modal.js'
 import ShowResaModal from './modals/show_resa.js'
 import Navbar from './navbar.js'
@@ -283,30 +284,5 @@ class Agenda extends React.Component {
 }
 
 const domContainer = document.querySelector('.page-wrapper');
-ReactDOM.render(<Agenda/>, domContainer);
-
-    {/* OLD CALENDAR */}
-    //   <div className="new-days-schedule-container">
-    //   {
-    //     this.state.weekdays.map((weekday, idx) => {
-    //       return (
-    //         <div key={idx} className={"new-agenda-days-row"}>
-    //           <div className="new-agenda-days-header text-2">{weekday.at(0).toUpperCase()}</div>
-    //           {
-    //             (this_month_days || []).filter(date => date.getDay() == idx + 1 || date.getDay() == 0 && idx == 6 )
-    //             .map((this_month_weekday, idx) => {
-    //               const date = this_month_weekday.getDate()                          
-    //               return (
-    //                 <div key={idx} className={"new-agenda-day text-3" + ((this_month_weekday.getTime() == this.state.day.getTime()) ? " selected bold-font" : "")}
-    //                  onClick={() => {this.setState({day: new Date(this.state.year, this.state.month, date)})}}>
-    //                   {date}
-    //                 </div>
-    //               )
-    //             })
-    //           }
-    //         </div>
-    //       )
-    //     })
-    //   }
-    // </div>
-    
+const root = ReactDOM.createRoot(domContainer)
+root.render(<Agenda />)

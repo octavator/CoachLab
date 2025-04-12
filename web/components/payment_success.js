@@ -1,3 +1,4 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import Flash from './flash.js'
 
@@ -57,4 +58,5 @@ class PaymentSuccess extends React.Component {
 }
 
 const domContainer = document.querySelector('.page-wrapper');
-ReactDOM.render(<PaymentSuccess/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<PaymentSuccess />)

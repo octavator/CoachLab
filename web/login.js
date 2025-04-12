@@ -1,3 +1,4 @@
+import http from "./http.js"
 import Navbar from './components/navbar.js'
 import Flash from './components/flash.js'
 import {TextInput, Button} from './components/forms/inputs.js'
@@ -61,7 +62,7 @@ class Login extends React.Component {
             name="password" type="password" placeholder="Mot de passe" />
 
           <Button text="Suivant"
-            extraClass="text-3 mt-1 white-bg" onClick={this.sendForm} />
+            extraClass="text-3 mt-1 white-bg" onClick={() => this.sendForm()} />
 
           <a className="sign-up-section text-2-5" href="/inscription">
             <b>Je n'ai pas encore de compte</b>
@@ -78,4 +79,5 @@ class Login extends React.Component {
 }
 
 const domContainer = document.querySelector('.login-wrapper');
-ReactDOM.render(<Login/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<Login />)

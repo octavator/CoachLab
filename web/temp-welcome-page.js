@@ -1,6 +1,6 @@
 import Navbar from './components/navbar.js'
 import Flash from './components/flash.js'
-
+import http from "./http.js"
 import {TextInput, Button} from "./components/forms/inputs.js"
 
 class TempWelcomePage extends React.Component {
@@ -61,11 +61,12 @@ class TempWelcomePage extends React.Component {
             name="invite_mail"
             placeholder="Invitez votre coaché" />
           
-          <Button extraClass="text-3" onClick={this.sendInviteMail} text="Suivant"/>
+          <Button extraClass="text-3" onClick={() => this.sendInviteMail()} text="Suivant"/>
         </div>
       </div>
   }
 }
 
 const domContainer = document.querySelector('.temp-welcome-page-wrapper')
-ReactDOM.render(<TempWelcomePage/>, domContainer)
+const root = ReactDOM.createRoot(domContainer)
+root.render(<TempWelcomePage />)

@@ -1,1 +1,1 @@
-const http=axios.create({baseURL:window.location.origin,timeout:5000});
+const http=axios.create({baseURL:window.location.origin,timeout:5000});export default http;

@@ -1,6 +1,7 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import Flash from './flash.js'
-import {TextInput, Button} from "./forms/inputs.js"
+import {Button} from "./forms/inputs.js"
 
 class Invoice extends React.Component {
   constructor(props) {
@@ -88,4 +89,5 @@ class Invoice extends React.Component {
 }
 
 const domContainer = document.querySelector('.invoice');
-ReactDOM.render(<Invoice/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<Invoice />)

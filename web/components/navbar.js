@@ -1,3 +1,5 @@
+import http from "../http.js"
+
 class Navbar extends React.Component {
   constructor(props) {
     super(props)
@@ -14,7 +16,7 @@ class Navbar extends React.Component {
     return (
       <div className={`navbar-wrapper ${this.props.blue_bg ? "blue-bg" : ""}`}>
         <div className="navbar-logo-section">
-          <a href="/" class="logo-wrapper">
+          <a href="/" className="logo-wrapper">
             <img src={`priv/static/images/${this.props.blue_bg ? "logo_blanc.svg" : "logo.svg"}`}/>
           </a>
         </div>
@@ -33,7 +35,7 @@ class Navbar extends React.Component {
             <div className={"menu-item text-3"}><a href="/mes_coaches">{ this.props.user.role == "coach" ? "Mes coachés" : "Mes coachs"}</a></div>
             <div className="menu-item user-dropdown text-3"
              onMouseOver={() => {this.setState({show_dropdown: true})}}
-             onMouseOut={() => {this.setState({show_dropdown: false})}}
+             onMouseOut={() => { this.setState({show_dropdown: false})}}
              onClick={() => {this.setState({show_dropdown: !this.state.show_dropdown})}}>
               {this.props.user.firstname + ' ' + this.props.user.lastname}&nbsp;<span className="downward-arrow">&#9660;</span>
               <div

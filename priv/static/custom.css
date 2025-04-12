@@ -1,19 +1,19 @@
 /* primary color: #26619C, secondary color: #318CE7 */
 
-@font-face {
-    font-family: Isidora-Medium;
+/* @font-face {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     src: url("./fonts/Isidora-Medium.otf") format("opentype");
 }  
 
 @font-face {
-    font-family: IsidoraSans-Medium;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     src: url("./fonts/IsidoraSans-Medium.otf") format("opentype");
 }  
 
 @font-face {
-    font-family: Isidora-Bold;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     src: url("./fonts/Isidora-Bold.otf") format("opentype");
-}  
+}   */
 
 html {
 /*    height: 100%; */
@@ -23,7 +23,7 @@ html {
 body {
     margin: 0;
     height: 100vh;
-    font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-size: 1.0vw;
     display: flex;
     flex-direction: column;
@@ -60,7 +60,7 @@ img {
 
 /* /!\ Problème avec les accents pour Isidora-Bold */
 .bold-font {
-    font-family: Isidora-Bold, Isidora-Medium, IsidoraSans-Medium, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .bg-white {
@@ -239,7 +239,7 @@ a {
     cursor: pointer;
     background-color: #26619C;
     color: white;
-    font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-weight: bold;
 }
 
@@ -402,7 +402,7 @@ a {
     background-color: #26619C;
     color: white;
     font-weight: bold;
-    font-family: Isidora-Medium, IsidoraSans-Medium, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 .file-input-label.bg-white {
     background-color: white;
@@ -555,7 +555,7 @@ a {
     border: 2px solid #318CE7;
     color: #318CE7;
     background: white;
-    font-family: 'Isidora-Bold';
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     width: 26px;
     height: 26px;
 }
@@ -833,6 +833,7 @@ a {
     position: relative;
     margin-right: 5px;
     text-align: center;
+    padding: 30px;
 }
 
 .navbar-wrapper {
@@ -931,7 +932,7 @@ a {
     display: flex;
     font-size: 3.1vw;
     margin: 0;
-    font-family: Isidora-Bold;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .landing-signup-button {
@@ -1427,7 +1428,7 @@ a {
 }
 
 .fa {
-    font-family: 'FontAwesome';
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .radio-label {
@@ -1578,7 +1579,7 @@ a {
         display: flex;
         justify-content: center;
         font-weight: bold;
-        font-family: Isidora-Medium;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
     .cl-button {
         padding: 10px 24px;

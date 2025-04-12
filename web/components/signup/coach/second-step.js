@@ -56,7 +56,7 @@ class CoachSecondStep extends React.Component {
             <FileInput accept=".png,.jpeg,.jpg,.pdf" text="Parcourir..." filename={this.state.filename && this.state.filename.split("_").pop()}
              onChange={(e) => this.uploadFile(e)} extraClass="bg-white text-2 pt-2"
              label="Merci de télécharger une copie de votre pièce d'identité (recto)" name="file" />
-            <Button onClick={this.sendForm} extraClass="cl-button cl-form-button text-3 bg-white"
+            <Button onClick={() => this.sendForm()} extraClass="cl-button cl-form-button text-3 bg-white"
               text="Suivant"/>
           </div>
           </form>

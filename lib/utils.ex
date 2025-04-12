@@ -1,6 +1,8 @@
 defmodule Utils do
-  @allowed_exts ["jpg", "jpeg", "png", "svg", "gif", "pdf"]
+  @env Application.compile_env(:clab, :env, :prod)
   require Logger
+
+  @allowed_exts ["jpg", "jpeg", "png", "svg", "gif", "pdf"]
 
   def test_file_type(filepath, filename) do
     ext = Utils.get_file_extension(filename)
@@ -8,6 +10,9 @@ defmodule Utils do
 
     is_valid_type =
       case mimetype do
+        nil ->
+          Enum.member?(@allowed_exts, ext)
+
         "image/" <> mime_type_ext ->
           Enum.member?(@allowed_exts, ext) &&
             (mime_type_ext == ext || (ext == "jpg" && mime_type_ext == "jpeg"))
@@ -57,10 +62,15 @@ defmodule Utils do
   end
 
   def contains_string(s1, s2) do
+    formatted_s2 =
+      s2
+      |> String.downcase()
+      |> String.trim()
+
     s1
     |> String.downcase()
     |> String.trim()
-    |> String.contains?(String.trim(String.downcase(s2)))
+    |> String.contains?(formatted_s2)
   end
 
   def equals_string(s1, s2) do
@@ -71,12 +81,27 @@ defmodule Utils do
   end
 
   def get_file_mimetype(filepath) do
-    {res, 0} = System.cmd("file", [filepath, "--mime-type", "-i"])
+    try do
+      case System.cmd("file", ["--mime-type", "-i", filepath]) do
+        {res, 0} ->
+          res
+          |> String.split(" ")
+          |> Enum.at(1)
+          |> String.trim(";")
 
-    res
-    |> String.split(" ")
-    |> Enum.at(1)
-    |> String.trim(";")
+        _ ->
+          # Fallback: use MIME.type/1 or another method as a fallback
+          ext = Path.extname(filepath) |> String.trim_leading(".")
+          MIME.type(ext)
+      end
+    rescue
+      ErlangError -> ## When testing locally on Windows, file cmd does not exists
+        if env() == :dev do
+          nil
+        else
+          throw ErlangError
+        end
+    end
   end
 
   def get_file_extension(path) do
@@ -102,4 +127,6 @@ defmodule Utils do
         Poison.decode!(json)
     end
   end
+
+  def env(), do: @env
 end

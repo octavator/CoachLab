@@ -1,6 +1,8 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import Flash from './flash.js'
 import { NumberInput, TextInput, Button } from './forms/inputs.js'
+
 
 class Profile extends React.Component {
   constructor(props) {
@@ -110,7 +112,7 @@ class Profile extends React.Component {
             
             <div className="input-group">
               <div className="button-group mb-2">
-                <button onClick={this.sendForm} className="cl-button">
+                <button onClick={() => this.sendForm()} className="cl-button">
                   Valider
                 </button>
               </div>
@@ -138,4 +140,5 @@ class Profile extends React.Component {
 }
 
 const domContainer = document.querySelector('.user-profile');
-ReactDOM.render(<Profile/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<Profile />)

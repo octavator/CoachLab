@@ -1,3 +1,4 @@
+import http from "../http.js"
 import Navbar from './navbar.js'
 import Flash from './flash.js'
 import {TextInput, Button} from "./forms/inputs.js"
@@ -43,4 +44,5 @@ class NewPassword extends React.Component {
 }
 
 const domContainer = document.querySelector('.new-password');
-ReactDOM.render(<NewPassword/>, domContainer);
+const root = ReactDOM.createRoot(domContainer)
+root.render(<NewPassword />)
