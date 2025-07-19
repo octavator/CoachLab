@@ -1,185 +1,24 @@
-<!doctype html>
-<html lang="fr">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!DOCTYPE html>
+<head>
+    <title>CoachLab</title>
+    <meta charset="UTF-8">
+    <!-- @TODO: define extensive list of SEO keyword -->
+    <meta name="keywords" content="Coach, Coaching, Coach sportif, Coach de vie, Plateforme de coaching, Visio-conférence, live vidéo">
+    <meta name="description" content="Plateforme complète pour coaching">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Théophile de Cagny">
+   <!-- @TODO: change development for production, by using eex & mix env for example -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
 
-        <!-- Primary Meta Tags -->
-        <title>CoachLab - Le centre de coaching digital</title>
-        <meta name="title" content="CoachLab - Le centre de coaching digital" />
-        <meta
-            name="description"
-            content="Plateforme complète pour coaching professionnel. Coachs certifiés, sessions en ligne, agenda interactif et facturation automatique."
-        />
-        <meta
-            name="keywords"
-            content="Coach, Coaching, Coach sportif, Coach de vie, Plateforme de coaching, Visio-conférence, live vidéo, développement personnel, coaching professionnel"
-        />
-        <meta name="author" content="CoachLab" />
-        <meta name="robots" content="index, follow" />
-        <meta name="language" content="French" />
+    <!-- <script crossorigin src="https://unpkg.com/react@19.1.0/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@19.1.0/umd/react-dom.production.min.js"></script>  -->
 
-        <!-- Open Graph / Facebook -->
-        <meta property="og:type" content="website" />
-        <meta
-            property="og:title"
-            content="CoachLab - Le centre de coaching digital"
-        />
-        <meta
-            property="og:description"
-            content="Plateforme complète pour coaching professionnel. Coachs certifiés, sessions en ligne, agenda interactif et facturation automatique."
-        />
-        <meta property="og:image" content="/priv/static/images/logo.svg" />
-        <meta property="og:url" content="https://coachlab.fr" />
-        <meta property="og:site_name" content="CoachLab" />
-        <meta property="og:locale" content="fr_FR" />
+    <!-- @TODO: change all calls using axios to fetch, then delete dependency -->
+    <script src="https://cdn.jsdelivr.net/npm/axios@0.30.0/dist/axios.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.30.0/axios.min.js" crossorigin></script> -->
 
-        <!-- Twitter -->
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta
-            property="twitter:title"
-            content="CoachLab - Le centre de coaching digital"
-        />
-        <meta
-            property="twitter:description"
-            content="Plateforme complète pour coaching professionnel. Coachs certifiés, sessions en ligne, agenda interactif et facturation automatique."
-        />
-        <meta property="twitter:image" content="/priv/static/images/logo.svg" />
-
-        <!-- Favicon -->
-        <link
-            rel="icon"
-            type="image/svg+xml"
-            href="/priv/static/images/logo.svg"
-        />
-        <link
-            rel="icon"
-            type="image/png"
-            href="/priv/static/images/favicon.png"
-        />
-        <link
-            rel="apple-touch-icon"
-            href="/priv/static/images/apple-touch-icon.png"
-        />
-
-        <!-- Theme Color -->
-        <meta name="theme-color" content="#0ea5e9" />
-        <meta name="msapplication-TileColor" content="#0ea5e9" />
-        <meta
-            name="msapplication-config"
-            content="/priv/static/browserconfig.xml"
-        />
-
-        <!-- PWA -->
-        <link rel="manifest" href="/priv/static/manifest.json" />
-        <meta name="application-name" content="CoachLab" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="CoachLab" />
-        <meta name="mobile-web-app-capable" content="yes" />
-
-        <!-- Performance & Security -->
-        <meta name="referrer" content="origin-when-cross-origin" />
-        <meta
-            http-equiv="Content-Security-Policy"
-            content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data:; img-src 'self' data: https:; font-src 'self' https:;"
-        />
-        <meta name="format-detection" content="telephone=no" />
-
-        <!-- Preload Critical Resources -->
-        <link rel="preload" href="/priv/static/design-system.css" as="style" />
-        <link rel="preload" href="/priv/static/custom.css" as="style" />
-        <link rel="preload" href="/priv/static/animations.css" as="style" />
-
-        <!-- CSS Files -->
-        <link rel="stylesheet" href="/priv/static/design-system.css" />
-        <link rel="stylesheet" href="/priv/static/custom.css" />
-        <link rel="stylesheet" href="/priv/static/animations.css" />
-
-        <!-- React Scripts -->
-        <!-- @TODO: change development for production, by using eex & mix env for example -->
-        <script
-            src="https://unpkg.com/react@18/umd/react.development.js"
-            crossorigin
-        ></script>
-        <script
-            src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-            crossorigin
-        ></script>
-
-        <!-- External Dependencies -->
-        <!-- @TODO: change all calls using axios to fetch, then delete dependency -->
-        <script src="https://cdn.jsdelivr.net/npm/axios@0.30.0/dist/axios.min.js"></script>
-        <script src="https://use.fontawesome.com/d9323d863e.js"></script>
-
-        <!-- Structured Data -->
-        <script type="application/ld+json">
-            {
-                "@context": "https://schema.org",
-                "@type": "Organization",
-                "name": "CoachLab",
-                "description": "Plateforme complète pour coaching professionnel",
-                "url": "https://coachlab.fr",
-                "logo": "https://coachlab.fr/priv/static/images/logo.svg",
-                "contactPoint": {
-                    "@type": "ContactPoint",
-                    "contactType": "customer service",
-                    "availableLanguage": "French"
-                },
-                "sameAs": []
-            }
-        </script>
-
-        <!-- Google Analytics / Tag Manager (if needed) -->
-        <!-- @TODO: Add tracking scripts if needed -->
-
-        <!-- Accessibility -->
-        <style>
-            /* Ensure content is accessible during CSS load */
-            .sr-only {
-                position: absolute;
-                width: 1px;
-                height: 1px;
-                padding: 0;
-                margin: -1px;
-                overflow: hidden;
-                clip: rect(0, 0, 0, 0);
-                white-space: nowrap;
-                border: 0;
-            }
-
-            /* Reduce motion for users who prefer it */
-            @media (prefers-reduced-motion: reduce) {
-                *,
-                *::before,
-                *::after {
-                    animation-duration: 0.01ms !important;
-                    animation-iteration-count: 1 !important;
-                    transition-duration: 0.01ms !important;
-                    scroll-behavior: auto !important;
-                }
-            }
-
-            /* Loading state */
-            .loading {
-                opacity: 0;
-                transition: opacity 0.3s ease;
-            }
-
-            .loaded {
-                opacity: 1;
-            }
-        </style>
-    </head>
-    <body class="loading">
-        <a id="top"></a>
-        <script>
-            // Add loaded class when page is ready
-            window.addEventListener("load", function () {
-                document.body.classList.remove("loading");
-                document.body.classList.add("loaded");
-            });
-        </script>
-    </body>
-</html>
+    <script src="https://use.fontawesome.com/d9323d863e.js"></script>
+</head>
+<body>
+    <a id="top"></a>
