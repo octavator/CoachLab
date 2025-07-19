@@ -1,22 +1,22 @@
 - Redirection sur page Connexion si 403, puis au sign in rediriger sur la page qu'il voulait voir en premier lieu
 
-- Injecter les secrets, API keys etc. autrement que via config.exs pour pouvoir push sur GIT
+- Injecter les secrets, API keys etc. autrement que via config.exs pour pouvoir push sur GIT => Delete de ses clés, changement de tous les MDP + désactivation des comptes Twilio & Stripe par sécurité car l'info reste trouvable dans les commits :/
 
-- Repasser sur tous les @TODO
+- Repasser sur tous les @TODO dans le code voir s'ils sont pertinents
 
 - Passer sur une BDD plutôt que les tables ets
 
-- sécuriser la confirmation de paiement avec un secret dans le redirect URI (un secret par paiement pour être tranquille)
+- sécuriser la confirmation de paiement avec un secret dans le redirect URI (un secret par paiement pour être au top)
 
 - Permettre l'annulation d'une résa par un coach (après que des gens aient payé, empecher le paiement pour les suivants etc.)
-=> contournement: prévenir ses coachés par mail de l'annulation, en replanifier manuellemeent une avec eux dont le prix sera à 0
+=> contournement: prévenir ses coachés par mail de l'annulation, en replanifier manuellemeent une avec eux dont le prix sera à 0 mais laborieux & moins safe
 
 - Gérer l'affichage des RDVs en fonction de leur durée sur l'agenda (par ex. garder 1 seul RDV par heure et gérer l'affichage via CSS)
-=> En tout cas, agenda buggé pour l'instant, on eput prendre un créneau d'une heure 30 sur 
+=> En tout cas, agenda buggé pour l'instant, on eput prendre un créneau d'une heure 30 sur une dispo d'une heure seulement
 
-- Permettre aux coachs de définir une liste de prestations, durée + prix
+- Permettre aux coachs de définir une liste de prestations, durée + prix plutôt qu'un seul prix fixe
 
-- delayed Sup => galère ? :o faudra tester en tt cas
+- Switch sur delayed Supervision pour l'arbre principal de supervision Elixir pour robustifier l'app à toute sorte de crash répétitifs
 
 - Twilio pricing a changé, le SDK aussi du coup => TOUTE REU EST PAYANTE PAR PARTICIPANT, mais plus de fonctionnalités OotB
 
@@ -36,10 +36,8 @@
 
 # Augmentation avec l'IA
 
-- IA Modération profils (avatars NSFW/hate, description, profils only fans like etc.)
+- IA Modération profils (avatars NSFW/hate, description, profils only-fans-like etc.)
 
-- Au moment où on envoie un mail d'inscription aujd, on pourrait aussi si le user est un coaché et qu'il a renseigné une recherche pour un coach, on peut appeler un agent IA pour matcher ses critères avec un ou plusieurs coachs de notre BDD 
+- Au moment où on envoie un mail d'inscription, si le user est un coaché et qu'il a renseigné une recherche pour un coach, on peut appeler un agent IA pour matcher ses critères avec un ou plusieurs coachs existants de notre BDD
 
 - Améliorations de l'audio/vidéo en post-processing (si pas trop couteux en temps ou en computing ?)
-
-- 

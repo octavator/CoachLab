@@ -1,11 +1,9 @@
 # Documentation !! Yaay let's have some fun
 
-
-
-## Routing 
+## Routing
 
 Routers are called in order specified in the main router, Clab.Router until one of the called router specifies a response through the connection object with send_resp/3
-Specified order should be: 
+Specified order should be:
 1. Clab.PublicRouter
     Savantly named since it contains all public routes, such as home, login, signup pages and assets (probably shoudln't give open access to ALL assets btw.. @TODO !! :p)
 
