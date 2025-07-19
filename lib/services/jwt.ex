@@ -1,6 +1,7 @@
 defmodule Jwt do
   use Joken.Config
   @app_config Application.compile_env(:clab, :twilio, %{})
+  @secret Application.compile_env!(:clab, :twilio)[:secret]
 
   @impl true
   def token_config do
@@ -23,7 +24,7 @@ defmodule Jwt do
         opts,
         Joken.Signer.create(
           "HS256",
-          Application.fetch_env!(:clab, :twilio)[:secret],
+          @secret,
           %{
             "typ" => "JWT",
             "alg" => "HS256",

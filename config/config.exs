@@ -3,6 +3,7 @@ import Config
 config :clab,
   env: :dev,
   url: "http://localhost:80",
+  port: 8001,
   test_key: "test value",
   mailer: %{
     region: "smtp_adress",

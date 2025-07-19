@@ -1,32 +1,24 @@
 # Clab
 
-## Server
+## Versions management
+Proper versions for Elixir & Erlang are specified in the .tool-versions file.
 
-Server runs on port 8080 in http in local dev and in https on port 443 in deployed environment (preprod and production)
-Environment is defined in config file
+Recommended usage & installation through asdf (https://asdf-vm.com/)
 
-## Installation
+## Deployment in production
+Assuming you already have installed versions for elixir & react specified in the .tool-versions file, and node & npm are installed with a sufficiently modern version.
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `clab` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:clab, "~> 0.1.0"}
-  ]
-end
 ```
+mix deps.get
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/clab](https://hexdocs.pm/clab).
+npm install
 
-## Webpack
+npm run build
 
-to compile changes to js & html
-```npm run build```
+mix release --overwrite
 
+_build/dev/rel/clab/bin/clab start
+```
 # renew certificates
 
 ```certbot renew``` génère un fichier privkey.pem et fullchain.pem dont le contenu est à copier dans les fichiers privkey.pem et certificate.pem à la racine du repo quand on docker build

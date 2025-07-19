@@ -2,6 +2,7 @@ defmodule Clab.Mailer do
   @sender_name "CoachLab"
   #@TODO: get real smtp & sender, not my own infos
   @sender_mail "theodecagny@hotmail.fr"
+  @base_url Application.compile_env!(:clab, :url)
 
   defp smtp_config(key), do: Application.fetch_env!(:clab, :mailer)[key]
 
@@ -107,7 +108,7 @@ defmodule Clab.Mailer do
       content =
         EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/forgotten-password.html.eex",
           hash: hash,
-          base_url: Application.fetch_env!(:clab, :url)
+          base_url: @base_url
         )
 
       Clab.Mailer.send_mail([mail], "Ré-initialisez votre mot de passe CoachLab", content)
@@ -119,7 +120,7 @@ defmodule Clab.Mailer do
     coach = User.get_user_by_id(resa[:coach_id])
     user = User.get_user_by_id(user_id)
     content = EEx.eval_file("#{:code.priv_dir(:clab)}/static/emails/invoice.html.eex",
-     user: user, coach: coach, resa: resa, base_url: Application.fetch_env!(:clab, :url))
+     user: user, coach: coach, resa: resa, base_url: @base_url)
     # Legally we should send PDF, and save PDF for several years...
     Task.start(fn ->
       Clab.Mailer.send_mail(

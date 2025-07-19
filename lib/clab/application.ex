@@ -1,10 +1,12 @@
 defmodule Clab.Application do
   @moduledoc false
+  @port Application.compile_env!(:clab, :port)
+  @env Application.compile_env!(:clab, :env)
 
   use Application
 
   def start(_type, _args) do
-    cowboy_children = case Application.fetch_env!(:clab, :env) do
+    cowboy_children = case @env do
       # env when env in [:prod, :preprod] ->
       #   [{
       #     Plug.Cowboy, scheme: :https, plug: Clab.Router, options: [
@@ -18,7 +20,7 @@ defmodule Clab.Application do
       #   ]
 
       _ ->
-        [{Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: 80]}]
+        [{Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: @port]}]
     end
 
     children = cowboy_children ++ [
