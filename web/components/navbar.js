@@ -16,7 +16,7 @@ class Navbar extends React.Component {
     return (
       <div className={`navbar-wrapper ${this.props.blue_bg ? "blue-bg" : ""}`}>
         <div className="navbar-logo-section">
-          <a href="/" className="logo-wrapper">
+          <a href="/coachlab/" className="logo-wrapper">
             <img src={`priv/static/images/${this.props.blue_bg ? "logo_blanc.svg" : "logo.svg"}`}/>
           </a>
         </div>
@@ -28,11 +28,11 @@ class Navbar extends React.Component {
             <div className={"menu-item text-3"}>
               {
                this.props.user.role == "coach" 
-               ? <a href="/agenda">Mon Agenda</a> 
-               : <a href="/mes_sessions">Mes Sessions</a>
+               ? <a href="/coachlab/agenda">Mon Agenda</a> 
+               : <a href="/coachlab/mes_sessions">Mes Sessions</a>
               }
             </div>
-            <div className={"menu-item text-3"}><a href="/mes_coaches">{ this.props.user.role == "coach" ? "Mes coachés" : "Mes coachs"}</a></div>
+            <div className={"menu-item text-3"}><a href="/coachlab/mes_coaches">{ this.props.user.role == "coach" ? "Mes coachés" : "Mes coachs"}</a></div>
             <div className="menu-item user-dropdown text-3"
              onMouseOver={() => {this.setState({show_dropdown: true})}}
              onMouseOut={() => { this.setState({show_dropdown: false})}}

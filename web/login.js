@@ -64,11 +64,11 @@ class Login extends React.Component {
           <Button text="Suivant"
             extraClass="text-3 mt-1 white-bg" onClick={() => this.sendForm()} />
 
-          <a className="sign-up-section text-2-5" href="/inscription">
+          <a className="sign-up-section text-2-5" href="/coachlab/inscription">
             <b>Je n'ai pas encore de compte</b>
           </a>
 
-          <a className="sign-up-section text-3" href="/nouveau-mot-de-passe">
+          <a className="sign-up-section text-3" href="/coachlab/nouveau-mot-de-passe">
             <b>J'ai oublié mon mot de passe !</b>
           </a>
 
