@@ -36,7 +36,7 @@ class Landing extends React.Component {
   }
   componentDidMount() {
     http.get("/api/me").then(res => {
-      if (res.status == 200) return window.location.href = "/bienvenue"
+      if (res.status == 200) return window.location.href = "/coachlab/bienvenue"
     }).catch(e => { return })
 
     this.handleNavbar()
@@ -46,7 +46,7 @@ class Landing extends React.Component {
       <div className="landing-wrapper">
         <div className="landing-first-page-wrapper">
           <div className="landing-first-page-buttons">
-            <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => window.location.href = "/inscription" }>
+            <div className="cl-button bg-white text-3 landing-page-desktop-signup-button" onClick={() => window.location.href = "/coachlab/inscription" }>
               Je m'inscris
             </div>
           </div>
@@ -55,7 +55,7 @@ class Landing extends React.Component {
           </div>
           <h2 className="landing-page-title">Le centre de coaching digital</h2>
           <div className="landing-first-page-buttons">
-            <div className="cl-button bg-white text-3 landing-page-mobile-signup-button mr-1" onClick={() => window.location.href = "/inscription" }>
+            <div className="cl-button bg-white text-3 landing-page-mobile-signup-button mr-1" onClick={() => window.location.href = "/coachlab/inscription" }>
               Je m'inscris
             </div>
           </div>
@@ -73,7 +73,7 @@ class Landing extends React.Component {
             <img className="landing-inline-logo" src="priv/static/images/logo.svg"/>
           </div>
           <div className="flex">
-            <div className="cl-button text-3 landing-intermediary-connection-button" onClick={() => window.location.href = "/inscription" }>
+            <div className="cl-button text-3 landing-intermediary-connection-button" onClick={() => window.location.href = "/coachlab/inscription" }>
               Je m'inscris
             </div>
           </div>
@@ -88,7 +88,7 @@ class Landing extends React.Component {
           <div className="landing-inscription-card-text text-2">
             Rejoignez la plateforme CoachLab,<br/> le premier centre de coaching digital
           </div>
-          <div className="cl-button text-3 landing-inscription-card-button" onClick={() => window.location.href = "/inscription" }>
+          <div className="cl-button text-3 landing-inscription-card-button" onClick={() => window.location.href = "/coachlab/inscription" }>
             Je m'inscris
           </div>
         </div>
@@ -128,7 +128,7 @@ class Landing extends React.Component {
             <div className="landing-inscription-card-text text-2">
               Soyez parmi les premiers coachs inscrits pour profiter de nombreux avantages !
             </div>
-            <div className="cl-button landing-inscription-card-button text-3 blue-bg" onClick={() => window.location.href = "/inscription" }>
+            <div className="cl-button landing-inscription-card-button text-3 blue-bg" onClick={() => window.location.href = "/coachlab/inscription" }>
               Je m'inscris
             </div>
           </div>

@@ -20,7 +20,7 @@ class PaymentSuccess extends React.Component {
     }
   }
   componentDidMount() {
-    window.location.href = "/mes_sessions"
+    window.location.href = "/coachlab/mes_sessions"
 
     //Unused for now
     const urlParams = new URLSearchParams(document.location.search)

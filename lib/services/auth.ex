@@ -1,7 +1,7 @@
-#@TODO: if we could make this work :pray:
 defmodule Clab.AuthPlug do
   import Plug.Conn
 
+  #TODO: use secret from file on server
   @secret "ex6NgPSw1MAcMolW0R1czwDC"
 
   def init(options), do: options

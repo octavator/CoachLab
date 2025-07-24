@@ -28,7 +28,7 @@ class ForgottenPassword extends React.Component {
       token: token
     })
     .then(res => {
-      if (res.status == 200) window.location.href = "/connexion"
+      if (res.status == 200) window.location.href = "/coachlab/connexion"
       else this.showFlashMessage("error", "Une erreur inattendue est survenue") 
     })
     .catch(err => {

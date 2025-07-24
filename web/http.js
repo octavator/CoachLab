@@ -1,5 +1,5 @@
 const http = axios.create({
-    baseURL: window.location.origin,
+    baseURL: `${window.location.origin}/coachlab`,
     timeout: 5000,
   })
 

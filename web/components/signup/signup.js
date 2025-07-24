@@ -27,7 +27,7 @@ class SignUp extends React.Component {
     sendForm() {
       http.post("/sign-up", this.state.form)
       .then(res => {
-        if (res.status == 200) return window.location.href = "/bienvenue"
+        if (res.status == 200) return window.location.href = "/coachlab/bienvenue"
         this.showFlashMessage("error", "Une erreur inattendue est survenue.") 
       })
       .catch(err =>

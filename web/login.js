@@ -19,13 +19,13 @@ class Login extends React.Component {
   }
   componentDidMount() {
     http.get("/api/me").then(res => {
-      if (res.status == 200) return window.location.href = "/bienvenue"
+      if (res.status == 200) return window.location.href = "/coachlab/bienvenue"
     })
   }
   sendForm() {
     http.post("/sign-in", this.state.form)
     .then(res => {
-      if (res.status == 200) return window.location.href = "/bienvenue"
+      if (res.status == 200) return window.location.href = "/coachlab/bienvenue"
       this.showFlashMessage("error", "Une erreur est survenue. Vérifiez vos identifiants.")
     })
     .catch(err => {

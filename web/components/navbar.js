@@ -9,7 +9,7 @@ class Navbar extends React.Component {
   }
   disconnect() {
     http.get("/logout").then(res => {
-      window.location.href = "/connexion"
+      window.location.href = "/coachlab/connexion"
     })
   }
   render() {
@@ -42,7 +42,7 @@ class Navbar extends React.Component {
                className={`menu-dropdown-list ${this.state.show_dropdown ? "" : "hidden"}`}
                onMouseOver={() => this.setState({show_dropdown: true})}
                onMouseOut={() => this.setState({show_dropdown: false})} >
-                <div className="menu-dropdown-list-item text-3" onClick={() => window.location.href = "/profil" }>
+                <div className="menu-dropdown-list-item text-3" onClick={() => window.location.href = "/coachlab/profil" }>
                   Mes informations
                 </div>
                 <div className="menu-dropdown-list-item text-3" onClick={() => this.disconnect()}>
