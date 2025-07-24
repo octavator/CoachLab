@@ -7,17 +7,17 @@ defmodule Clab.Application do
 
   def start(_type, _args) do
     cowboy_children = case @env do
-      # env when env in [:prod, :preprod] ->
-      #   [{
-      #     Plug.Cowboy, scheme: :https, plug: Clab.Router, options: [
-      #       port: 443,
-      #       otp_app: :clab,
-      #       keyfile: "./privkey.pem",
-      #       certfile: "./certificate.pem"
-      #     ]
-      #   },
-      #   {Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: 8080]}
-      #   ]
+      env when env in [:prod] ->
+        [{
+          Plug.Cowboy, scheme: :https, plug: Clab.Router, options: [
+            port: @port,
+            otp_app: :clab,
+            keyfile: "/etc/letsencrypt/live/theophile-decagny.fr/privkey.pem",
+            certfile: "/etc/letsencrypt/live/theophile-decagny.fr/fullchain.pem"
+          ]
+        },
+        {Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: @port]}
+        ]
 
       _ ->
         [{Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: @port]}]

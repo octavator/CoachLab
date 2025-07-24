@@ -3,7 +3,7 @@ import Config
 config :clab,
   env: :prod,
   test_key: "production value",
-  url: "http://localhost:80",
+  url: "https://theophile-decagny.fr/coachlab",
   stripe: %{
     url: "https://api.stripe.com/v1/",
     test_sid: "make_your_own;)",
