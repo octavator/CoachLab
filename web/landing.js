@@ -62,9 +62,9 @@ class Landing extends React.Component {
         </div>
         <div className="landing-intermediary-gradiant-wrapper"/>
         <div className="landing-gradient-wrapper text-1">
-          <div className="landing-desktop-pictures-container">
+          {/* <div className="landing-desktop-pictures-container">
             <img className="landing-picture-desktop" src="priv/static/images/mickey_2.png"/>
-          </div>
+          </div> */}
           <div className="landing-picture-text-container">Se trouver.<br/>Ici et maintenant.</div>
         </div>
         {/* 2ND NAVBAR */}
