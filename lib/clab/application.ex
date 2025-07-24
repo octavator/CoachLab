@@ -10,14 +10,12 @@ defmodule Clab.Application do
       env when env in [:prod] ->
         [{
           Plug.Cowboy, scheme: :https, plug: Clab.Router, options: [
-            port: @port,
+            port: 8001,
             otp_app: :clab,
             keyfile: "/etc/letsencrypt/live/theophile-decagny.fr/privkey.pem",
             certfile: "/etc/letsencrypt/live/theophile-decagny.fr/fullchain.pem"
           ]
-        },
-        {Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: @port]}
-        ]
+        }]
 
       _ ->
         [{Plug.Cowboy, scheme: :http, plug: Clab.Router, options: [port: @port]}]
